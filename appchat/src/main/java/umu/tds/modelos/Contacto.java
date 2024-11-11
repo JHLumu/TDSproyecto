@@ -1,0 +1,52 @@
+package umu.tds.modelos;
+
+import java.net.URL;
+
+public class Contacto {
+
+	//Atributos de la clase
+		private String nombre;
+		private String telefono;
+		private URL imagen;
+	
+	//Constructor de la clase
+		public Contacto(String nombre, String telefono) {
+			this.nombre = nombre;
+			this.telefono = telefono;
+		}
+		
+		public Contacto(String nombre, String telefono, URL imagen) {
+			this(nombre,telefono);
+			this.imagen = imagen;
+		}
+			
+
+	//Metodos getter y setter
+		
+		public String getNombre() {
+			return nombre;
+		}
+
+		public String getTelefono() {
+			return telefono;
+		}
+
+
+		public URL getImagen() {
+			return imagen;
+		}
+
+		public void setImagen(URL imagen) {
+			this.imagen = imagen;
+		}
+		
+		
+		
+	
+	
+	
+	
+	
+	
+	
+}

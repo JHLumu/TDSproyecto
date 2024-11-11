@@ -36,7 +36,7 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje>
 
 		// Load the image from a random URL (for example, using "https://robohash.org")
 		try {
-			URL imageUrl = new URL("https://robohash.org/" + mensaje.getUsuario() + "?size=50x50");
+			URL imageUrl = new URL("https://robohash.org/" + mensaje.getReceptor() + "?size=50x50");
 			Image image = ImageIO.read(imageUrl);
 			ImageIcon imageIcon = new ImageIcon(image.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
 			imageLabel.setIcon(imageIcon);
