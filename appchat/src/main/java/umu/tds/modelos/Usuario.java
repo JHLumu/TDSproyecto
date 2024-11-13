@@ -2,6 +2,7 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.HashSet;
 
 public class Usuario {
 
@@ -24,6 +25,14 @@ public class Usuario {
 		private boolean esPremium = false;
 		
 		
+	//El siguiente atributo es una coleccion que representa una lista de Contactos
+	//Se utiliza como colección un conjunto para así, evitar contactos repetidos 
+		private final HashSet<Contacto> listaContactos; 
+		
+	//El siguiente atributo es una coleccion que representa una lista de Grupos
+	//Se utiliza como colección un conjunto para así, evitar grupos repetidos 	
+		private final HashSet<Grupo> listaGrupos; 
+		
 	//Constructores de la clase
 		
 		/**
@@ -39,6 +48,8 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password) {
+			this.listaContactos = new HashSet<Contacto>();
+			this.listaGrupos = new HashSet<Grupo>();
 			this.nombre = nombre;
 			this.telefono = telefono;
 			this.apellidos = apellidos;
@@ -111,7 +122,31 @@ public class Usuario {
 		}
 		
 
+	//Funcionalidades
 		
+		public boolean crearContacto(String nombre, String telefono, URL imagen) {
+			//Ya se tiene que haber verificado que el telefono se encuentra registrado en el sistema
+			return (this.listaContactos.add(new Contacto(nombre,telefono,imagen)));
+		}
+		
+		public boolean crearGrupo(String nombre, URL imagen) {
+			return (this.listaGrupos.add(new Grupo(nombre, imagen)));
+		}
+		
+		public boolean crearGrupo(String nombre) {
+			return (this.listaGrupos.add(new Grupo(nombre)));
+		}
+		
+		public boolean introducirMiembroaGrupo(Contacto c, Grupo g) {
+			return (g.nuevoMiembro(c));
+		}
+		
+	/*
+		public void cambiarImagen(URL imagen) {
+			this.imagenPerfil = imagen;
+		}
+		
+	*/
 	
-	
+		
 }

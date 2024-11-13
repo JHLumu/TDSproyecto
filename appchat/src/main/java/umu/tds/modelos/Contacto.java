@@ -1,6 +1,7 @@
 package umu.tds.modelos;
 
 import java.net.URL;
+import java.util.Objects;
 
 public class Contacto {
 
@@ -42,7 +43,22 @@ public class Contacto {
 		
 		
 		
-	
+	//Redeficiones de metodos
+		@Override
+		public boolean equals(Object o) {
+			if (o == null) return false;
+			else if (this == o) return true;
+			else if (this.getClass() != o.getClass()) return false;
+			
+			Contacto objeto = (Contacto) o;
+			return (this.telefono == objeto.telefono);
+			
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(telefono);
+		}
 	
 	
 	
