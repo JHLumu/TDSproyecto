@@ -5,19 +5,18 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Toolkit;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import javax.swing.JButton;
 
-public class LoginFallido extends JFrame {
+public class RegistroFallido extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -29,7 +28,7 @@ public class LoginFallido extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					LoginFallido frame = new LoginFallido();
+					RegistroFallido frame = new RegistroFallido();
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
@@ -42,37 +41,33 @@ public class LoginFallido extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public LoginFallido() {
+	public RegistroFallido() {
 		setResizable(false);
-		setMinimumSize(new Dimension(450, 200));
+		setMaximumSize(new Dimension(510, 200));
+		setMinimumSize(new Dimension(510, 200));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 197);
-		
+		setBounds(100, 100, 507, 200);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 		setForeground(new Color(0, 0, 0));
 		setTitle("AppChat");
 		
-		contentPane = new JPanel();
-		contentPane.setMinimumSize(new Dimension(243, 13));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+		
 		setContentPane(contentPane);
-		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
+		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panelCentro = new JPanel();
-		panelCentro.setMinimumSize(new Dimension(243, 13));
-		contentPane.add(panelCentro);
-		panelCentro.setLayout(new BorderLayout(0, 0));
+		JLabel lblRegistroFallido = new JLabel("Registro fallido: No se han inicializado correctamente los campos");
+		lblRegistroFallido.setFont(new Font("Dialog", Font.BOLD, 15));
+		lblRegistroFallido.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRegistroFallido.setHorizontalAlignment(SwingConstants.CENTER);
+		contentPane.add(lblRegistroFallido, BorderLayout.CENTER);
 		
-		JLabel loginIncorrecto = new JLabel("Login fallido: Teléfono y/o contraseña son incorrectos");
-		loginIncorrecto.setFont(new Font("Dialog", Font.BOLD, 15));
-		loginIncorrecto.setHorizontalAlignment(SwingConstants.CENTER);
-		panelCentro.add(loginIncorrecto);
-		
-		JPanel panelBotones = new JPanel();
-		panelCentro.add(panelBotones, BorderLayout.SOUTH);
-		panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JPanel panelBoton = new JPanel();
+		contentPane.add(panelBoton, BorderLayout.SOUTH);
+		panelBoton.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton botonAceptar = new JButton("Aceptar");
 		botonAceptar.setForeground(new Color(255, 255, 255));
@@ -81,7 +76,8 @@ public class LoginFallido extends JFrame {
 		botonAceptar.addActionListener(evento -> {
 			this.dispose();	
 		});
-		panelBotones.add(botonAceptar);
+		panelBoton.add(botonAceptar);
+		
 	}
 
 }

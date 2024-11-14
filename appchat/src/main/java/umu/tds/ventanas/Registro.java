@@ -1,7 +1,10 @@
 package umu.tds.ventanas;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -9,9 +12,17 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.time.ZoneId;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import com.toedter.calendar.JDateChooser;
+
+import umu.tds.appchat.AppChat;
+
 import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,12 +34,12 @@ import javax.swing.ImageIcon;
 public class Registro extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
+	private JTextField nombreField;
+	private JTextField apellidosField;
+	private JTextField telefonoField;
 	private JPasswordField passwordField;
 	private JPasswordField passwordField_1;
-	private JTextField textField_3;
+	private JTextField imagenField;
 
 	/**
 	 * Launch the application.
@@ -57,6 +68,11 @@ public class Registro extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
+		
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
+		setForeground(new Color(0, 0, 0));
+		setTitle("AppChat");
+		
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{20, 20, 136, 0, 0, 20, 0};
 		gbl_contentPane.rowHeights = new int[]{20, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0};
@@ -65,6 +81,7 @@ public class Registro extends JFrame {
 		contentPane.setLayout(gbl_contentPane);
 		
 		JLabel lblNombre = new JLabel("Nombre:");
+		lblNombre.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblNombre = new GridBagConstraints();
 		gbc_lblNombre.anchor = GridBagConstraints.EAST;
 		gbc_lblNombre.insets = new Insets(0, 0, 5, 5);
@@ -72,17 +89,19 @@ public class Registro extends JFrame {
 		gbc_lblNombre.gridy = 1;
 		contentPane.add(lblNombre, gbc_lblNombre);
 		
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.gridwidth = 3;
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 1;
-		contentPane.add(textField, gbc_textField);
-		textField.setColumns(10);
+		nombreField = new JTextField();
+		GridBagConstraints gbc_nombreField = new GridBagConstraints();
+		gbc_nombreField.gridwidth = 3;
+		gbc_nombreField.insets = new Insets(0, 0, 5, 5);
+		gbc_nombreField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_nombreField.gridx = 2;
+		gbc_nombreField.gridy = 1;
+		contentPane.add(nombreField, gbc_nombreField);
+		nombreField.setColumns(10);
 		
+	
 		JLabel lblApellidos = new JLabel("Apellidos:");
+		lblApellidos.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblApellidos = new GridBagConstraints();
 		gbc_lblApellidos.anchor = GridBagConstraints.EAST;
 		gbc_lblApellidos.insets = new Insets(0, 0, 5, 5);
@@ -90,17 +109,18 @@ public class Registro extends JFrame {
 		gbc_lblApellidos.gridy = 2;
 		contentPane.add(lblApellidos, gbc_lblApellidos);
 		
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.gridwidth = 3;
-		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_1.gridx = 2;
-		gbc_textField_1.gridy = 2;
-		contentPane.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
+		apellidosField = new JTextField();
+		GridBagConstraints gbc_apellidosField = new GridBagConstraints();
+		gbc_apellidosField.gridwidth = 3;
+		gbc_apellidosField.insets = new Insets(0, 0, 5, 5);
+		gbc_apellidosField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_apellidosField.gridx = 2;
+		gbc_apellidosField.gridy = 2;
+		contentPane.add(apellidosField, gbc_apellidosField);
+		apellidosField.setColumns(10);
 		
 		JLabel lblTelfono = new JLabel("Tel\u00E9fono:");
+		lblTelfono.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblTelfono = new GridBagConstraints();
 		gbc_lblTelfono.anchor = GridBagConstraints.EAST;
 		gbc_lblTelfono.insets = new Insets(0, 0, 5, 5);
@@ -108,16 +128,17 @@ public class Registro extends JFrame {
 		gbc_lblTelfono.gridy = 3;
 		contentPane.add(lblTelfono, gbc_lblTelfono);
 		
-		textField_2 = new JTextField();
-		GridBagConstraints gbc_textField_2 = new GridBagConstraints();
-		gbc_textField_2.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_2.gridx = 2;
-		gbc_textField_2.gridy = 3;
-		contentPane.add(textField_2, gbc_textField_2);
-		textField_2.setColumns(10);
+		telefonoField = new JTextField();
+		GridBagConstraints gbc_telefonoField = new GridBagConstraints();
+		gbc_telefonoField.insets = new Insets(0, 0, 5, 5);
+		gbc_telefonoField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_telefonoField.gridx = 2;
+		gbc_telefonoField.gridy = 3;
+		contentPane.add(telefonoField, gbc_telefonoField);
+		telefonoField.setColumns(10);
 		
 		JLabel lblContrasea = new JLabel("Contrase\u00F1a:");
+		lblContrasea.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblContrasea = new GridBagConstraints();
 		gbc_lblContrasea.anchor = GridBagConstraints.EAST;
 		gbc_lblContrasea.insets = new Insets(0, 0, 5, 5);
@@ -134,6 +155,7 @@ public class Registro extends JFrame {
 		contentPane.add(passwordField, gbc_passwordField);
 		
 		JLabel lblContrasea_1 = new JLabel("Conf. contrase\u00F1a:");
+		lblContrasea_1.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblContrasea_1 = new GridBagConstraints();
 		gbc_lblContrasea_1.anchor = GridBagConstraints.EAST;
 		gbc_lblContrasea_1.insets = new Insets(0, 0, 5, 5);
@@ -150,6 +172,7 @@ public class Registro extends JFrame {
 		contentPane.add(passwordField_1, gbc_passwordField_1);
 		
 		JLabel lblFecha = new JLabel("Fecha:");
+		lblFecha.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblFecha = new GridBagConstraints();
 		gbc_lblFecha.anchor = GridBagConstraints.EAST;
 		gbc_lblFecha.insets = new Insets(0, 0, 5, 5);
@@ -157,15 +180,16 @@ public class Registro extends JFrame {
 		gbc_lblFecha.gridy = 5;
 		contentPane.add(lblFecha, gbc_lblFecha);
 		
-		JDateChooser dateChooser = new JDateChooser();
-		GridBagConstraints gbc_dateChooser = new GridBagConstraints();
-		gbc_dateChooser.insets = new Insets(0, 0, 5, 5);
-		gbc_dateChooser.fill = GridBagConstraints.BOTH;
-		gbc_dateChooser.gridx = 2;
-		gbc_dateChooser.gridy = 5;
-		contentPane.add(dateChooser, gbc_dateChooser);
+		JDateChooser fecha = new JDateChooser();
+		GridBagConstraints gbc_fecha = new GridBagConstraints();
+		gbc_fecha.insets = new Insets(0, 0, 5, 5);
+		gbc_fecha.fill = GridBagConstraints.BOTH;
+		gbc_fecha.gridx = 2;
+		gbc_fecha.gridy = 5;
+		contentPane.add(fecha, gbc_fecha);
 		
 		JLabel lblSaludo = new JLabel("Saludo:");
+		lblSaludo.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblSaludo = new GridBagConstraints();
 		gbc_lblSaludo.anchor = GridBagConstraints.EAST;
 		gbc_lblSaludo.insets = new Insets(0, 0, 5, 5);
@@ -186,6 +210,7 @@ public class Registro extends JFrame {
 		scrollPane.setViewportView(textArea);
 		
 		JLabel lblImagen = new JLabel("Imagen:");
+		lblImagen.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
 		GridBagConstraints gbc_lblImagen = new GridBagConstraints();
 		gbc_lblImagen.anchor = GridBagConstraints.EAST;
 		gbc_lblImagen.insets = new Insets(0, 0, 5, 5);
@@ -193,14 +218,14 @@ public class Registro extends JFrame {
 		gbc_lblImagen.gridy = 6;
 		contentPane.add(lblImagen, gbc_lblImagen);
 		
-		textField_3 = new JTextField();
-		GridBagConstraints gbc_textField_3 = new GridBagConstraints();
-		gbc_textField_3.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_3.gridx = 4;
-		gbc_textField_3.gridy = 6;
-		contentPane.add(textField_3, gbc_textField_3);
-		textField_3.setColumns(10);
+		imagenField = new JTextField();
+		GridBagConstraints gbc_imagenField = new GridBagConstraints();
+		gbc_imagenField.insets = new Insets(0, 0, 5, 5);
+		gbc_imagenField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_imagenField.gridx = 4;
+		gbc_imagenField.gridy = 6;
+		contentPane.add(imagenField, gbc_imagenField);
+		imagenField.setColumns(10);
 		
 		JLabel lblImagen_1 = new JLabel("");
 		lblImagen_1.setIcon(new ImageIcon(Registro.class.getResource("/resources/usuario_64.png")));
@@ -220,12 +245,39 @@ public class Registro extends JFrame {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		
 		JButton botonCancelar = new JButton("Cancelar");
+		botonCancelar.setForeground(new Color(255, 255, 255));
+		botonCancelar.setBackground(new Color(81, 116, 255));
+		botonCancelar.setFont(new Font("Gill Sans MT", Font.BOLD, 12));
+		botonCancelar.addActionListener(evento -> {
+			this.dispose();
+		});
 		panel.add(botonCancelar);
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panel.add(horizontalGlue);
 		
 		JButton botonAceptar = new JButton("Aceptar");
+		botonAceptar.setForeground(new Color(255, 255, 255));
+		botonAceptar.setBackground(new Color(81, 116, 255));
+		botonAceptar.setFont(new Font("Gill Sans MT", Font.BOLD, 12));
+		botonAceptar.addActionListener(evento -> {
+			
+			if ((fecha.getDate() != null) && AppChat.registrarUsuario(nombreField.getText(), apellidosField.getText(), telefonoField.getText(), (fecha.getDate().toInstant().atZone(ZoneId.systemDefault())).toLocalDate(), "", new String(passwordField.getPassword()))) {
+				RegistroCorrecto frame = new RegistroCorrecto();
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				this.dispose();
+			}
+			
+			else {
+				
+					RegistroFallido frame = new RegistroFallido();
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+						
+				}
+			});
+		
 		panel.add(botonAceptar);
 	}
 

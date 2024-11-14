@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import umu.tds.appchat.AppChat;
 
@@ -17,11 +18,13 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.Dimension;
 
 public class Login {
 
@@ -58,12 +61,15 @@ public class Login {
 	 */
 	private void initialize() {
 		frmAppchat = new JFrame();
+		frmAppchat.setMinimumSize(new Dimension(500, 355));
+		frmAppchat.getContentPane().setMinimumSize(new Dimension(500, 350));
 		frmAppchat.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 		frmAppchat.setForeground(new Color(0, 0, 0));
+		
 		frmAppchat.setTitle("AppChat");
 		frmAppchat.setBackground(new Color(255, 255, 255));
 		frmAppchat.getContentPane().setBackground(new Color(255, 255, 255));
-		frmAppchat.setBounds(100, 100, 502, 417);
+		frmAppchat.setBounds(100, 100, 500, 352);
 		frmAppchat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmAppchat.getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -71,6 +77,7 @@ public class Login {
 		JPanel panelCentro = new JPanel();
 		panelCentro.setBackground(new Color(255, 255, 253));
 		frmAppchat.getContentPane().add(panelCentro, BorderLayout.CENTER);
+	
 		GridBagLayout gbl_panelCentro = new GridBagLayout();
 		gbl_panelCentro.columnWidths = new int[]{126, 0, 153, 101, 0};
 		gbl_panelCentro.rowHeights = new int[]{36, 0, 0, 30, 0, 15, 40, 0};
@@ -119,10 +126,26 @@ public class Login {
 		botonLogin.setForeground(new Color(255, 255, 255));
 		botonLogin.setBackground(new Color(81, 116, 255));
 		botonLogin.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
-		botonLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		
+		botonLogin.addActionListener(evento -> {
+			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
+			//Si el login es correcto
+			if (AppChat.iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword()))){
+				this.frmAppchat.dispose();
+				Principal frame = new Principal();
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
 			}
+			
+			//Si el login falla
+			else {
+				LoginFallido frame = new LoginFallido();
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+			}
+			
 		});
+
 		GridBagConstraints gbc_botonLogin = new GridBagConstraints();
 		gbc_botonLogin.fill = GridBagConstraints.HORIZONTAL;
 		gbc_botonLogin.anchor = GridBagConstraints.NORTH;
@@ -145,13 +168,22 @@ public class Login {
 		botonRegistro.setBorderPainted(false);
 		botonRegistro.setFont(new Font("Gill Sans MT", Font.BOLD, 10));
 		botonRegistro.setBackground(new Color(255, 255, 255));
+		//Acciones de los botones
+		//Al pulsar el boton Registro, se abre la ventana Registro
+		botonRegistro.addActionListener(evento -> {
+			Registro frame = new Registro();
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+		});
+				
+		
 		panelSur.add(botonRegistro);
 		
 		JPanel panelNorte = new JPanel();
 		panelNorte.setBackground(new Color(255, 255, 253));
 		frmAppchat.getContentPane().add(panelNorte, BorderLayout.NORTH);
 		
-		JLabel nombreAPP = new JLabel("App CHAT");
+		JLabel nombreAPP = new JLabel("AppChat");
 		nombreAPP.setForeground(new Color(81, 116, 255));
 		nombreAPP.setBackground(new Color(255, 255, 253));
 		nombreAPP.setFont(new Font("Gill Sans Ultra Bold", Font.PLAIN, 35));
@@ -167,61 +199,7 @@ public class Login {
 		
 		
 		
-		//Acciones de los botones
-		//Al pulsar el boton Registro, se abre la ventana Registro
-		botonRegistro.addActionListener(evento -> {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						Registro frame = new Registro();
-						frame.setVisible(true);
-						frame.setLocationRelativeTo(null);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-		});
 		
-		
-		botonLogin.addActionListener(evento -> {
-			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
-			
-			
-			
-			//Si el login es correcto
-			
-			if (AppChat.iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword())))
-			{
-			this.frmAppchat.dispose();
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						Principal frame = new Principal();
-						frame.setVisible(true);
-						frame.setLocationRelativeTo(null);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-			}
-			//Si el login falla
-			else {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							LoginFallido frame = new LoginFallido();
-							frame.setVisible(true);
-							frame.setLocationRelativeTo(null);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-			
-		});
 		
 		
 		

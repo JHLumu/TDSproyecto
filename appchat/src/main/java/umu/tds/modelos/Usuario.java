@@ -112,6 +112,10 @@ public class Usuario {
 			return fechaNac;
 		}
 
+		public String getPassword() {
+			return password;
+		}
+		
 		/*
 		public URL getImagenPerfil() {
 			return imagenPerfil;
