@@ -141,6 +141,8 @@ public class Usuario {
 			return (g.nuevoMiembro(c));
 		}
 		
+		
+		
 	/*
 		public void cambiarImagen(URL imagen) {
 			this.imagenPerfil = imagen;

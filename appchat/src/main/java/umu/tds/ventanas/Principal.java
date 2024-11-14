@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
-import umu.tds.modelos.MensajeRenderer;
+import umu.tds.ventanas.MensajeRenderer;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -90,7 +90,7 @@ public class Principal extends JFrame {
 		JList<Mensaje> list = new JList <Mensaje>();
 		list.setCellRenderer(new MensajeRenderer());
 		list.setModel(new AbstractListModel() {
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersiononUID = 1L;
 			List<Mensaje> values = AppChat.obtenerListaMensajesRecientesPorUsuario();
 			public int getSize() {
 				return values.size();

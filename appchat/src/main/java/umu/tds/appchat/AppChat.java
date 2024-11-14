@@ -31,7 +31,8 @@ public class AppChat {
 	
 	public static boolean iniciarSesionUsuario(String telefono, String contraseña) {
 		//Se tiene que verificar en el repositorio si los datos son correctos
-		return true;
+		//Como aun no tenemos el RepositorioUsuario, vamos a meter datos aqui como prueba
+		return (telefono.equals("asu") && contraseña.equals("asu"));
 	}
 	/*
 	public static boolean cambiarImagen(Usuario usuario, URL imagen) {

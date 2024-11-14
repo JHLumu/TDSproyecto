@@ -8,6 +8,9 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
+import umu.tds.appchat.AppChat;
+
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -35,6 +38,7 @@ public class Login {
 				try {
 					Login window = new Login();
 					window.frmAppchat.setVisible(true);
+					window.frmAppchat.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -62,6 +66,7 @@ public class Login {
 		frmAppchat.setBounds(100, 100, 502, 417);
 		frmAppchat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmAppchat.getContentPane().setLayout(new BorderLayout(0, 0));
+		
 		
 		JPanel panelCentro = new JPanel();
 		panelCentro.setBackground(new Color(255, 255, 253));
@@ -159,6 +164,68 @@ public class Login {
 		JPanel panelOeste = new JPanel();
 		panelOeste.setBackground(new Color(255, 255, 253));
 		frmAppchat.getContentPane().add(panelOeste, BorderLayout.WEST);
+		
+		
+		
+		//Acciones de los botones
+		//Al pulsar el boton Registro, se abre la ventana Registro
+		botonRegistro.addActionListener(evento -> {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						Registro frame = new Registro();
+						frame.setVisible(true);
+						frame.setLocationRelativeTo(null);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		});
+		
+		
+		botonLogin.addActionListener(evento -> {
+			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
+			
+			
+			
+			//Si el login es correcto
+			
+			if (AppChat.iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword())))
+			{
+			this.frmAppchat.dispose();
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						Principal frame = new Principal();
+						frame.setVisible(true);
+						frame.setLocationRelativeTo(null);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			}
+			//Si el login falla
+			else {
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							LoginFallido frame = new LoginFallido();
+							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+			
+		});
+		
+		
+		
+		
 	}
 
 }

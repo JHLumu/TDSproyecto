@@ -1,4 +1,4 @@
-package umu.tds.modelos;
+package umu.tds.ventanas;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+
+import umu.tds.modelos.Mensaje;
 
 public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje> {
 	
