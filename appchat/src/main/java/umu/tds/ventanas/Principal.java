@@ -8,6 +8,8 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.ventanas.MensajeRenderer;
@@ -17,13 +19,20 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.Component;
+import java.awt.Dimension;
+
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Principal extends JFrame {
 
 	private JPanel contentPane;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -91,8 +100,6 @@ public class Principal extends JFrame {
 		contentPane.add(panelMensaje, BorderLayout.WEST);
 		panelMensaje.setLayout(new BorderLayout(0, 0));
 		
-		
-		
 		JList<Mensaje> list = new JList <Mensaje>();
 		list.setCellRenderer(new MensajeRenderer());
 		list.setModel(new AbstractListModel() {
@@ -106,6 +113,46 @@ public class Principal extends JFrame {
 			}
 		});
 		panelMensaje.add(list);
+		
+		JPanel chat = new JPanel();
+		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
+		chat.setSize(200,350);
+		chat.setMinimumSize(new Dimension(100,175));
+		chat.setMaximumSize(new Dimension(400,700));
+		chat.setPreferredSize(new Dimension(200,350));
+		
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.add(chat);
+		
+		JPanel panelCentro = new JPanel();
+		panelCentro.setLayout(new BorderLayout(0,0));
+		panelCentro.add(scrollPane, BorderLayout.CENTER);
+		contentPane.add(panelCentro, BorderLayout.CENTER);
+		
+		JPanel panel = new JPanel();
+		panelCentro.add(panel, BorderLayout.SOUTH);
+		
+		textField = new JTextField();
+		panel.add(textField);
+		textField.setColumns(10);
+		
+		Component horizontalGlue_1 = Box.createHorizontalGlue();
+		panel.add(horizontalGlue_1);
+		
+		JButton btnNewButton = new JButton("enviar");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BubbleText burbuja;
+				burbuja=new BubbleText(chat,textField.getText(), Color.GREEN, "J.Ramón", BubbleText.SENT);
+				textField.setText("");
+				chat.add(burbuja);
+				
+			}
+		});
+		panel.add(btnNewButton);
+		
+
 	}
 
 }
