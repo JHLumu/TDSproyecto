@@ -33,6 +33,9 @@ import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class Principal extends JFrame {
 
@@ -178,15 +181,30 @@ public class Principal extends JFrame {
 		panelCentro.add(scrollPane, BorderLayout.CENTER);
 		contentPane.add(panelCentro, BorderLayout.CENTER);
 		
-		JPanel panel = new JPanel();
-		panelCentro.add(panel, BorderLayout.SOUTH);
+		JPanel barraIntro = new JPanel();
+		panelCentro.add(barraIntro, BorderLayout.SOUTH);
+		GridBagLayout gbl_barraIntro = new GridBagLayout();
+		gbl_barraIntro.columnWidths = new int[]{20, 0, 96, 20, 20, 1, 0};
+		gbl_barraIntro.rowHeights = new int[]{21, 0};
+		gbl_barraIntro.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_barraIntro.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		barraIntro.setLayout(gbl_barraIntro);
+		
+		JButton Emoticono = new JButton("Emoticono");
+		GridBagConstraints gbc_Emoticono = new GridBagConstraints();
+		gbc_Emoticono.insets = new Insets(0, 0, 0, 5);
+		gbc_Emoticono.gridx = 1;
+		gbc_Emoticono.gridy = 0;
+		barraIntro.add(Emoticono, gbc_Emoticono);
 		
 		textField = new JTextField();
-		panel.add(textField);
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.insets = new Insets(0, 0, 0, 5);
+		gbc_textField.gridx = 2;
+		gbc_textField.gridy = 0;
+		barraIntro.add(textField, gbc_textField);
 		textField.setColumns(10);
-		
-		Component horizontalGlue_1 = Box.createHorizontalGlue();
-		panel.add(horizontalGlue_1);
 		
 		JButton btnNewButton = new JButton("enviar");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -198,7 +216,19 @@ public class Principal extends JFrame {
 				
 			}
 		});
-		panel.add(btnNewButton);
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNewButton.anchor = GridBagConstraints.NORTH;
+		gbc_btnNewButton.gridx = 3;
+		gbc_btnNewButton.gridy = 0;
+		barraIntro.add(btnNewButton, gbc_btnNewButton);
+		
+		Component horizontalGlue_1 = Box.createHorizontalGlue();
+		GridBagConstraints gbc_horizontalGlue_1 = new GridBagConstraints();
+		gbc_horizontalGlue_1.anchor = GridBagConstraints.WEST;
+		gbc_horizontalGlue_1.gridx = 5;
+		gbc_horizontalGlue_1.gridy = 0;
+		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
 
 	}
