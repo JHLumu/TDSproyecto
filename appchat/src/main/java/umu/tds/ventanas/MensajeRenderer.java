@@ -17,6 +17,7 @@ import umu.tds.modelos.Mensaje;
 
 public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje> {
 	
+	private static final long serialVersionUID = 1L;
 	private JLabel nameLabel;
 	private JLabel imageLabel;
 

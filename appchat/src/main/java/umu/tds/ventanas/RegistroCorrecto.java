@@ -12,8 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+
 
 import javax.swing.JButton;
 import java.awt.Dimension;

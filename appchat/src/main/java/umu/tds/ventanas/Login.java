@@ -7,8 +7,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
 
 import umu.tds.appchat.AppChat;
 
@@ -18,10 +16,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
-import javax.swing.BorderFactory;
+
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Dimension;

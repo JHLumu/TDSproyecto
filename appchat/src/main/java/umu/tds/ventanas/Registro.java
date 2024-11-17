@@ -1,6 +1,6 @@
 package umu.tds.ventanas;
 
-import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.ZoneId;
 
 import javax.swing.JTextField;
@@ -33,6 +31,7 @@ import javax.swing.ImageIcon;
 
 public class Registro extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField nombreField;
 	private JTextField apellidosField;

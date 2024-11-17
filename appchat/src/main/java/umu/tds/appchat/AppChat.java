@@ -4,7 +4,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import umu.tds.modelos.Contacto;
@@ -73,7 +72,7 @@ public class AppChat {
 		Usuario jose = new Usuario("Jose", "", "", LocalDate.now(),"", "");
 		Usuario maria = new Usuario("Maria", "", "", LocalDate.now(),"", "");
 		Mensaje[] values = new Mensaje [] {
-				 new Mensaje(ana,jose, "Hola"),
+				 new Mensaje(ana,jose, "Holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
 			     new Mensaje(jose,ana, "Que tal"),
 			     new Mensaje(ana,maria, "Adios")
 				
