@@ -52,7 +52,7 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje>
 			URL imageUrl = new URL("https://robohash.org/" + mensaje.getReceptor() + "?size=50x50");
 		    
 		    // Crear la carpeta local específica si no existe
-		    File directorio = new File("C:\\Users\\gojia\\Downloads\\appchat-iconos");
+		    File directorio = new File("imagenPerfilContactos");
 		    if (!directorio.exists()) {
 		        directorio.mkdirs(); // Crear directorio y subdirectorios si es necesario
 		    }
