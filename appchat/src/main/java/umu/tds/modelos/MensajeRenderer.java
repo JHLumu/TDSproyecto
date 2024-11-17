@@ -19,22 +19,26 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje>
 	private static final long serialVersionUID = 1L;
 	private JLabel nameLabel;
 	private JLabel imageLabel;
+	private JLabel mensajeLabel;
 
 	public MensajeRenderer() {
 		setLayout(new BorderLayout(5, 5));
 
 		nameLabel = new JLabel();
 		imageLabel = new JLabel();
+		mensajeLabel = new JLabel();
 
 		add(imageLabel, BorderLayout.WEST);
-		add(nameLabel, BorderLayout.CENTER);
+		add(mensajeLabel, BorderLayout.CENTER);
+		add(nameLabel, BorderLayout.NORTH);
 	}
 
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
 		// Set the text
-		nameLabel.setText(mensaje.toString());
+		nameLabel.setText(mensaje.getEmisorNombre());
+		mensajeLabel.setText(mensaje.getTexto());
 
 		// Load the image from a random URL (for example, using "https://robohash.org")
 		try {
@@ -54,7 +58,7 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje>
 		    }
 		    
 		    // Ruta del archivo local
-		    File localFile = new File(directorio, mensaje.getReceptor().getNombre()+".png");
+		    File localFile = new File(directorio, mensaje.getEmisorNombre()+".png");
 		    
 		    // Descargar y guardar la imagen
 		    Image image = ImageIO.read(imageUrl);

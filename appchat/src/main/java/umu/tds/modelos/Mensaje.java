@@ -73,10 +73,17 @@ public class Mensaje {
 			return horaEnvio;
 		}
 	
+	public String getEmisorNombre() {
+		return emisor.getNombre();
+	}
+	
+	public String getEmisorTelf() {
+		return emisor.getTelefono();
+	}
 	
 	@Override
 	public String toString() {
-		return receptor.getNombre() + " " + texto;
+		return emisor.getNombre() + " " + texto;
 	}
 
 	

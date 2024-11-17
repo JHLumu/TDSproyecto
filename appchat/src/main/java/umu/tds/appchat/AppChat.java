@@ -74,7 +74,7 @@ public class AppChat {
 		Mensaje[] values = new Mensaje [] {
 				 new Mensaje(ana,jose, "Holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
 			     new Mensaje(jose,ana, "Que tal"),
-			     new Mensaje(ana,maria, "Adios")
+			     new Mensaje(maria,jose, "Adios")
 				
 		};
 		return Arrays.asList(values);
