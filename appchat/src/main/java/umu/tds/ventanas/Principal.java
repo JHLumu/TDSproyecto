@@ -14,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
+import umu.tds.modelos.MensajeRenderer;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -167,17 +169,9 @@ public class Principal extends JFrame {
 		
 		JPanel chat = new JPanel();
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
-		chat.setSize(200,350);
-		chat.setMinimumSize(new Dimension(200, 175));
-		chat.setMaximumSize(new Dimension(300, 200));
-		chat.setPreferredSize(new Dimension(300, 200));
-		chat.setBorder(new LineBorder(new Color(0, 0, 0), 0));		
+	
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setMaximumSize(new Dimension(300, 200));
-		scrollPane.setMinimumSize(new Dimension(200, 23));
-		scrollPane.setBorder(null);
-		scrollPane.setPreferredSize(new Dimension(300, 200));
-		scrollPane.add(chat);
+		scrollPane.setViewportView(chat);
 		
 		JPanel panelCentro = new JPanel();
 		panelCentro.setLayout(new BorderLayout(0,0));
