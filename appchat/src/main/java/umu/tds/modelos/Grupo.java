@@ -5,77 +5,54 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class Grupo {
-	
-	//Podemos hacer que Grupo y Contacto heredan de una clase general ya que estos dos comparten atributos
-	//y metodos que opinas
-	
-	
-	//Atributos de la Clase
-		private final String nombre;
-		private URL imagen;
-		private final HashSet<Contacto> miembros;
-	
-	//Constructor de la Clase
-	
-	/**
-	 * Crea una nueva instancia de "Grupo" con el nombre, imagen e contactos del grupo.
-	 *
-	 * @param nombre el nombre del grupo
-	 * @param imagen la imagen del grupo
-	 * @param contactos los contactos que pertenecen al grupo
-	 *
-	 */
-		
-		public Grupo(String nombre,Contacto... usuarios) {
-			this.nombre = nombre;
-			this.miembros = new HashSet<Contacto>();
-			Collections.addAll(this.miembros, usuarios);
-		}
-		
-		public Grupo(String nombre, URL imagen, Contacto... usuarios) {
-			this(nombre,usuarios);
-			this.imagen = imagen;
-		}
-		
-		
-		
-	//Metodos getter y setter
-		public String getNombre() {
-			return nombre;
-		}
+public class Grupo extends Contacto {
 
-		public URL getImagen() {
-			return imagen;
-		}
+    // Atributos específicos para Grupo
+    private final HashSet<Contacto> miembros;
 
-		public HashSet<Contacto> getMiembros() {
-			return miembros;
-		}
+    // Constructor para crear un grupo con miembros sin imagen
+    public Grupo(String nombre, Contacto... usuarios) {
+        super(nombre);
+        this.miembros = new HashSet<>();
+        Collections.addAll(this.miembros, usuarios);
+    }
 
-		
-		
-	//Redeficiones de metodos
-		@Override
-		public boolean equals(Object o) {
-			if (o == null) return false;
-			else if (this == o) return true;
-			else if (this.getClass() != o.getClass()) return false;
-				
-			Grupo objeto = (Grupo) o;
-			return (this.nombre.equals(objeto.nombre));
-				
-		}
-			
-		@Override
-		public int hashCode() {
-			return Objects.hash(nombre);
-		}
-		
-	//Funcionalidades
-		public boolean nuevoMiembro(Contacto c) {
-			return (this.miembros.add(c));
-		}
-		
-	
+    // Constructor para crear un grupo con miembros y con imagen
+    public Grupo(String nombre, URL imagen, Contacto... usuarios) {
+        super(nombre, imagen);
+        this.miembros = new HashSet<>();
+        Collections.addAll(this.miembros, usuarios);
+    }
+
+    // Métodos getter y setter
+    public HashSet<Contacto> getMiembros() {
+        return miembros;
+    }
+
+    // Redefinición de equals y hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+        if (this.getClass() != o.getClass()) return false;
+
+        Grupo grupo = (Grupo) o;
+        return this.getNombre().equals(grupo.getNombre());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNombre());
+    }
+
+    // Funcionalidad para agregar un nuevo miembro
+    public boolean nuevoMiembro(Contacto c) {
+        return this.miembros.add(c);
+    }
+
+    // Implementación del método abstracto
+    @Override
+    public String getTipoContacto() {
+        return "Grupo";
+    }
 }

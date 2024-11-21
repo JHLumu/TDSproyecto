@@ -2,7 +2,10 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class Usuario {
 
@@ -27,11 +30,14 @@ public class Usuario {
 		
 	//El siguiente atributo es una coleccion que representa una lista de Contactos
 	//Se utiliza como colección un conjunto para así, evitar contactos repetidos 
-		private final HashSet<Contacto> listaContactos; 
+		private final HashSet<ContactoIndividual> listaContactos; 
 		
 	//El siguiente atributo es una coleccion que representa una lista de Grupos
 	//Se utiliza como colección un conjunto para así, evitar grupos repetidos 	
 		private final HashSet<Grupo> listaGrupos; 
+		
+	//El siguiente atributo se un mapa que contiene para cada contacto, su lista de mensajes asociada
+		private Map<Usuario, List<Mensaje>> conversaciones;
 		
 	//Constructores de la clase
 		
@@ -48,7 +54,7 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password) {
-			this.listaContactos = new HashSet<Contacto>();
+			this.listaContactos = new HashSet<ContactoIndividual>();
 			this.listaGrupos = new HashSet<Grupo>();
 			this.nombre = nombre;
 			this.telefono = telefono;
@@ -128,9 +134,9 @@ public class Usuario {
 
 	//Funcionalidades
 		
-		public boolean crearContacto(String nombre, String telefono, URL imagen) {
+		public boolean crearContacto(String nombre, Usuario usuario) {
 			//Ya se tiene que haber verificado que el telefono se encuentra registrado en el sistema
-			return (this.listaContactos.add(new Contacto(nombre,telefono,imagen)));
+			return (this.listaContactos.add(new ContactoIndividual(nombre, usuario)));
 		}
 		
 		public boolean crearGrupo(String nombre, URL imagen) {
@@ -146,7 +152,27 @@ public class Usuario {
 		}
 		
 		
-		
+		public void enviarMensaje(Mensaje mensaje) {
+			if (!mensaje.esEmitidoPor(this)) {
+	            throw new IllegalArgumentException("El emisor del mensaje no coincide con este usuario.");
+	        }
+
+	        Usuario receptor = mensaje.getReceptor();
+
+	        // Agregar el mensaje a la conversación con el receptor
+	        conversaciones.computeIfAbsent(receptor, k -> new ArrayList<>()).add(mensaje);
+
+	        // Agregar el mensaje a la conversación del receptor con este usuario
+	        receptor.recibirMensaje(mensaje);
+	    }
+
+	    private void recibirMensaje(Mensaje mensaje) {
+	        Usuario emisor = mensaje.getEmisor();
+	        conversaciones.computeIfAbsent(emisor, k -> new ArrayList<>()).add(mensaje);
+	    }
+	    public List<Mensaje> getChatMensaje(Usuario otroUsuario) {
+	        return conversaciones.getOrDefault(otroUsuario, new ArrayList<>());
+	    }
 	/*
 		public void cambiarImagen(URL imagen) {
 			this.imagenPerfil = imagen;

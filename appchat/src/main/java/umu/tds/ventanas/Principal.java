@@ -191,6 +191,15 @@ public class Principal extends JFrame {
 		barraIntro.setLayout(gbl_barraIntro);
 		
 		JButton Emoticono = new JButton("Emoticono");
+		Emoticono.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BubbleText burbuja;
+				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.GREEN, "J.Ramón", BubbleText.SENT, 18);
+				textField.setText("");
+				chat.add(burbuja);
+			}
+		});
+		
 		GridBagConstraints gbc_Emoticono = new GridBagConstraints();
 		gbc_Emoticono.insets = new Insets(0, 0, 0, 5);
 		gbc_Emoticono.gridx = 1;

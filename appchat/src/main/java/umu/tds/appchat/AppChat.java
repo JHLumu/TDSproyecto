@@ -17,9 +17,9 @@ public class AppChat {
 	public static Usuario sesionUsuario;
 	public static HashMap<String,Usuario> usuariosRegistrados = new HashMap<String,Usuario>();
 	
-	public static boolean crearContacto(Usuario usuario, String nombre, String telefono, URL imagen) {
+	public static boolean crearContacto(Usuario usuario, String nombre, String telefono) {
 		//Tendriamos que verificar en el Repositorio si el telefono se encuentra registrado en el sistema
-		return (usuario.crearContacto(nombre, telefono, imagen));
+		return (usuario.crearContacto(nombre, usuario));
 	}
 	
 	public static boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo) {

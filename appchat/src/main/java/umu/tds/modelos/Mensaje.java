@@ -81,6 +81,10 @@ public class Mensaje {
 		return emisor.getTelefono();
 	}
 	
+	public boolean esEmitidoPor(Usuario usuario) {
+        return this.emisor.equals(usuario);
+    }
+	
 	@Override
 	public String toString() {
 		return emisor.getNombre() + " " + texto;
