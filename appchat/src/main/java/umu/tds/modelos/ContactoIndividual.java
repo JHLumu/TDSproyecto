@@ -1,5 +1,9 @@
 package umu.tds.modelos;
 
+
+//Clase que hereda de Contacto que representa 
+//el objeto simple en la estructura del patron
+//Composite
 public class ContactoIndividual extends Contacto {
 
     // Atributo específico: el usuario asociado al contacto

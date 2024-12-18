@@ -3,12 +3,19 @@ package umu.tds.modelos;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class Usuario {
-
+	
+	//Atributo estatico para asignar identificadores unicos a cada usuario
+		private static int ID_USUARIO = 1;
+	
+	//El siguiente atributo se utiliza como identificador unico de usuario
+		private final int id;
+	
 	//Atributos de la Clase
 	//Como no se menciona nada en los requisitos sobre la posibilidad de cambiar algun dato del usuario
 	//las siguientes son finales
@@ -17,7 +24,7 @@ public class Usuario {
 		private final String apellidos;
 		private final String telefono;
 		private final LocalDate fechaNac;
-		//private final URL imagenPerfil;
+		private URL imagenPerfil;
 		private final String email;	
 		private final String password;
 		
@@ -53,35 +60,20 @@ public class Usuario {
 		 * @param contraseña la contraseña del usuario
 		 *
 		 */
-		public Usuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password) {
-			this.listaContactos = new HashSet<ContactoIndividual>();
-			this.listaGrupos = new HashSet<Grupo>();
-			this.nombre = nombre;
-			this.telefono = telefono;
-			this.apellidos = apellidos;
-			this.fechaNac = fechaNac;
+		public Usuario(BuilderUsuario b) {
+			this.listaContactos =b.listaContactos;
+			this.listaGrupos =b.listaGrupos;
+			this.nombre = b.nombre;
+			this.telefono = b.telefono;
+			this.apellidos = b.apellidos;
+			this.fechaNac = b.fechaNac;
+			this.saludo = b.saludo;
+			this.imagenPerfil = b.imagen;
 			//this.imagenPerfil = imagenPerfil;
-			this.email = email;
-			this.password = password;
-		}
-		
-		
-		/**
-		 * Crea una nueva instancia de "Usuario" con el nombre, apellidos, numero de telefono, fecha de nacimiento, imagen de perfil, correo, contraseña y un mensaje de saludo
-		 *
-		 * @param nombre el nombre del usuario
-		 * @param apellidos los apellidos del usuario
-		 * @param telefono el numero de telefono del usuario
-		 * @param fecha la fecha de nacimiento del usuario
-		 * @param imagen la imagen de perfil del usuario
-		 * @param email el correo electronico del usuario
-		 * @param contraseña la contraseña del usuario
-		 * @param saludo el mensaje de saludo del usuario
-		 *
-		 */
-		public Usuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo) {
-			this(nombre,apellidos,telefono,fechaNac,email,password);
-			this.saludo=saludo;
+			this.email = b.email;
+			this.password = b.password;
+			this.id = ID_USUARIO;
+			ID_USUARIO++;
 		}
 
 	//Metodos getter y setter
@@ -131,6 +123,9 @@ public class Usuario {
 			return email;
 		}
 		
+		public int getID() {
+			return id;
+		}
 
 	//Funcionalidades
 		
@@ -179,6 +174,37 @@ public class Usuario {
 		}
 		
 	*/
-	
+
+	    public static class BuilderUsuario {
+	    	//Atributos, iguales que la clase Usuario
+	    	private String nombre;
+	    	private String apellidos;
+	    	private String telefono;
+	    	private LocalDate fechaNac;
+	    	private String email;
+	    	private URL imagen;
+	    	private String password;
+	    	private String saludo="";
+	    	private boolean esPremium = false;
+	    	private HashSet<ContactoIndividual> listaContactos = new HashSet<>();
+	        private HashSet<Grupo> listaGrupos = new HashSet<>();
+	        private Map<Usuario, List<Mensaje>> conversaciones = new HashMap<>();
+	        
+	        public BuilderUsuario(String nombre, String telefono) {
+	        	this.nombre = nombre;
+	        	this.telefono = telefono;
+	        }
+	        
+	        public BuilderUsuario apellidos(String apellidos) {this.apellidos=apellidos;return this;}
+	        public BuilderUsuario fechaNac(LocalDate fechaNac) {this.fechaNac=fechaNac;return this;}
+	        public BuilderUsuario email(String email) {this.email=email;return this;}
+	        public BuilderUsuario password(String password) {this.password=password;return this;}
+	        public BuilderUsuario saludo(String saludo) {this.saludo=saludo;return this;}
+	        public BuilderUsuario imagenDePerfil(URL imagen) {this.imagen = imagen;return this;}
+	        public Usuario build() {return new Usuario(this);}
+	    }
 		
 }
+
+
+

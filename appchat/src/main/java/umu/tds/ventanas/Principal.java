@@ -3,7 +3,7 @@ package umu.tds.ventanas;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Font;
+
 import java.awt.Toolkit;
 import java.util.List;
 import javax.swing.JFrame;
@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.border.LineBorder;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -160,7 +160,7 @@ public class Principal extends JFrame {
 		list.setCellRenderer(new MensajeRenderer());
 		list.setModel(new AbstractListModel<Mensaje>() {
 			private static final long serialVersionUID = 1L;
-			List<Mensaje> values = AppChat.obtenerListaMensajesRecientesPorUsuario();
+			List<Mensaje> values = AppChat.getInstancia().obtenerListaMensajesRecientesPorUsuario();
 			public int getSize() {
 				return values.size();
 			}

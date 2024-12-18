@@ -3,6 +3,11 @@ package umu.tds.modelos;
 import java.net.URL;
 import java.util.Objects;
 
+
+//Clase abstracta para implementar el Patron Composite
+//Tanto Grupos como Contactos Individuales son 
+//tratados de igual manera, aqui se define la 
+//estructura comun de ambos
 public abstract class Contacto {
 
     // Atributos comunes a todos los contactos
@@ -40,6 +45,7 @@ public abstract class Contacto {
     // Métodos abstractos (obligatorios en subclases)
     public abstract String getTipoContacto();
 
+    
     // Redefiniciones de métodos
     @Override
     public boolean equals(Object o) {

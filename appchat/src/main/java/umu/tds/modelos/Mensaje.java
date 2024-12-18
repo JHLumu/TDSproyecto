@@ -15,6 +15,7 @@ public class Mensaje {
 		private final LocalDate fechaEnvio;
 		private final LocalTime horaEnvio;
 	
+	//A
 		
 	//Constructor de la clase
 		

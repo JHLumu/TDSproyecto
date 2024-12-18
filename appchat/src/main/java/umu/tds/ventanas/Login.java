@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 
@@ -15,6 +16,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.JPasswordField;
 
 import javax.swing.JButton;
@@ -36,6 +38,7 @@ public class Login {
 			public void run() {
 				try {
 					Login window = new Login();
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					window.frmAppchat.setVisible(true);
 					window.frmAppchat.setLocationRelativeTo(null);
 				} catch (Exception e) {
@@ -126,7 +129,7 @@ public class Login {
 		botonLogin.addActionListener(evento -> {
 			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
 			//Si el login es correcto
-			if (AppChat.iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword()))){
+			if (AppChat.getInstancia().iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword()))){
 				this.frmAppchat.dispose();
 				Principal frame = new Principal();
 				frame.setVisible(true);
@@ -135,9 +138,11 @@ public class Login {
 			
 			//Si el login falla
 			else {
-				LoginFallido frame = new LoginFallido();
-				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
+				
+				 JOptionPane.showMessageDialog(frmAppchat, 
+		                    "Login Fallido",
+		                    "AppChat",
+		                    JOptionPane.ERROR_MESSAGE);
 			}
 			
 		});
