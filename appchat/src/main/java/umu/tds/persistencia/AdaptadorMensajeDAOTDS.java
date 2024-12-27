@@ -23,18 +23,18 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 	
 	
 	@Override
-	public void registrarMensaje() {
+	public void registrarMensaje(Mensaje mensaje) {
 		Entidad eMensaje = null;
 		try {
 			
-			eMensaje = servPersistencia.recuperarEntidad(null)
+			eMensaje = servPersistencia.recuperarEntidad(null);
 			
 		}catch(NullPointerException e) {}
 		
 	}
 
 	@Override
-	public void modificarMensaje() {
+	public void modificarMensaje(Mensaje mensaje) {
 		// TODO Auto-generated method stub
 		
 	}

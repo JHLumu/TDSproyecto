@@ -30,18 +30,22 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.ComponentOrientation;
 
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField textField;
+	private final AppChat controlador;
 
 	/**
 	 * Launch the application.
@@ -63,6 +67,10 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
+		
+		//Se obtiene la instancia del controlador
+		this.controlador = AppChat.getInstancia();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 746, 425);
 		contentPane = new JPanel();
@@ -80,25 +88,24 @@ public class Principal extends JFrame {
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
 		JComboBox<String> comboBoxContactos = new JComboBox<String>();
+		comboBoxContactos.setName("contacto o telefono");
+		comboBoxContactos.setToolTipText("");
+		comboBoxContactos.setSize(new Dimension(100, 25));
 		comboBoxContactos.setBackground(new Color(81, 116, 255));
-		comboBoxContactos.setMaximumSize(new Dimension(10000, 16000));
-		comboBoxContactos.setMinimumSize(new Dimension(0, 25));
-		comboBoxContactos.setPreferredSize(new Dimension(0, 25));
-		comboBoxContactos.setModel(new DefaultComboBoxModel<String>(new String[] {"contacto 1", "contacto 2", "contacto 3"}));
+		comboBoxContactos.setMaximumSize(new Dimension(100000, 16000));
+		comboBoxContactos.setMinimumSize(new Dimension(100, 25));
+		comboBoxContactos.setPreferredSize(new Dimension(100, 25));
+		
+		DefaultComboBoxModel<String> listaContactos = new DefaultComboBoxModel<String>(new String[] {"Contacto o Teléfono"});
+		for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
+		comboBoxContactos.setModel(listaContactos);
 		panelNorte.add(comboBoxContactos);
-		
-		Border borde = BorderFactory.createLineBorder(Color.BLACK,2);
-		
-		Component horizontalGlue_5 = Box.createHorizontalGlue();
-		horizontalGlue_5.setMaximumSize(new Dimension(15600, 0));
-		panelNorte.add(horizontalGlue_5);
 		
 		JButton btnEnv = new JButton("");
 		btnEnv.setPreferredSize(new Dimension(25, 25));
 		btnEnv.setForeground(new Color(255, 255, 255));
 		btnEnv.setBackground(new Color(81, 116, 255));
 		btnEnv.setIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")));
-		btnEnv.setBorder(borde);
 		panelNorte.add(btnEnv);
 		
 		Component horizontalGlue_4 = Box.createHorizontalGlue();
@@ -110,7 +117,6 @@ public class Principal extends JFrame {
 		btnBuscar.setPreferredSize(new Dimension(25, 25));
 		btnBuscar.setForeground(new Color(255, 255, 255));
 		btnBuscar.setBackground(new Color(81, 116, 255));
-		btnBuscar.setBorder(borde);
 		btnBuscar.setIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")));
 		panelNorte.add(btnBuscar);
 		
@@ -122,7 +128,6 @@ public class Principal extends JFrame {
 		btnPremium.setPreferredSize(new Dimension(25, 25));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(new Color(81, 116, 255));
-		btnPremium.setBorder(borde);
 		btnPremium.setIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")));
 		panelNorte.add(btnPremium);
 		
@@ -134,7 +139,6 @@ public class Principal extends JFrame {
 		btnContactos.setPreferredSize(new Dimension(25, 25));
 		btnContactos.setForeground(new Color(255, 255, 255));
 		btnContactos.setBackground(new Color(81, 116, 255));
-		btnContactos.setBorder(borde);
 		btnContactos.setIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")));
 		panelNorte.add(btnContactos);
 		
@@ -142,12 +146,11 @@ public class Principal extends JFrame {
 		horizontalGlue.setMaximumSize(new Dimension(100, 0));
 		panelNorte.add(horizontalGlue);
 		
-		JButton btnAvatar = new JButton("Nombre Usuario");
-		btnAvatar.setForeground(new Color(0, 0, 0));
-		btnAvatar.setBackground(new Color(81, 116, 255));
-		btnAvatar.setBorder(borde);
-		btnAvatar.setIcon(new ImageIcon(Principal.class.getResource("/resources/avatar.png")));
-		panelNorte.add(btnAvatar);
+		JButton btnUsuario = new JButton(this.controlador.getNombreUsuario());
+		btnUsuario.setForeground(new Color(0, 0, 0));
+		btnUsuario.setBackground(new Color(81, 116, 255));
+		btnUsuario.setIcon(new ImageIcon(Principal.class.getResource("/resources/avatar.png")));
+		panelNorte.add(btnUsuario);
 		
 		JPanel panelMensaje = new JPanel();
 		panelMensaje.setPreferredSize(new Dimension(200, 0));
@@ -194,7 +197,8 @@ public class Principal extends JFrame {
 		Emoticono.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BubbleText burbuja;
-				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.GREEN, "J.Ramón", BubbleText.SENT, 18);
+				
+				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.GREEN,  AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT, 18);
 				textField.setText("");
 				chat.add(burbuja);
 			}
@@ -215,11 +219,11 @@ public class Principal extends JFrame {
 		barraIntro.add(textField, gbc_textField);
 		textField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("enviar");
+		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BubbleText burbuja;
-				burbuja=new BubbleText(chat,textField.getText(), Color.GREEN, "J.Ramón", BubbleText.SENT);
+				burbuja=new BubbleText(chat,textField.getText(), Color.GREEN, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT);
 				textField.setText("");
 				chat.add(burbuja);
 				

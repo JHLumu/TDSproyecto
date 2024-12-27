@@ -62,7 +62,6 @@ public class Registro extends JFrame {
 			public void run() {
 				try {
 					Registro frame = new Registro();
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
@@ -82,8 +81,17 @@ public class Registro extends JFrame {
 		
 		
 		else {
+			
+			System.out.println("[DEBUG]: " + "Campos de Registro:");
+			System.out.println("[DEBUG]: " + "Nombre: " + nombreField.getText());
+			System.out.println("[DEBUG]: " + "Apellidos: " + apellidosField.getText());
+			System.out.println("[DEBUG]: " + "Telefono: " + telefonoField.getText());
+			System.out.println("[DEBUG]: " + "Password: " + password);
+			System.out.println("[DEBUG]: " + "Confirmar Password: " + password1);
+			System.out.println("[DEBUG]: " + "Fecha: " + fecha.getDateFormatString());
+			
 			//Comprobacion sobre el formato de los datos y sobre la contraseña
-			if (! password.equals(password1)) return false;
+			if (!password.equals(password1)) return false;
 			return true;	
 		}
 	}
@@ -362,6 +370,7 @@ public class Registro extends JFrame {
 		                    "Se ha registrado correctamente",
 		                    "AppChat",
 		                    JOptionPane.PLAIN_MESSAGE);
+				 this.dispose();
 				
 			}
 			

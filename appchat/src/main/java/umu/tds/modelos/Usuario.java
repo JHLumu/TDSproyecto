@@ -3,18 +3,19 @@ package umu.tds.modelos;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Usuario {
 	
-	//Atributo estatico para asignar identificadores unicos a cada usuario
-		private static int ID_USUARIO = 1;
-	
 	//El siguiente atributo se utiliza como identificador unico de usuario
-		private final int id;
+		private int codigo;
 	
 	//Atributos de la Clase
 	//Como no se menciona nada en los requisitos sobre la posibilidad de cambiar algun dato del usuario
@@ -35,16 +36,14 @@ public class Usuario {
 		private boolean esPremium = false;
 		
 		
-	//El siguiente atributo es una coleccion que representa una lista de Contactos
-	//Se utiliza como colección un conjunto para así, evitar contactos repetidos 
-		private final HashSet<ContactoIndividual> listaContactos; 
+	//El siguiente atributo es una coleccion que representa una lista de Contactos y Grupos
+	//Se utiliza como colección un conjunto para así, evitar contactos y grupos repetidos 
+		private final HashSet<Contacto> listaContactos; 
 		
-	//El siguiente atributo es una coleccion que representa una lista de Grupos
-	//Se utiliza como colección un conjunto para así, evitar grupos repetidos 	
-		private final HashSet<Grupo> listaGrupos; 
+	//Los siguientes atributos guardan los mensajes enviados y recibidos del usuario
 		
-	//El siguiente atributo se un mapa que contiene para cada contacto, su lista de mensajes asociada
-		private Map<Usuario, List<Mensaje>> conversaciones;
+		private final List<Mensaje> mensajesRecibidos;
+		private final List<Mensaje> mensajesEnviados;
 		
 	//Constructores de la clase
 		
@@ -61,22 +60,25 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(BuilderUsuario b) {
-			this.listaContactos =b.listaContactos;
-			this.listaGrupos =b.listaGrupos;
+			this.listaContactos =new HashSet<Contacto>();
+			this.mensajesRecibidos = new LinkedList<Mensaje>();
+			this.mensajesEnviados = new LinkedList<Mensaje>();
 			this.nombre = b.nombre;
 			this.telefono = b.telefono;
 			this.apellidos = b.apellidos;
 			this.fechaNac = b.fechaNac;
 			this.saludo = b.saludo;
 			this.imagenPerfil = b.imagen;
-			//this.imagenPerfil = imagenPerfil;
 			this.email = b.email;
 			this.password = b.password;
-			this.id = ID_USUARIO;
-			ID_USUARIO++;
+			this.codigo = 0;	
 		}
 
 	//Metodos getter y setter
+		
+		public List<Contacto> getListaContacto(){
+			return new LinkedList<Contacto>(this.listaContactos);
+		}
 		
 		public String getSaludo() {
 			return saludo;
@@ -114,66 +116,83 @@ public class Usuario {
 			return password;
 		}
 		
-		/*
+		
 		public URL getImagenPerfil() {
 			return imagenPerfil;
 		}
-		*/
+		
 		public String getEmail() {
 			return email;
 		}
 		
-		public int getID() {
-			return id;
+		public int getCodigo() {
+			return codigo;
+		}
+		
+		public void setCodigo(int id) {
+			this.codigo = id;
 		}
 
 	//Funcionalidades
 		
 		public boolean crearContacto(String nombre, Usuario usuario) {
-			//Ya se tiene que haber verificado que el telefono se encuentra registrado en el sistema
 			return (this.listaContactos.add(new ContactoIndividual(nombre, usuario)));
 		}
 		
 		public boolean crearGrupo(String nombre, URL imagen) {
-			return (this.listaGrupos.add(new Grupo(nombre, imagen)));
+			return (this.listaContactos.add(new Grupo(nombre, imagen)));
 		}
 		
 		public boolean crearGrupo(String nombre) {
-			return (this.listaGrupos.add(new Grupo(nombre)));
+			return this.crearGrupo(nombre, null);
 		}
 		
 		public boolean introducirMiembroaGrupo(Contacto c, Grupo g) {
+			if (! this.listaContactos.contains(g)) return false;
 			return (g.nuevoMiembro(c));
 		}
-		
 		
 		public void enviarMensaje(Mensaje mensaje) {
 			if (!mensaje.esEmitidoPor(this)) {
 	            throw new IllegalArgumentException("El emisor del mensaje no coincide con este usuario.");
 	        }
 
-	        Usuario receptor = mensaje.getReceptor();
-
-	        // Agregar el mensaje a la conversación con el receptor
-	        conversaciones.computeIfAbsent(receptor, k -> new ArrayList<>()).add(mensaje);
-
-	        // Agregar el mensaje a la conversación del receptor con este usuario
-	        receptor.recibirMensaje(mensaje);
+	       //Agregar el mensaje a la lista de mensajes enviados
+			this.mensajesEnviados.add(mensaje);
+			
+	        // REVISAR: Llamar al receptor para que reciba el mensaje
+	        mensaje.getReceptor().recibirMensaje(mensaje);
 	    }
 
 	    private void recibirMensaje(Mensaje mensaje) {
-	        Usuario emisor = mensaje.getEmisor();
-	        conversaciones.computeIfAbsent(emisor, k -> new ArrayList<>()).add(mensaje);
+	       //Se recibe el mensaje por parte del emisor y se guarda en la lista de mensajes recibidos
 	    }
 	    public List<Mensaje> getChatMensaje(Usuario otroUsuario) {
-	        return conversaciones.getOrDefault(otroUsuario, new ArrayList<>());
+	        //Uso de streams. Recupera aquellos mensajes
+	    	List<Mensaje> aux = Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+	    			.flatMap(mensajes -> mensajes.stream()
+	    					.filter(msg -> msg.getEmisor().equals(otroUsuario) || msg.getReceptor().equals(otroUsuario)))
+	    			.sorted()
+	    			.collect(Collectors.toList());
+	    	return aux;
+	    	
+	    	
 	    }
-	/*
+	
 		public void cambiarImagen(URL imagen) {
 			this.imagenPerfil = imagen;
 		}
 		
-	*/
+		public List<Mensaje> getMensajesRecibidos() {
+			return new LinkedList<Mensaje>(this.mensajesRecibidos);
+			
+		}
+		
+		public List<Mensaje> getMensajesEnviados() {
+			return new LinkedList<Mensaje>(this.mensajesEnviados);
+			
+		}
+
 
 	    public static class BuilderUsuario {
 	    	//Atributos, iguales que la clase Usuario
@@ -186,9 +205,6 @@ public class Usuario {
 	    	private String password;
 	    	private String saludo="";
 	    	private boolean esPremium = false;
-	    	private HashSet<ContactoIndividual> listaContactos = new HashSet<>();
-	        private HashSet<Grupo> listaGrupos = new HashSet<>();
-	        private Map<Usuario, List<Mensaje>> conversaciones = new HashMap<>();
 	        
 	        public BuilderUsuario(String nombre, String telefono) {
 	        	this.nombre = nombre;

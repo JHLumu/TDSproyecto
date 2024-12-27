@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 import javax.swing.ImageIcon;
 
-public class Mensaje {
+public class Mensaje implements Comparable<Mensaje>{
 	
 	//Atributos de la clase
 		private String texto; 
@@ -91,5 +91,25 @@ public class Mensaje {
 		return emisor.getNombre() + " " + texto;
 	}
 
+
+	@Override
+	//Un mensaje A va despues de un mensaje B si A ha ocurrido despues de B.
+	public int compareTo(Mensaje o) {
+		
+		if (this.fechaEnvio.isAfter(o.getFechaEnvio())) return 1;
+		
+		else if (this.fechaEnvio.isEqual(o.getFechaEnvio())) {
+		
+			if (this.horaEnvio.isAfter(o.getHoraEnvio())) return 1;
+			
+			else if (this.horaEnvio.isBefore(o.getHoraEnvio())) return -1;
+			
+			else return 0;
+		}
+		
+		else return -1;
+	}
+	
+	
 	
 }

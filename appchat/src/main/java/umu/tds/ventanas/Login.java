@@ -37,8 +37,8 @@ public class Login {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 					Login window = new Login();
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					window.frmAppchat.setVisible(true);
 					window.frmAppchat.setLocationRelativeTo(null);
 				} catch (Exception e) {
@@ -85,7 +85,7 @@ public class Login {
 		panelCentro.setLayout(gbl_panelCentro);
 		
 		JLabel labelTelf = new JLabel("Teléfono");
-		labelTelf.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
+		labelTelf.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_labelTelf = new GridBagConstraints();
 		gbc_labelTelf.anchor = GridBagConstraints.WEST;
 		gbc_labelTelf.insets = new Insets(0, 0, 5, 5);
@@ -94,7 +94,7 @@ public class Login {
 		panelCentro.add(labelTelf, gbc_labelTelf);
 		
 		textField = new JTextField();
-		textField.setFont(new Font("Gill Sans MT", Font.PLAIN, 15));
+		textField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.insets = new Insets(0, 0, 5, 5);
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
@@ -104,7 +104,7 @@ public class Login {
 		textField.setColumns(10);
 		
 		JLabel labelPass = new JLabel("Contraseña");
-		labelPass.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
+		labelPass.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_labelPass = new GridBagConstraints();
 		gbc_labelPass.anchor = GridBagConstraints.WEST;
 		gbc_labelPass.insets = new Insets(0, 0, 5, 5);
@@ -113,7 +113,7 @@ public class Login {
 		panelCentro.add(labelPass, gbc_labelPass);
 		
 		passwordField = new JPasswordField();
-		passwordField.setFont(new Font("Gill Sans MT", Font.PLAIN, 15));
+		passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_passwordField = new GridBagConstraints();
 		gbc_passwordField.insets = new Insets(0, 0, 5, 5);
 		gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
@@ -124,7 +124,7 @@ public class Login {
 		JButton botonLogin = new JButton("Login");
 		botonLogin.setForeground(new Color(255, 255, 255));
 		botonLogin.setBackground(new Color(81, 116, 255));
-		botonLogin.setFont(new Font("Gill Sans MT", Font.BOLD, 15));
+		botonLogin.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
 		botonLogin.addActionListener(evento -> {
 			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador

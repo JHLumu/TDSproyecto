@@ -10,13 +10,6 @@ public class FactoriaDAOTDS extends FactoriaDAO {
 		return instancia;
 	}
 	
-	
-	
-	
-	@Override
-	public GrupoDAO getGrupoDAO() {
-		return AdaptadorGrupoDAOTDS.getGrupoDAO();
-	}
 
 	@Override
 	public UsuarioDAO getUsuarioDAO() {
@@ -29,8 +22,8 @@ public class FactoriaDAOTDS extends FactoriaDAO {
 	}
 
 	@Override
-	public ContactoIndividualDAO getContactoIndividualDAO() {
-		return AdaptadorContactoIndividualDAOTDS.getContactoIndividualDAO();
+	public ContactoDAO getContactoDAO() {
+		return AdaptadorContactoDAO.getContactoIndividualDAO();
 	}
 
 	

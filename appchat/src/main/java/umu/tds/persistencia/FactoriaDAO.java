@@ -22,10 +22,8 @@ public abstract class FactoriaDAO {
 		 return instancia ;
 		 }
 	
-	
-	public abstract GrupoDAO getGrupoDAO();
 	public abstract UsuarioDAO getUsuarioDAO();
 	public abstract MensajeDAO getMensajeDAO();
-	public abstract ContactoIndividualDAO getContactoIndividualDAO();
+	public abstract ContactoDAO getContactoDAO();
 	
 }
