@@ -2,13 +2,10 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,7 +57,7 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(BuilderUsuario b) {
-			this.listaContactos =new HashSet<Contacto>();
+			this.listaContactos =b.listaContactos;
 			this.mensajesRecibidos = new LinkedList<Mensaje>();
 			this.mensajesEnviados = new LinkedList<Mensaje>();
 			this.nombre = b.nombre;
@@ -147,7 +144,7 @@ public class Usuario {
 			return this.crearGrupo(nombre, null);
 		}
 		
-		public boolean introducirMiembroaGrupo(Contacto c, Grupo g) {
+		public boolean introducirMiembroaGrupo(ContactoIndividual c, Grupo g) {
 			if (! this.listaContactos.contains(g)) return false;
 			return (g.nuevoMiembro(c));
 		}
@@ -204,11 +201,13 @@ public class Usuario {
 	    	private URL imagen;
 	    	private String password;
 	    	private String saludo="";
+	    	private final HashSet<Contacto> listaContactos; 
 	    	private boolean esPremium = false;
 	        
 	        public BuilderUsuario(String nombre, String telefono) {
 	        	this.nombre = nombre;
 	        	this.telefono = telefono;
+	        	this.listaContactos = new HashSet<Contacto>();
 	        }
 	        
 	        public BuilderUsuario apellidos(String apellidos) {this.apellidos=apellidos;return this;}
@@ -217,6 +216,7 @@ public class Usuario {
 	        public BuilderUsuario password(String password) {this.password=password;return this;}
 	        public BuilderUsuario saludo(String saludo) {this.saludo=saludo;return this;}
 	        public BuilderUsuario imagenDePerfil(URL imagen) {this.imagen = imagen;return this;}
+	        public BuilderUsuario listaDeContactos(List<Contacto> lista) {this.listaContactos.addAll(lista);return this;}
 	        public Usuario build() {return new Usuario(this);}
 	    }
 		

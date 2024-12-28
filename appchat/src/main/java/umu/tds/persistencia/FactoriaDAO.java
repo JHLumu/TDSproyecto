@@ -1,6 +1,5 @@
 package umu.tds.persistencia;
 
-import java.lang.reflect.InvocationTargetException;
 
 public abstract class FactoriaDAO {
 

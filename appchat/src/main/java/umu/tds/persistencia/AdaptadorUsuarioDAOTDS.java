@@ -1,20 +1,20 @@
 package umu.tds.persistencia;
 
-import java.text.ParseException;
-import java.time.LocalDate;
+
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Usuario.BuilderUsuario;
@@ -77,8 +77,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("apellidos", usuario.getApellidos()),
 						new Propiedad("telefono", usuario.getTelefono()),
 						new Propiedad("email", usuario.getEmail()),
-						new Propiedad("password", usuario.getPassword())
-						
+						new Propiedad("password", usuario.getPassword()),
+						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto()) )
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -104,6 +104,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 			else if (prop.getNombre().equals("email")) prop.setValor(usuario.getEmail());
 			else if (prop.getNombre().equals("password")) prop.setValor(usuario.getPassword());
 			else if (prop.getNombre().equals("fecha")) prop.setValor(usuario.getFechaNacimiento().format(formateador));
+			else if (prop.getNombre().equals("lista de contactos")) prop.setValor(obtenerIdsContactos(usuario.getListaContacto()));
 			servPersistencia.modificarPropiedad(prop);
 		}
 		
@@ -127,20 +128,24 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String email = servPersistencia.recuperarPropiedadEntidad(eUsuario, "email");
 		String password = servPersistencia.recuperarPropiedadEntidad(eUsuario, "password");
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
-		
+		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
+		List<Contacto> lista = obtenerContactosAPartirDeIds(idLista);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
 		Usuario usuario = new BuilderUsuario(nombre,telefono)
 							.apellidos(apellidos)
 							.email(email)
-							.password(password)
-							
+							.password(password) 
+							.listaDeContactos(lista)
 							.build();
 		
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);
 		
-		//Se recuperan los objetos referenciados y se actualiza el objeto: de momento no se hace nada
+		//Se recuperan los objetos referenciados y se actualiza el objeto: 
+		
+		
+		
 		
 		//Devolvemos el objeto
 		return usuario;
@@ -162,4 +167,24 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		
 	}
 
+	private String obtenerIdsContactos(List<Contacto> lista) {
+		String aux = lista.stream()
+				.map(c -> String.valueOf(c.getCodigo()))
+				.collect(Collectors.joining(" "));
+		return aux;
+				
+	}
+	
+	private List<Contacto> obtenerContactosAPartirDeIds(String idContactos){
+		List<Contacto> resultado = new LinkedList<Contacto>();
+		if (idContactos != null && !idContactos.isEmpty()) {
+		
+			for (String idContacto: idContactos.split(" ")) {
+				resultado.add((FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto))));
+			}
+		
+		}
+		return resultado;
+	}
+	
 }

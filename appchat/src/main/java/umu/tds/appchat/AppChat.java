@@ -5,10 +5,11 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import umu.tds.modelos.CatalogoUsuarios;
-import umu.tds.modelos.Contacto;
+
+import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
@@ -117,14 +118,18 @@ public class AppChat {
 	}
 	
 	
-	public boolean introducirMiembroAGrupo(Usuario u, Contacto c, Grupo g) {
+	public boolean introducirMiembroAGrupo(Usuario u, ContactoIndividual c, Grupo g) {
 		return u.introducirMiembroaGrupo(c, g);
 	}
 	
 	
 	public boolean nuevoContacto(String nombre, String telefono) {
 		if (! catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
-		return this.sesionUsuario.crearContacto(nombre, catalogoUsuarios.getUsuario(telefono));
+		 if (!this.sesionUsuario.crearContacto(nombre, catalogoUsuarios.getUsuario(telefono))) return false;
+		 else {
+			 usuarioDAO.modificarUsuario(sesionUsuario);
+			 return true;
+		 }
 	
 	}
 	
@@ -135,6 +140,8 @@ public class AppChat {
 				.toArray(String[]::new);
 		return nombresContactos;
 	}
+	
+	
 	
 	//Esto es mas cosa del patron dao que del controlador
 	public List <Mensaje> obtenerListaMensajesRecientesPorUsuario(){

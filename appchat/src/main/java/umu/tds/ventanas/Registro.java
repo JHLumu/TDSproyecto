@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+
 import javax.swing.JPasswordField;
 import com.toedter.calendar.JDateChooser;
 

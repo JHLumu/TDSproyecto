@@ -13,16 +13,18 @@ public abstract class Contacto {
     // Atributos comunes a todos los contactos
     private String nombre;
     private URL imagen;
+    private int codigo;
 
     // Constructor para contactos sin imagen
     public Contacto(String nombre) {
-        this.nombre = nombre;
+        this(nombre, null);
     }
 
     // Constructor para contactos con imagen
     public Contacto(String nombre, URL imagen) {
         this.nombre = nombre;
         this.imagen = imagen;
+        this.codigo = 0;
     }
 
     // Getters y setters
@@ -42,6 +44,16 @@ public abstract class Contacto {
         this.imagen = imagen;
     }
 
+
+	public int getCodigo() {
+		return this.codigo;
+	}
+	
+	public void setCodigo(int codigo) {
+		this.codigo = codigo;
+	}
+
+    
     // Métodos abstractos (obligatorios en subclases)
     public abstract String getTipoContacto();
 
@@ -59,4 +71,6 @@ public abstract class Contacto {
     public int hashCode() {
         return Objects.hash(nombre);
     }
-}
+    
+    }
+
