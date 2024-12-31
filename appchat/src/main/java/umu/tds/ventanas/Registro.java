@@ -82,13 +82,13 @@ public class Registro extends JFrame {
 		
 		else {
 			
-			System.out.println("[DEBUG]: " + "Campos de Registro:");
-			System.out.println("[DEBUG]: " + "Nombre: " + nombreField.getText());
-			System.out.println("[DEBUG]: " + "Apellidos: " + apellidosField.getText());
-			System.out.println("[DEBUG]: " + "Telefono: " + telefonoField.getText());
-			System.out.println("[DEBUG]: " + "Password: " + password);
-			System.out.println("[DEBUG]: " + "Confirmar Password: " + password1);
-			System.out.println("[DEBUG]: " + "Fecha: " + fecha.getDateFormatString());
+			System.out.println("[DEBUG Registro validacionCampos]: " + "Campos de Registro:");
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Nombre: " + nombreField.getText());
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Apellidos: " + apellidosField.getText());
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Telefono: " + telefonoField.getText());
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Password: " + password);
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Confirmar Password: " + password1);
+			System.out.println("[DEBUG Registro validacionCampos]: "  + "Fecha: " + fecha.getDateFormatString());
 			
 			//Comprobacion sobre el formato de los datos y sobre la contraseña
 			if (!password.equals(password1)) return false;

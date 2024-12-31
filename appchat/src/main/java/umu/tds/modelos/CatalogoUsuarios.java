@@ -2,6 +2,7 @@ package umu.tds.modelos;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import umu.tds.persistencia.FactoriaDAO;
 import umu.tds.persistencia.FactoriaDAOTDS;
@@ -53,8 +54,15 @@ public class CatalogoUsuarios {
 	private void cargarCatalogo() {
 		
 		List<Usuario> aux = usuarioDAO.recuperarTodosUsuarios();
+		System.out.println("\n");
 		for (Usuario usuario : aux) {
 			usuarios.put(usuario.getTelefono(), usuario);
+			System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "ID Usuario:" + usuario.getCodigo());
+			System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Nombre Usuario:" + usuario.getNombre());
+			List<String> lista = usuario.getListaContacto().stream()
+					.map(c -> c.getNombre())
+					.collect(Collectors.toList());
+			System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Lista de Contacto Usuario:" + lista);
 		}
 	}
 	

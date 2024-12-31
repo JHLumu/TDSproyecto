@@ -8,7 +8,7 @@ import java.util.List;
 
 
 import umu.tds.modelos.CatalogoUsuarios;
-
+import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
@@ -50,11 +50,6 @@ public class AppChat {
 	//Usado hasta que se implemente el repositorio, se usa esto como prueba
 	private Usuario sesionUsuario;
 	private static HashMap<String,Usuario> usuariosRegistrados = new HashMap<String,Usuario>();
-	
-	public boolean crearContacto(Usuario usuario, String nombre, String telefono) {
-		//Tendriamos que verificar en el Repositorio si el telefono se encuentra registrado en el sistema
-		return (usuario.crearContacto(nombre, usuario));
-	}
 	
 	//Para evitar tener dos metodos iguales podriamos usar un Optional para saludo
 	
@@ -124,9 +119,12 @@ public class AppChat {
 	
 	
 	public boolean nuevoContacto(String nombre, String telefono) {
+		System.out.println("\n[DEBUG Controlador nuevoContacto]: Inicio de crear contacto.");
 		if (! catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
-		 if (!this.sesionUsuario.crearContacto(nombre, catalogoUsuarios.getUsuario(telefono))) return false;
+		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre, catalogoUsuarios.getUsuario(telefono));
+		 if ( contacto == null) return false;
 		 else {
+			 contactoDAO.registrarContacto(contacto);
 			 usuarioDAO.modificarUsuario(sesionUsuario);
 			 return true;
 		 }
@@ -134,9 +132,9 @@ public class AppChat {
 	}
 	
 	public String[] obtenerListaContactos(){
+		//REVISAR: Sorted falla
 		String[] nombresContactos = this.sesionUsuario.getListaContacto().stream()
 				.map(c -> c.getNombre())
-				.sorted()
 				.toArray(String[]::new);
 		return nombresContactos;
 	}

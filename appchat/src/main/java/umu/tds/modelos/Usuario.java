@@ -35,7 +35,7 @@ public class Usuario {
 		
 	//El siguiente atributo es una coleccion que representa una lista de Contactos y Grupos
 	//Se utiliza como colección un conjunto para así, evitar contactos y grupos repetidos 
-		private final HashSet<Contacto> listaContactos; 
+		private List<Contacto> listaContactos; 
 		
 	//Los siguientes atributos guardan los mensajes enviados y recibidos del usuario
 		
@@ -132,8 +132,10 @@ public class Usuario {
 
 	//Funcionalidades
 		
-		public boolean crearContacto(String nombre, Usuario usuario) {
-			return (this.listaContactos.add(new ContactoIndividual(nombre, usuario)));
+		public ContactoIndividual crearContacto(String nombre, Usuario usuario) {
+			ContactoIndividual contacto = new ContactoIndividual(nombre, usuario);
+			boolean resultado = this.listaContactos.add(contacto);
+			return contacto;
 		}
 		
 		public boolean crearGrupo(String nombre, URL imagen) {
@@ -189,7 +191,8 @@ public class Usuario {
 			return new LinkedList<Mensaje>(this.mensajesEnviados);
 			
 		}
-
+		
+		public void setListaContacto(List<Contacto> lista) {this.listaContactos = new LinkedList<Contacto>(lista);}
 
 	    public static class BuilderUsuario {
 	    	//Atributos, iguales que la clase Usuario
@@ -201,13 +204,13 @@ public class Usuario {
 	    	private URL imagen;
 	    	private String password;
 	    	private String saludo="";
-	    	private final HashSet<Contacto> listaContactos; 
+	    	private final List<Contacto> listaContactos; 
 	    	private boolean esPremium = false;
 	        
 	        public BuilderUsuario(String nombre, String telefono) {
 	        	this.nombre = nombre;
 	        	this.telefono = telefono;
-	        	this.listaContactos = new HashSet<Contacto>();
+	        	this.listaContactos = new LinkedList<Contacto>();
 	        }
 	        
 	        public BuilderUsuario apellidos(String apellidos) {this.apellidos=apellidos;return this;}

@@ -27,7 +27,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	
 	
 	public static AdaptadorUsuarioDAOTDS getUsuarioDAO() {
-		System.out.println("[DEBUG]: " + "Se ha recuperado la instancia de AdaptadorUsuarioDAOTDS.");
+		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS getUsuarioDAO]: " + "Se ha recuperado la instancia de AdaptadorUsuarioDAOTDS.");
 		return instancia;
 	}
 	
@@ -42,17 +42,17 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	
 	@Override
 	public void registrarUsuario(Usuario usuario) {
-		System.out.println("[DEBUG]: " + "Se ha entrado a registrar usuario en el servidor de persistencia.");
+		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS registrarUsuario]: " + "Se ha entrado a registrar usuario en el servidor de persistencia.");
 		//Comprobacion de que usuario ya no tenga asociado una entidad
 		Entidad eUsuario = null;
 		try {
-			System.out.println("[DEBUG]: " + "Se comprueba si ya se encuentra registrado.");
+			System.out.println("[DEBUG AdaptadorUsuarioDAOTDS registrarUsuario]: " + "Se comprueba si ya se encuentra registrado.");
 			eUsuario=servPersistencia.recuperarEntidad(usuario.getCodigo());
 		}catch(NullPointerException e) {}
 		if (eUsuario != null) return;
 		
 		//Registramos sus objetos: Deberia registrarse los contactos individuales y los mensajes
-		System.out.println("[DEBUG]: " + "No se encuentra registrado. Se crea la entidad");
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS registrarUsuario]: " + "No se encuentra registrado. Se crea la entidad");
 		for (Mensaje mensaje : usuario.getMensajesEnviados()) {
 			FactoriaDAOTDS.getFactoriaDAO().getMensajeDAO().registrarMensaje(mensaje);
 		}
@@ -78,13 +78,13 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("telefono", usuario.getTelefono()),
 						new Propiedad("email", usuario.getEmail()),
 						new Propiedad("password", usuario.getPassword()),
-						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto()) )
+						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto()))
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
-		System.out.println("[DEBUG]: " + "Se ha registrado la entidad.");
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS]: " + "Se ha registrado la entidad.");
 		usuario.setCodigo(eUsuario.getId());
-		System.out.println("[DEBUG]: " + "El id del usuario registrado es " + usuario.getCodigo());
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS]: " + "El id del usuario registrado es " + usuario.getCodigo());
 
 	
 	
@@ -93,34 +93,59 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 
 	@Override
 	public void modificarUsuario(Usuario usuario) {
-		
+		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Inicio de modificar usuario.");
 		Entidad eUsuario = servPersistencia.recuperarEntidad(usuario.getCodigo());
 		
+		//REVISAR: Eliminar aquellos campos en los que no se haya implementado la funcionalidad de cambiar al usuario.
 		for (Propiedad prop : eUsuario.getPropiedades()) {
 			
-			if (prop.getNombre().equals("nombre")) prop.setValor(usuario.getNombre());
-			else if (prop.getNombre().equals("apellidos")) prop.setValor(usuario.getApellidos());
-			else if (prop.getNombre().equals("telefono")) prop.setValor(usuario.getTelefono());
-			else if (prop.getNombre().equals("email")) prop.setValor(usuario.getEmail());
-			else if (prop.getNombre().equals("password")) prop.setValor(usuario.getPassword());
-			else if (prop.getNombre().equals("fecha")) prop.setValor(usuario.getFechaNacimiento().format(formateador));
-			else if (prop.getNombre().equals("lista de contactos")) prop.setValor(obtenerIdsContactos(usuario.getListaContacto()));
+			if (prop.getNombre().equals("nombre")) {
+				
+				prop.setValor(usuario.getNombre());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el nombre del usuario.");
+			}
+			else if (prop.getNombre().equals("apellidos")) {
+				prop.setValor(usuario.getApellidos());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se han modificado los apellidos del usuario.");
+			}
+			else if (prop.getNombre().equals("telefono")) {
+				prop.setValor(usuario.getTelefono());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el telefono del usuario.");
+			}
+			
+			else if (prop.getNombre().equals("email")) {
+				prop.setValor(usuario.getEmail());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el correo del usuario.");
+				}
+			else if (prop.getNombre().equals("password")) {
+				prop.setValor(usuario.getPassword());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la contraseña del usuario.");
+			}
+			else if (prop.getNombre().equals("fecha")) {
+				prop.setValor(usuario.getFechaNacimiento().format(formateador));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la fecha de nacimiento del usuario.");
+				}
+			else if (prop.getNombre().equals("lista de contactos")) {
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Lista ID Contactos:" + this.obtenerIdsContactos(usuario.getListaContacto()));
+				prop.setValor(obtenerIdsContactos(usuario.getListaContacto()));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de contactos del usuario.");
+				}
 			servPersistencia.modificarPropiedad(prop);
 		}
 		
 	}
 	
-	
-	
-
 	@Override
 	public Usuario recuperarUsuario(int id) {
-		
+		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Inicio de recuperar usuario.");
 		//Si el objeto se encuentra en el pool, se retorna
 		PoolDAO poolUsuario = PoolDAO.getUnicaInstancia();
-		if (poolUsuario.contiene(id)) return (Usuario) poolUsuario.getObjeto(id);
+		if (poolUsuario.contiene(id)) {
+			System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Se devuelve el usuario al estar en el Pool.");
+			return (Usuario) poolUsuario.getObjeto(id);
+		}
 		
-		//Si no lo está, se recupera Entidedad y aquellas Propiedades de campos primitivos
+		//Si no lo está, se recupera Entidad y aquellas Propiedades de campos primitivos
 		Entidad eUsuario = servPersistencia.recuperarEntidad(id);
 		
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eUsuario, "nombre");
@@ -129,18 +154,22 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String password = servPersistencia.recuperarPropiedadEntidad(eUsuario, "password");
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
-		List<Contacto> lista = obtenerContactosAPartirDeIds(idLista);
+		
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
-		Usuario usuario = new BuilderUsuario(nombre,telefono)
-							.apellidos(apellidos)
-							.email(email)
-							.password(password) 
-							.listaDeContactos(lista)
-							.build();
-		
+				Usuario usuario = new BuilderUsuario(nombre,telefono)
+									.apellidos(apellidos)
+									.email(email)
+									.password(password) 
+									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);
+		
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Se recupera la entidad y sus propiedades primitivas.");
+		List<Contacto> lista = obtenerContactosAPartirDeIds(idLista);
+		usuario.setListaContacto(lista);
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Se crea y se añade al pool.");
 		
 		//Se recuperan los objetos referenciados y se actualiza el objeto: 
 		
@@ -154,15 +183,15 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 
 	@Override
 	public List<Usuario> recuperarTodosUsuarios(){
-		System.out.println("[DEBUG]: " + "Se ha entrado a recuperar todos los usuarios.");
+		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS recuperarTodosUsuarios]: " + "Se ha entrado a recuperar todos los usuarios.");
 		List<Entidad> eUsuarios = servPersistencia.recuperarEntidades("Usuario");
 		List<Usuario> usuarios = new LinkedList<Usuario>();
 		
 		for (Entidad eUsuario : eUsuarios) {
-			System.out.println("[DEBUG]: " + "Se recupera un usuario.");
+			System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarTodosUsuarios]: " + "Se recupera un usuario.");
 			usuarios.add(recuperarUsuario(eUsuario.getId()));
 		}
-		System.out.println("[DEBUG]: " + "Se devuelven los usuarios recuperados.");
+		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarTodosUsuarios]: " + "Se devuelven los usuarios recuperados.");
 		return usuarios;
 		
 	}
@@ -178,9 +207,12 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	private List<Contacto> obtenerContactosAPartirDeIds(String idContactos){
 		List<Contacto> resultado = new LinkedList<Contacto>();
 		if (idContactos != null && !idContactos.isEmpty()) {
-		
+			
 			for (String idContacto: idContactos.split(" ")) {
-				resultado.add((FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto))));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerContactosAPartirDeIds]: " + "idContacto: " + idContacto);
+				Contacto contacto = (FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto)));
+				resultado.add(contacto);
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerContactosAPartirDeIds]: " + "Se recupera el contacto " + contacto.getNombre());
 			}
 		
 		}

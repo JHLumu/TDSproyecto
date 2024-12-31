@@ -71,7 +71,6 @@ public class NuevoContacto extends JFrame {
 		setBackground(new Color(255, 255, 255));
 		getContentPane().setBackground(new Color(255, 255, 255));
 		setBounds(100, 100, 363, 239);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		

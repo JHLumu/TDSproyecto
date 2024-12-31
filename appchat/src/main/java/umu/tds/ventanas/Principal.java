@@ -3,7 +3,8 @@ package umu.tds.ventanas;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.List;
 import javax.swing.JFrame;
@@ -16,6 +17,7 @@ import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 
+
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -27,10 +29,10 @@ import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
-
+import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
+import javax.swing.UIDefaults;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -54,6 +56,7 @@ public class Principal extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					BubbleText.noZoom();
 					Principal frame = new Principal();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -90,11 +93,11 @@ public class Principal extends JFrame {
 		JComboBox<String> comboBoxContactos = new JComboBox<String>();
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
-		comboBoxContactos.setSize(new Dimension(100, 25));
+		comboBoxContactos.setSize(new Dimension(100, 20));
 		comboBoxContactos.setBackground(new Color(81, 116, 255));
 		comboBoxContactos.setMaximumSize(new Dimension(100000, 16000));
-		comboBoxContactos.setMinimumSize(new Dimension(100, 25));
-		comboBoxContactos.setPreferredSize(new Dimension(100, 25));
+		comboBoxContactos.setMinimumSize(new Dimension(100, 20));
+		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
 		
 		DefaultComboBoxModel<String> listaContactos = new DefaultComboBoxModel<String>(new String[] {"Contacto o Teléfono"});
 		for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
@@ -216,6 +219,8 @@ public class Principal extends JFrame {
 		barraIntro.add(Emoticono, gbc_Emoticono);
 		
 		textField = new JTextField();
+		textField.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+		
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.insets = new Insets(0, 0, 0, 5);
@@ -227,11 +232,23 @@ public class Principal extends JFrame {
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BubbleText burbuja;
-				burbuja=new BubbleText(chat,textField.getText(), Color.GREEN, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT);
-				textField.setText("");
-				chat.add(burbuja);
+				BubbleText burbuja = new BubbleText(chat,textField.getText(), Color.CYAN, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
+	
+				// Asocia las propiedades específicas a este componente
+				burbuja.setBackground(new Color(0, 0, 0, 0)); // Fondo transparente
+				burbuja.setForeground(Color.BLACK); // Texto negro
+				burbuja.setOpaque(false); // Asegúrate de que sea transparente
 				
+				UIDefaults bubbleTextOverrides = new UIDefaults();
+				bubbleTextOverrides.put("Component.background", new Color(0, 0, 0, 0)); // Fondo transparente
+				bubbleTextOverrides.put("Component.foreground", Color.BLACK); // Texto negro
+				bubbleTextOverrides.put("Component.border", BorderFactory.createEmptyBorder()); // Sin bordes
+
+				
+				burbuja.putClientProperty("Nimbus.Overrides", bubbleTextOverrides);
+				burbuja.putClientProperty("Nimbus.Overrides.InheritDefaults", true); // Hereda configuraciones generales de Nimbus
+				
+				chat.add(burbuja);	
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();

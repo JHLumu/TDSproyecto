@@ -17,8 +17,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.JPasswordField;
 
+import javax.swing.JPasswordField;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -37,8 +38,12 @@ public class Login {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-					Login window = new Login();
+					UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
+					
+					// Hacer el fondo transparente globalmente
+				    UIManager.put("nimbusLightBackground", new Color(0, 0, 0, 0));
+
+				    Login window = new Login();
 					window.frmAppchat.setVisible(true);
 					window.frmAppchat.setLocationRelativeTo(null);
 				} catch (Exception e) {

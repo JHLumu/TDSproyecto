@@ -37,15 +37,19 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 	
 	@Override
 	public void registrarContacto(Contacto contacto) {
-		
+		System.out.println("\n[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Inicio de registro de contacto.");
 		//Comprobamos que contacto no se encuentre registrado ya
 		
 		Entidad eContacto = null;
 		try {
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se comprueba si ya hay una entidad asociada.");
 			eContacto = servPersistencia.recuperarEntidad(contacto.getCodigo());
 		}catch(NullPointerException e) {};
-		if (eContacto != null) return;
-		
+		if (eContacto != null) {
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Contacto ya ha sido registrado anteriormente.");
+			return;
+			}
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "No tiene una entidad asociada. Se crea la entidad.");
 		//Se deberian registrar sus objetos referenciados, pero se tiene en cuenta
 		//que para crear un contacto ya se valida si el usuario se encuentra registrado
 		
@@ -53,6 +57,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		eContacto = new Entidad();
 		eContacto.setNombre("Contacto");
 		
+		
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se asocian sus propiedades comunes.");
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		propiedades.addAll(Arrays.asList(
@@ -61,15 +67,20 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 				));
 		
 		//Propiedades si es ContactoIndividual
+		
 		if (contacto.getTipoContacto().equals("Individual")) {
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo ContactoIndividual.");
+			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
+			
 			propiedades.add(
-					new Propiedad("Usuario", String.valueOf(aux.getUsuario().getCodigo()))
+					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo()))
 					);
 		}
 		
 		//Propiedades si es Grupo
 		else if (contacto.getTipoContacto().equals("Grupo")) {
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo Grupo.");
 			Grupo aux = (Grupo) contacto;
 			propiedades.add(
 					new Propiedad("miembros", obtenerIdsMiembros(aux.getMiembros()))
@@ -79,6 +90,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		//Se asocia a la entidad las propiedaddes y se registra la entidad
 		eContacto.setPropiedades(propiedades);
 		eContacto = servPersistencia.registrarEntidad(eContacto);
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene id " + eContacto.getId());
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene usuario referencia " + servPersistencia.recuperarPropiedadEntidad(eContacto, "usuario"));
 		contacto.setCodigo(eContacto.getId());
 	
 		
@@ -86,23 +99,37 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 
 	@Override
 	public void modificarContacto(Contacto contacto) {
+		System.out.println("\n[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Inicio de modificación de contacto " + contacto.getCodigo());
 		//Se recupera la entidad asociada al contacto
 		Entidad eContacto = servPersistencia.recuperarEntidad(contacto.getCodigo());
-		
 		//Se recorren sus propiedades 
 		
 		for (Propiedad p : eContacto.getPropiedades()) {
 			String pNombre = p.getNombre();
 			
-			if (pNombre.equals("nombre")) p.setValor(contacto.getNombre());
+			if (pNombre.equals("nombre")) {
+				p.setValor(contacto.getNombre());
+				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica el nombre de contacto.");
+			}
 			
-			else if (pNombre.equals("imagen")) p.setValor(String.valueOf(contacto.getImagen()));
+			else if (pNombre.equals("imagen")) {
+				p.setValor(String.valueOf(contacto.getImagen()));
+				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la imagen de contacto");
+			}
 			
-			else if (pNombre.equals("Usuario")) p.setValor(String.valueOf(((ContactoIndividual) contacto).getUsuario().getCodigo()));
+			//REVISAR: Eliminar si no se implementa la funcionalidad de cambiar el telefono
+			else if (pNombre.equals("usuario")) {
+				p.setValor(String.valueOf(((ContactoIndividual) contacto).getUsuario().getCodigo()));
+				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica el Usuario asociado a contacto");
+			}
 			
-			else if (pNombre.equals("miembros")) p.setValor(obtenerIdsMiembros(((Grupo) contacto).getMiembros()));
+			else if (pNombre.equals("miembros")) {
+				p.setValor(obtenerIdsMiembros(((Grupo) contacto).getMiembros()));
+				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
+			}
 			
 			servPersistencia.modificarPropiedad(p);
+			System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se guardan los cambios de contacto.");
 		}
 		
 		
@@ -110,47 +137,52 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 
 	@Override
 	public Contacto recuperarContacto(int id) {
-		
+		System.out.println("\n[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Inicio de recuperar contacto.");
 		//Si el objeto se encuentra en el pool, se retorna
+		
 		PoolDAO poolContacto = PoolDAO.getUnicaInstancia();
-		if (poolContacto.contiene(id)) return (Contacto) poolContacto.getObjeto(id);
-		
-		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
-		Entidad eContacto = servPersistencia.recuperarEntidad(id);
-		
-		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
-		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
-		URL imagen = null;
-		if (imagenString != null) {
-			try {
-				imagen = new URL(imagenString);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
+		if (poolContacto.contiene(id)) {
+			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Contacto se encuentra en el Pool. Se devuelve contacto");
+			return (Contacto) poolContacto.getObjeto(id);
 			
 		}
 		
+		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
+		Entidad eContacto = servPersistencia.recuperarEntidad(id);
+		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
+		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
+		
+			
+		
+		System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la entidad con sus propiedades primitivas.");
+		
+		//Se guarda en el pool antes de recuperar los objetos referenciados
+		
 		//Para poder crear el objeto Contacto necesitamos saber de que tipo es
-
+		String idUsuario = servPersistencia.recuperarPropiedadEntidad(eContacto, "usuario");
+		System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "idUsuario igual a " + idUsuario);
+		
 		Contacto contacto = null;
 		
-		String idUsuario = servPersistencia.recuperarPropiedadEntidad(eContacto, "Usuario");
-		
 		//Si tiene asignado un Usuario, es Contacto Individual; si no, es Grupo
-		if ((idUsuario!=null) && (!idUsuario.isEmpty())) {
+		if ((idUsuario!=null)) {
 			
+			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera el usuario asociado a Contacto si es tipo ContactoIndividual.");
 			Usuario usuario = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idUsuario));
 			contacto = new ContactoIndividual(nombre,usuario);
+			
 			
 		}
 		
 		//Si no tiene asignado un Usuario, es un Grupo. Recuperamos los miembros del grupo
 		else {
+			
+			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la lista de miembros si es tipo Grupo.");
 			String idMiembros = servPersistencia.recuperarPropiedadEntidad(eContacto, "miembros");
 			contacto = new Grupo(nombre, obtenerMiembrosporIds(idMiembros));
+			
 		}
-		
+		contacto.setCodigo(id);
 		poolContacto.addObjeto(id, contacto);
 		return contacto;
 		
@@ -161,14 +193,16 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 	
 	private String obtenerIdsMiembros(ContactoIndividual[] grupo) {
 		String aux = Stream.of(grupo)
-				.map(c -> c.getNombre())
+				.map(c -> String.valueOf(c.getCodigo()))
 				.collect(Collectors.joining(" "));
+		System.out.println("\n[DEBUG AdaptadorContactoDAO obtenerIdsMiembros]: Resultado:" + aux);
 		return aux;
 
 	}
 	
 	private ContactoIndividual[] obtenerMiembrosporIds(String idsMiembros){
 		List<ContactoIndividual> resultado = new LinkedList<ContactoIndividual>();
+		if (idsMiembros == null) return resultado.toArray(new ContactoIndividual[0]);
 		for (String idMiembro: idsMiembros.split(" ")) {
 		resultado.add((ContactoIndividual) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idMiembro)));
 		}
