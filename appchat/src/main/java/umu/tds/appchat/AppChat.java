@@ -14,9 +14,10 @@ import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.*;
+import umu.tds.utils.TDSObservable;
 
 //Clase Controlador entre modelos y ventanas
-public class AppChat {
+public class AppChat extends TDSObservable{
 	
 	//Servidor de persistencia elegido
 	public static String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
@@ -126,6 +127,11 @@ public class AppChat {
 		 else {
 			 contactoDAO.registrarContacto(contacto);
 			 usuarioDAO.modificarUsuario(sesionUsuario);
+			 
+			// Notificar a los observadores sobre el nuevo contacto
+	            setChanged();
+	            notifyObservers("nuevoContacto");
+	            
 			 return true;
 		 }
 	

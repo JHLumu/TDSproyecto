@@ -16,7 +16,8 @@ import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
-
+import umu.tds.utils.TDSObservable;
+import umu.tds.utils.TDSObserver;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -42,12 +43,13 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
 
-public class Principal extends JFrame {
+public class Principal extends JFrame implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField textField;
 	private final AppChat controlador;
+	DefaultComboBoxModel<String> listaContactos;
 
 	/**
 	 * Launch the application.
@@ -99,8 +101,8 @@ public class Principal extends JFrame {
 		comboBoxContactos.setMinimumSize(new Dimension(100, 20));
 		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
 		
-		DefaultComboBoxModel<String> listaContactos = new DefaultComboBoxModel<String>(new String[] {"Contacto o Teléfono"});
-		for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
+		listaContactos = new DefaultComboBoxModel<String>();
+		actualizarListaContactos(); // Cargar contactos inicialmente
 		comboBoxContactos.setModel(listaContactos);
 		panelNorte.add(comboBoxContactos);
 		
@@ -265,7 +267,33 @@ public class Principal extends JFrame {
 		gbc_horizontalGlue_1.gridy = 0;
 		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
-
+		AppChat.getInstancia().addObserver(this);
 	}
+	
+	// Implementación del método update de TDSObserver
+    @Override
+    public void update(TDSObservable o, Object arg) {
+        if (arg instanceof String) {
+            String evento = (String) arg;
+            if (evento.equals("nuevoContacto")) {
+                actualizarListaContactos();
+            }
+            // Puedes manejar otros eventos según sea necesario
+        }
+    }
+
+    // Método para actualizar la lista de contactos en la UI
+    private void actualizarListaContactos() {
+    	listaContactos.removeAllElements();
+    	listaContactos.addElement("Contacto o Teléfono");
+    	for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
+    }
+
+    // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra
+    @Override
+    public void dispose() {
+        AppChat.getInstancia().deleteObserver(this);
+        super.dispose();
+    }
 
 }

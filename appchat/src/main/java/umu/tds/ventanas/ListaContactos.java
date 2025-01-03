@@ -22,6 +22,8 @@ import java.awt.Color;
 import javax.swing.border.SoftBevelBorder;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.TDSObservable;
+import umu.tds.utils.TDSObserver;
 
 import javax.swing.border.BevelBorder;
 
@@ -35,10 +37,11 @@ import java.awt.Toolkit;
 
 import javax.swing.JLabel;
 
-public class ListaContactos extends JFrame {
+public class ListaContactos extends JFrame implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private DefaultListModel<String> listaContactos;
 
 	/**
 	 * Launch the application.
@@ -99,10 +102,9 @@ public class ListaContactos extends JFrame {
 		
 		JList<String> list = new JList<String>();
 		list.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		DefaultListModel<String> listaContactos = new DefaultListModel<String>();
-		
-		for (String nombreContacto : AppChat.getInstancia().obtenerListaContactos()) listaContactos.addElement(nombreContacto);
-		list.setModel(listaContactos);
+		listaContactos = new DefaultListModel<>();
+        actualizarListaContactos(); // Cargar contactos inicialmente
+        list.setModel(listaContactos);
 		
 		GridBagConstraints gbc_list = new GridBagConstraints();
 		gbc_list.insets = new Insets(0, 0, 5, 5);
@@ -155,6 +157,16 @@ public class ListaContactos extends JFrame {
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 			
+			frame.addWindowListener(new java.awt.event.WindowAdapter() {
+
+		        @Override
+		        public void windowClosed(java.awt.event.WindowEvent e) {
+		            listaContactos.clear();
+		            for (String nombreContacto : AppChat.getInstancia().obtenerListaContactos()) listaContactos.addElement(nombreContacto);
+		    		list.setModel(listaContactos);
+		        }
+		    });
+			
 			
 		});
 		
@@ -168,6 +180,35 @@ public class ListaContactos extends JFrame {
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelSuperior.add(horizontalGlue);
 		
+		AppChat.getInstancia().addObserver(this);
+		
 	}
+	
+	// Implementación del método update de TDSObserver
+    @Override
+    public void update(TDSObservable o, Object arg) {
+        if (arg instanceof String) {
+            String evento = (String) arg;
+            if (evento.equals("nuevoContacto")) {
+                actualizarListaContactos();
+            }
+            // Puedes manejar otros eventos según sea necesario
+        }
+    }
+
+    // Método para actualizar la lista de contactos en la UI
+    private void actualizarListaContactos() {
+        listaContactos.clear();
+        for (String nombreContacto : AppChat.getInstancia().obtenerListaContactos()) {
+            listaContactos.addElement(nombreContacto);
+        }
+    }
+
+    // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra
+    @Override
+    public void dispose() {
+        AppChat.getInstancia().deleteObserver(this);
+        super.dispose();
+    }
 
 }
