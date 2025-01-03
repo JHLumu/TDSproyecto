@@ -24,6 +24,8 @@ import javax.swing.border.SoftBevelBorder;
 import umu.tds.appchat.AppChat;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
+import umu.tds.modelos.Contacto;
+import umu.tds.modelos.ContactoRenderer;
 
 import javax.swing.border.BevelBorder;
 
@@ -34,6 +36,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.util.List;
 
 import javax.swing.JLabel;
 
@@ -41,7 +44,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private DefaultListModel<String> listaContactos;
+	private DefaultListModel<Contacto> listaContactos;
 
 	/**
 	 * Launch the application.
@@ -100,10 +103,11 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		panelCentral.add(lblGrupo, gbc_lblGrupo);
 		
 		
-		JList<String> list = new JList<String>();
+		JList<Contacto> list = new JList<Contacto>();
 		list.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listaContactos = new DefaultListModel<>();
         actualizarListaContactos(); // Cargar contactos inicialmente
+        list.setCellRenderer(new ContactoRenderer());
         list.setModel(listaContactos);
 		
 		GridBagConstraints gbc_list = new GridBagConstraints();
@@ -157,17 +161,6 @@ public class ListaContactos extends JFrame implements TDSObserver {
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 			
-			frame.addWindowListener(new java.awt.event.WindowAdapter() {
-
-		        @Override
-		        public void windowClosed(java.awt.event.WindowEvent e) {
-		            listaContactos.clear();
-		            for (String nombreContacto : AppChat.getInstancia().obtenerListaContactos()) listaContactos.addElement(nombreContacto);
-		    		list.setModel(listaContactos);
-		        }
-		    });
-			
-			
 		});
 		
 		JPanel panelInferior = new JPanel();
@@ -198,9 +191,10 @@ public class ListaContactos extends JFrame implements TDSObserver {
 
     // Método para actualizar la lista de contactos en la UI
     private void actualizarListaContactos() {
-        listaContactos.clear();
-        for (String nombreContacto : AppChat.getInstancia().obtenerListaContactos()) {
-            listaContactos.addElement(nombreContacto);
+        listaContactos.clear(); // Limpiar el modelo actual
+        List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactosIndividuales(); // Obtener lista de contactos
+        for (Contacto contacto : contactos) {
+            listaContactos.addElement(contacto); // Añadir cada contacto al modelo
         }
     }
 

@@ -1,0 +1,120 @@
+package umu.tds.modelos;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+
+import umu.tds.appchat.AppChat;
+
+public class ContactoRenderer extends JPanel implements ListCellRenderer<Contacto> {
+    
+    private static final long serialVersionUID = 1L;
+    private JLabel imageLabel;
+    private JLabel nombreLabel;
+    private JLabel tipoOtelfLabel;
+
+    public ContactoRenderer() {
+        setLayout(new BorderLayout(5, 5));
+
+        imageLabel = new JLabel();
+        nombreLabel = new JLabel();
+        tipoOtelfLabel = new JLabel();
+
+        JPanel textPanel = new JPanel(new BorderLayout());
+        textPanel.add(nombreLabel, BorderLayout.CENTER);
+        textPanel.add(tipoOtelfLabel, BorderLayout.SOUTH);
+
+        add(imageLabel, BorderLayout.WEST);
+        add(textPanel, BorderLayout.CENTER);
+    }
+
+    @Override
+    public Component getListCellRendererComponent(JList<? extends Contacto> list, Contacto contacto, int index,
+            boolean isSelected, boolean cellHasFocus) {
+    	
+    	AppChat controlador = AppChat.getInstancia();
+        // Set the text fields
+    	nombreLabel.setText(contacto.getNombre());
+
+    	// Si es un ContactoIndividual, mostrar el número de teléfono
+    	if (contacto instanceof ContactoIndividual) {
+    	    String telefono = ((ContactoIndividual) contacto).getTelefono();
+    	    tipoOtelfLabel.setText("Teléfono: " + telefono);
+    	} else {
+    	    tipoOtelfLabel.setText("Tipo: " + contacto.getTipoContacto());
+    	}
+
+    	try {
+    	    // Obtener el usuario de la sesión actual
+    	    if (controlador.getNombreUsuario() == null) {
+    	        throw new IllegalStateException("Usuario de sesión actual no encontrado");
+    	    }
+
+    	    // Directorio base del usuario de la sesión actual
+    	    String directorioBase = "imagenPerfilContactos\\" + 
+    	    						controlador.getNombreUsuario() +  "-" + 
+    	    						controlador.getTelefonoUsuario();
+
+    	    // Crear subdirectorio específico para el contacto
+    	    String subcarpeta;
+    	    if (contacto instanceof ContactoIndividual) {
+    	        String telefono = ((ContactoIndividual) contacto).getTelefono();
+    	        subcarpeta = contacto.getNombre() + "-" + telefono;
+    	    } else { // Caso para grupos
+    	        subcarpeta = contacto.getNombre() + "-GRUPO";
+    	    }
+
+    	    File directorio = new File(directorioBase, subcarpeta);
+    	    if (!directorio.exists()) {
+    	        directorio.mkdirs(); // Crear directorio si no existe
+    	    }
+
+    	    // Ruta al archivo local
+    	    File localFile = new File(directorio, "perfil.png");
+
+    	    if (!localFile.exists()) {
+    	        // Si el archivo no existe, descargarlo desde el URL
+    	        URL imageUrl = contacto.getImagen(); // Obtener el URL de la imagen
+    	        if (imageUrl != null) {
+    	            Image image = ImageIO.read(imageUrl);
+    	            ImageIO.write((java.awt.image.RenderedImage) image, "png", localFile);
+    	        }
+    	    }
+
+    	    // Cargar la imagen local y establecerla en el JLabel
+    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
+    	        Image localImage = ImageIO.read(localFile);
+    	        ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+    	        imageLabel.setIcon(imageIcon);
+    	    } else {
+    	        // Si no existe imagen local, usar un ícono predeterminado
+    	        imageLabel.setIcon(null); // Aquí puedes usar un ícono por defecto si lo prefieres
+    	    }
+
+    	} catch (IOException | IllegalStateException e) {
+    	    e.printStackTrace();
+    	    imageLabel.setIcon(null); // En caso de error, no establecer imagen
+    	}
+
+        // Set background and foreground based on selection
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+
+        return this;
+    }
+}

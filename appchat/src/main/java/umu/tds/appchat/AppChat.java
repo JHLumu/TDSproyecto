@@ -58,6 +58,10 @@ public class AppChat extends TDSObservable{
 		return this.sesionUsuario.getNombre();
 	}
 	
+	public String getTelefonoUsuario() {
+		return this.sesionUsuario.getTelefono();
+	}
+	
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
@@ -145,6 +149,30 @@ public class AppChat extends TDSObservable{
 		return nombresContactos;
 	}
 	
+	public List<Contacto> obtenerListaContactosIndividuales() {
+	    if (this.sesionUsuario == null) {
+	        return new LinkedList<>(); // Devuelve una lista vacía si no hay sesión iniciada
+	    }
+
+	    return this.sesionUsuario.getListaContacto().stream()
+	            .filter(contacto -> contacto.getTipoContacto().equals("Individual")) // Filtrar sólo ContactoIndividual
+	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
+	            .toList(); // Convertir a lista
+	}
+	
+	public List<Contacto> obtenerListaContactosGrupo() {
+	    if (this.sesionUsuario == null) {
+	        return new LinkedList<>(); // Devuelve una lista vacía si no hay sesión iniciada
+	    }
+
+	    return this.sesionUsuario.getListaContacto().stream()
+	            .filter(contacto -> contacto.getTipoContacto().equals("Grupo")) // Filtrar sólo Grupos
+	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
+	            .toList(); // Convertir a lista
+	}
+
+
+	
 	
 	
 	//Esto es mas cosa del patron dao que del controlador
@@ -164,4 +192,10 @@ public class AppChat extends TDSObservable{
 		*/
 		return new LinkedList<Mensaje>();
 	}
+	
+	public void enviarMensaje(Contacto contacto) {
+		
+	}
+
+	
 }

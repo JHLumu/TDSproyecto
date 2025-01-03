@@ -8,7 +8,7 @@ import java.util.Objects;
 //Tanto Grupos como Contactos Individuales son 
 //tratados de igual manera, aqui se define la 
 //estructura comun de ambos
-public abstract class Contacto {
+public abstract class Contacto implements Comparable<Contacto> {
 
     // Atributos comunes a todos los contactos
     private String nombre;
@@ -58,19 +58,49 @@ public abstract class Contacto {
     public abstract String getTipoContacto();
 
     
-    // Redefiniciones de métodos
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Contacto contacto = (Contacto) o;
-        return Objects.equals(nombre, contacto.nombre);
+
+        // Comparación específica basada en el tipo
+        if (this instanceof ContactoIndividual && contacto instanceof ContactoIndividual) {
+            return Objects.equals(((ContactoIndividual) this).getUsuario().getTelefono(),
+                    ((ContactoIndividual) contacto).getUsuario().getTelefono());
+        } else if (this instanceof Grupo && contacto instanceof Grupo) {
+            return Objects.equals(this.nombre, contacto.nombre);
+        }
+
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nombre);
+        if (this instanceof ContactoIndividual) {
+            return Objects.hash(((ContactoIndividual) this).getUsuario().getTelefono());
+        } else if (this instanceof Grupo) {
+            return Objects.hash(this.nombre);
+        }
+        return super.hashCode();
     }
-    
+
+    @Override
+    public int compareTo(Contacto otro) {
+        if (otro == null) {
+            throw new NullPointerException("El contacto comparado no puede ser null");
+        }
+
+        // Priorizamos los grupos sobre los contactos individuales
+        if (this instanceof Grupo && !(otro instanceof Grupo)) {
+            return -1; // Este contacto (Grupo) va antes
+        } else if (!(this instanceof Grupo) && otro instanceof Grupo) {
+            return 1; // El otro contacto (Grupo) va antes
+        }
+
+        // Si son del mismo tipo entonces se compara por nombre
+        return this.nombre.compareTo(otro.nombre);
     }
+}
 
