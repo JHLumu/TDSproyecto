@@ -203,19 +203,33 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
-	public static Image getImagen(String url) {
-		try {
-		    if (new URL(url) != null) { // Si se proporciona una URL
-		        
-		            System.out.println("[DEBUG getImagen]: Descargando imagen desde URL: " + new URL(url));
-		            return ImageIO.read(new URL(url)); // Descargar la imagen desde la URL
-		        
-		    } 
-		} catch (IOException e) {
-			e.printStackTrace();
-        }
-		return null;
+	public static Image getImagen(Object urlObj) {
+	    try {
+	        URL url;
+
+	        // Determinar si el objeto es String o URL
+	        if (urlObj instanceof String) {
+	            url = new URL((String) urlObj);
+	        } else if (urlObj instanceof URL) {
+	            url = (URL) urlObj;
+	        } else {
+	            throw new IllegalArgumentException("El parámetro debe ser una URL o una cadena válida.");
+	        }
+
+	        // Descargar la imagen desde la URL
+	        System.out.println("[DEBUG getImagen]: Descargando imagen desde URL: " + url);
+	        return ImageIO.read(url);
+
+	    } catch (IOException e) {
+	        System.err.println("[ERROR getImagen]: No se pudo descargar la imagen.");
+	        e.printStackTrace();
+	    } catch (IllegalArgumentException e) {
+	        System.err.println("[ERROR getImagen]: " + e.getMessage());
+	    }
+
+	    return null; // Retorna null en caso de error
 	}
+
 
 	public boolean validarCampos(String nombre, String apellidos, String telefono, String email, String contraseña, String confcontraseña,
 			LocalDate fechaNac, String imagenURL) {

@@ -1,6 +1,8 @@
 package umu.tds.persistencia;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
@@ -14,7 +16,6 @@ import beans.Propiedad;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 import umu.tds.modelos.Contacto;
-import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Usuario.BuilderUsuario;
@@ -78,7 +79,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("telefono", usuario.getTelefono()),
 						new Propiedad("email", usuario.getEmail()),
 						new Propiedad("password", usuario.getPassword()),
-						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto()))
+						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
+						new Propiedad("imagen", usuario.getImagenPerfil().toString())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -136,7 +138,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	}
 	
 	@Override
-	public Usuario recuperarUsuario(int id) {
+	public Usuario recuperarUsuario(int id) throws MalformedURLException {
 		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Inicio de recuperar usuario.");
 		//Si el objeto se encuentra en el pool, se retorna
 		PoolDAO poolUsuario = PoolDAO.getUnicaInstancia();
@@ -154,6 +156,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String password = servPersistencia.recuperarPropiedadEntidad(eUsuario, "password");
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
+		String imagen = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
 		
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
@@ -161,7 +164,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				Usuario usuario = new BuilderUsuario(nombre,telefono)
 									.apellidos(apellidos)
 									.email(email)
-									.password(password) 
+									.password(password)
+									.imagenDePerfil(new URL(imagen))
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);
@@ -182,7 +186,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	}
 
 	@Override
-	public List<Usuario> recuperarTodosUsuarios(){
+	public List<Usuario> recuperarTodosUsuarios() throws MalformedURLException{
 		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS recuperarTodosUsuarios]: " + "Se ha entrado a recuperar todos los usuarios.");
 		List<Entidad> eUsuarios = servPersistencia.recuperarEntidades("Usuario");
 		List<Usuario> usuarios = new LinkedList<Usuario>();
@@ -204,7 +208,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				
 	}
 	
-	private List<Contacto> obtenerContactosAPartirDeIds(String idContactos){
+	private List<Contacto> obtenerContactosAPartirDeIds(String idContactos) throws NumberFormatException, MalformedURLException{
 		List<Contacto> resultado = new LinkedList<Contacto>();
 		if (idContactos != null && !idContactos.isEmpty()) {
 			

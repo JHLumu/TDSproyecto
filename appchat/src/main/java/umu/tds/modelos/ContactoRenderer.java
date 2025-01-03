@@ -67,27 +67,32 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
 
     	    // Crear subdirectorio específico para el contacto
     	    String subcarpeta;
-    	    if (contacto instanceof ContactoIndividual) {
+    	    if (contacto.getTipoContacto().equals("Individual")) {
     	        String telefono = ((ContactoIndividual) contacto).getTelefono();
     	        subcarpeta = contacto.getNombre() + "-" + telefono;
     	    } else { // Caso para grupos
     	        subcarpeta = contacto.getNombre() + "-GRUPO";
     	    }
-
+    	    
     	    File directorio = new File(directorioBase, subcarpeta);
     	    if (!directorio.exists()) {
     	        directorio.mkdirs(); // Crear directorio si no existe
     	    }
-
+    	    
+    	    
+    	    File localFile;
+    	    if (contacto.getTipoContacto().equals("Individual")) {
     	    // Ruta al archivo local
-    	    File localFile = new File(directorio, "perfil.png");
-
+    	    	localFile = new File(directorio, contacto.getNombre() + "_" + ((ContactoIndividual) contacto).getTelefono() +".png");
+    	    } else {
+    	    	localFile = new File(directorio, contacto.getNombre() + "_GRUPO.png");
+    	    }
+    	    
     	    if (!localFile.exists()) {
     	        // Si el archivo no existe, descargarlo desde el URL
-    	        URL imageUrl = contacto.getImagen(); // Obtener el URL de la imagen
+    	        Image imageUrl = AppChat.getImagen(contacto.getImagen()); // Obtener el URL de la imagen
     	        if (imageUrl != null) {
-    	            Image image = ImageIO.read(imageUrl);
-    	            ImageIO.write((java.awt.image.RenderedImage) image, "png", localFile);
+    	            ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
 

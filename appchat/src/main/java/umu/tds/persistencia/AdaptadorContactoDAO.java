@@ -63,7 +63,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		propiedades.addAll(Arrays.asList(
 				new Propiedad("nombre", contacto.getNombre()),
-				new Propiedad("imagen", String.valueOf(contacto.getImagen()))
+				new Propiedad("imagen", contacto.getImagen().toString())
 				));
 		
 		//Propiedades si es ContactoIndividual
@@ -136,7 +136,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 	}
 
 	@Override
-	public Contacto recuperarContacto(int id) {
+	public Contacto recuperarContacto(int id) throws NumberFormatException, MalformedURLException {
 		System.out.println("\n[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Inicio de recuperar contacto.");
 		//Si el objeto se encuentra en el pool, se retorna
 		
@@ -150,7 +150,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
 		Entidad eContacto = servPersistencia.recuperarEntidad(id);
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
-		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
+		URL imagenString = new URL(servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen"));
 		
 			
 		
@@ -200,7 +200,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 
 	}
 	
-	private ContactoIndividual[] obtenerMiembrosporIds(String idsMiembros){
+	private ContactoIndividual[] obtenerMiembrosporIds(String idsMiembros) throws NumberFormatException, MalformedURLException{
 		List<ContactoIndividual> resultado = new LinkedList<ContactoIndividual>();
 		if (idsMiembros == null) return resultado.toArray(new ContactoIndividual[0]);
 		for (String idMiembro: idsMiembros.split(" ")) {
