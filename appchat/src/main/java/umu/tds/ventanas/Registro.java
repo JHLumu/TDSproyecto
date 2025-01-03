@@ -20,7 +20,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
-
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.ZoneId;
 
 import javax.swing.JTextField;
@@ -52,8 +53,9 @@ public class Registro extends JFrame {
 	private JPasswordField passwordField;
 	private JPasswordField passwordField_1;
 	private JDateChooser fecha;
-	private FileDialog file;
-
+	private JTextArea saludoArea;
+	private JTextField imagenField;
+	private JTextField emailField;
 	/**
 	 * Launch the application.
 	 */
@@ -72,30 +74,18 @@ public class Registro extends JFrame {
 	}
 
 	private boolean validacionCampos() {
-		//Debido a que en los requisitos de la aplicacion, no indica nada sobre un formato para los nombres y los apellidos, estos no se van a comprobar.
-		String password = new String(passwordField.getPassword());
-		String password1 = new String(passwordField_1.getPassword());
-		
-		//Comprobacion de que todos los campos obligatorias se han rellenado
-		if(nombreField.getText().isEmpty() || apellidosField.getText().isEmpty() || telefonoField.getText().isEmpty()|| password.isEmpty() || password1.isEmpty() || (fecha.getDate() == null) || (getImagen() == null)) return false;
-		
-		
-		else {
-			
-			System.out.println("[DEBUG Registro validacionCampos]: " + "Campos de Registro:");
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Nombre: " + nombreField.getText());
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Apellidos: " + apellidosField.getText());
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Telefono: " + telefonoField.getText());
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Password: " + password);
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Confirmar Password: " + password1);
-			System.out.println("[DEBUG Registro validacionCampos]: "  + "Fecha: " + fecha.getDateFormatString());
-			
-			//Comprobacion sobre el formato de los datos y sobre la contraseña
-			if (!password.equals(password1)) return false;
-			return true;	
-		}
+	    return AppChat.getInstancia().validarCampos(
+	        nombreField.getText(),
+	        apellidosField.getText(),
+	        telefonoField.getText(),
+	        emailField.getText(),
+	        new String(passwordField.getPassword()),
+	        new String(passwordField_1.getPassword()),
+	        fecha.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+	        imagenField.getText()
+	    );
 	}
-	
+/*	
 	private Image getImagen() {
 		String dir = file.getDirectory();
 		String name = file.getFile();
@@ -130,9 +120,25 @@ public class Registro extends JFrame {
 		
 	
 	}
+*/
 	
+
 	boolean registroUsuario() {
-		return AppChat.getInstancia().registrarUsuario(nombreField.getText(), apellidosField.getText(), telefonoField.getText(), (fecha.getDate().toInstant().atZone(ZoneId.systemDefault())).toLocalDate(), "", new String(passwordField.getPassword()));
+		try {
+			return AppChat.getInstancia().registrarUsuario(
+					nombreField.getText(), 
+					apellidosField.getText(), 
+					telefonoField.getText(), 
+					(fecha.getDate().toInstant().atZone(ZoneId.systemDefault())).toLocalDate(),
+					emailField.getText(),
+					new String(passwordField.getPassword()),
+					saludoArea.getText(), 
+					new URL(imagenField.getText()));
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	/**
@@ -151,9 +157,9 @@ public class Registro extends JFrame {
 		setTitle("AppChat");
 		
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{20, 20, 136, 0, 0, 20, 0};
+		gbl_contentPane.columnWidths = new int[]{20, 20, 136, 0, 121, 0, 20, 0};
 		gbl_contentPane.rowHeights = new int[]{20, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0};
-		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
@@ -168,7 +174,7 @@ public class Registro extends JFrame {
 		
 		nombreField = new JTextField();
 		GridBagConstraints gbc_nombreField = new GridBagConstraints();
-		gbc_nombreField.gridwidth = 3;
+		gbc_nombreField.gridwidth = 4;
 		gbc_nombreField.insets = new Insets(0, 0, 5, 5);
 		gbc_nombreField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_nombreField.gridx = 2;
@@ -188,7 +194,7 @@ public class Registro extends JFrame {
 		
 		apellidosField = new JTextField();
 		GridBagConstraints gbc_apellidosField = new GridBagConstraints();
-		gbc_apellidosField.gridwidth = 3;
+		gbc_apellidosField.gridwidth = 4;
 		gbc_apellidosField.insets = new Insets(0, 0, 5, 5);
 		gbc_apellidosField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_apellidosField.gridx = 2;
@@ -213,6 +219,25 @@ public class Registro extends JFrame {
 		gbc_telefonoField.gridy = 3;
 		contentPane.add(telefonoField, gbc_telefonoField);
 		telefonoField.setColumns(10);
+		
+		JLabel lblEmail = new JLabel("email:");
+		lblEmail.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		GridBagConstraints gbc_lblEmail = new GridBagConstraints();
+		gbc_lblEmail.anchor = GridBagConstraints.EAST;
+		gbc_lblEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_lblEmail.gridx = 3;
+		gbc_lblEmail.gridy = 3;
+		contentPane.add(lblEmail, gbc_lblEmail);
+		
+		emailField = new JTextField();
+		emailField.setColumns(10);
+		GridBagConstraints gbc_emailField = new GridBagConstraints();
+		gbc_emailField.gridwidth = 2;
+		gbc_emailField.insets = new Insets(0, 0, 5, 5);
+		gbc_emailField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_emailField.gridx = 4;
+		gbc_emailField.gridy = 3;
+		contentPane.add(emailField, gbc_emailField);
 		
 		JLabel lblContrasea = new JLabel("Contrase\u00F1a:");
 		lblContrasea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -248,6 +273,7 @@ public class Registro extends JFrame {
 		
 		passwordField_1 = new JPasswordField();
 		GridBagConstraints gbc_passwordField_1 = new GridBagConstraints();
+		gbc_passwordField_1.gridwidth = 2;
 		gbc_passwordField_1.insets = new Insets(0, 0, 5, 5);
 		gbc_passwordField_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_passwordField_1.gridx = 4;
@@ -289,8 +315,8 @@ public class Registro extends JFrame {
 		gbc_scrollPane.gridy = 6;
 		contentPane.add(scrollPane, gbc_scrollPane);
 		
-		JTextArea textArea = new JTextArea();
-		scrollPane.setViewportView(textArea);
+		saludoArea = new JTextArea();
+		scrollPane.setViewportView(saludoArea);
 		
 		JLabel lblImagen = new JLabel("Imagen:");
 		lblImagen.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -302,34 +328,45 @@ public class Registro extends JFrame {
 		contentPane.add(lblImagen, gbc_lblImagen);
 		
 		
-
 		JLabel lblImagen_1 = new JLabel("");
 		lblImagen_1.setIcon(new ImageIcon(Registro.class.getResource("/resources/usuario_64.png")));
 		GridBagConstraints gbc_lblImagen_1 = new GridBagConstraints();
+		gbc_lblImagen_1.gridwidth = 2;
 		gbc_lblImagen_1.insets = new Insets(0, 0, 5, 5);
 		gbc_lblImagen_1.gridx = 4;
 		gbc_lblImagen_1.gridy = 7;
 		contentPane.add(lblImagen_1, gbc_lblImagen_1);
 		
+		imagenField = new JTextField();
+		GridBagConstraints gbc_imagenlField = new GridBagConstraints();
+		gbc_imagenlField.insets = new Insets(0, 0, 5, 5);
+		gbc_imagenlField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_imagenlField.gridx = 4;
+		gbc_imagenlField.gridy = 6;
+		contentPane.add(imagenField, gbc_imagenlField);
+		imagenField.setColumns(10);
 		
-		JButton botonImagen = new JButton("Seleccionar");
+		
+		JButton botonImagen = new JButton("Aceptar");
 		botonImagen.setBackground(new Color(79, 87, 255));
 		botonImagen.setForeground(Color.WHITE);
 		botonImagen.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 		GridBagConstraints gbc_imagenField = new GridBagConstraints();
 		gbc_imagenField.insets = new Insets(0, 0, 5, 5);
-		gbc_imagenField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_imagenField.gridx = 4;
+		gbc_imagenField.gridx = 5;
 		gbc_imagenField.gridy = 6;
 		
 		
 		botonImagen.addActionListener(evento -> {
-			 file = new FileDialog(this, "Seleccionar Imagen", FileDialog.LOAD);
-		     file.setVisible(true);
-		     Image imagen = getImagen();
+			Image imagen = AppChat.getImagen(imagenField.getText());
 		     if(imagen != null) {
 		    	 lblImagen_1.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
-		     }		
+		     } else {
+		    	 JOptionPane.showMessageDialog(this, 
+		                 "No se pudo descargar la imagen desde la URL proporcionada.",
+		                 "AppChat",
+		                 JOptionPane.ERROR_MESSAGE);
+		     }
 		});
 		contentPane.add(botonImagen, gbc_imagenField);
 		

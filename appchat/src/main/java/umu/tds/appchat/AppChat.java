@@ -1,11 +1,15 @@
 package umu.tds.appchat;
 
+import java.awt.Image;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
@@ -62,7 +66,7 @@ public class AppChat extends TDSObservable{
 		return this.sesionUsuario.getTelefono();
 	}
 	
-	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo) {
+	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
 	
@@ -73,6 +77,8 @@ public class AppChat extends TDSObservable{
 				.email(email)
 				.password(password)
 				.saludo(saludo)
+				.fechaNac(fechaNac)
+				.imagenDePerfil(imagen)
 				.build();
 		
 		usuarioDAO.registrarUsuario(usuario);
@@ -83,10 +89,10 @@ public class AppChat extends TDSObservable{
 	
 	//Necesidad de Patron Builder para construir el usuario?
 	
-	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password) {
+	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
-		return this.registrarUsuario(nombre, apellidos, telefono, fechaNac, email, password, "");
+		return this.registrarUsuario(nombre, apellidos, telefono, fechaNac, email, password, "", imagen);
 	}
 	
 	public boolean iniciarSesionUsuario(String telefono, String contraseña) {
@@ -195,6 +201,46 @@ public class AppChat extends TDSObservable{
 	
 	public void enviarMensaje(Contacto contacto) {
 		
+	}
+	
+	public static Image getImagen(String url) {
+		try {
+		    if (new URL(url) != null) { // Si se proporciona una URL
+		        
+		            System.out.println("[DEBUG getImagen]: Descargando imagen desde URL: " + new URL(url));
+		            return ImageIO.read(new URL(url)); // Descargar la imagen desde la URL
+		        
+		    } 
+		} catch (IOException e) {
+			e.printStackTrace();
+        }
+		return null;
+	}
+
+	public boolean validarCampos(String nombre, String apellidos, String telefono, String email, String contraseña, String confcontraseña,
+			LocalDate fechaNac, String imagenURL) {
+		//Debido a que en los requisitos de la aplicacion, no indica nada sobre un formato para los nombres y los apellidos, estos no se van a comprobar.
+				String password = new String(contraseña);
+				String password1 = new String(confcontraseña);
+				
+				//Comprobacion de que todos los campos obligatorias se han rellenado
+				if(nombre.isEmpty() || apellidos.isEmpty() || telefono.isEmpty()|| password.isEmpty() || password1.isEmpty() || (fechaNac == null) || (getImagen(imagenURL) == null)) return false;
+				
+				
+				else {
+					
+					System.out.println("[DEBUG Registro validacionCampos]: " + "Campos de Registro:");
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Nombre: " + nombre);
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Apellidos: " + apellidos);
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Telefono: " + telefono);
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Password: " + password);
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Confirmar Password: " + password1);
+					System.out.println("[DEBUG Registro validacionCampos]: "  + "Fecha: " + fechaNac);
+					
+					//Comprobacion sobre el formato de los datos y sobre la contraseña
+					if (!password.equals(password1)) return false;
+					return true;	
+				}
 	}
 
 	
