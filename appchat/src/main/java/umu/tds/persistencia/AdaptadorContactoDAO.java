@@ -62,8 +62,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		propiedades.addAll(Arrays.asList(
-				new Propiedad("nombre", contacto.getNombre()),
-				new Propiedad("imagen", contacto.getImagen().toString())
+				new Propiedad("nombre", contacto.getNombre())
+				
 				));
 		
 		//Propiedades si es ContactoIndividual
@@ -72,10 +72,11 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo ContactoIndividual.");
 			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
-			
-			propiedades.add(
-					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo()))
-					);
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: URL de la imagen del contacto: "+ contacto.getImagen());
+			propiedades.addAll( Arrays.asList(
+					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo())),
+					new Propiedad("imagen", contacto.getImagen().toExternalForm())
+					));
 		}
 		
 		//Propiedades si es Grupo
@@ -169,7 +170,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera el usuario asociado a Contacto si es tipo ContactoIndividual.");
 			Usuario usuario = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idUsuario));
-			contacto = new ContactoIndividual(nombre,usuario);
+			
+			contacto = new ContactoIndividual(nombre, usuario);
 			
 			
 		}

@@ -80,7 +80,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("email", usuario.getEmail()),
 						new Propiedad("password", usuario.getPassword()),
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
-						new Propiedad("imagen", usuario.getImagenPerfil().toString())
+						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -156,8 +156,9 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String password = servPersistencia.recuperarPropiedadEntidad(eUsuario, "password");
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
-		String imagen = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
-		
+		String imagenPath = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
+		URL imagen = null;
+		if (imagenPath == null) imagen = new URL(imagenPath);
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
@@ -165,7 +166,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 									.apellidos(apellidos)
 									.email(email)
 									.password(password)
-									.imagenDePerfil(new URL(imagen))
+									.imagenDePerfil(imagen)
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);

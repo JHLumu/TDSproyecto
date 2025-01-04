@@ -1,6 +1,5 @@
 package umu.tds.modelos;
 
-
 //Clase que hereda de Contacto que representa 
 //el objeto simple en la estructura del patron
 //Composite
@@ -11,8 +10,9 @@ public class ContactoIndividual extends Contacto {
 
     // Constructor
     public ContactoIndividual(String nombre, Usuario usuario) {
-        super(nombre);  // Llamamos al constructor de la clase base (Contacto)
+        super(nombre, usuario.getImagenPerfil());  // Llamamos al constructor de la clase base (Contacto)
         this.usuario = usuario;
+        
     }
 
     // Getter y setter para el usuario

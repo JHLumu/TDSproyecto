@@ -2,7 +2,6 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -134,7 +133,7 @@ public class Usuario {
 		
 		public ContactoIndividual crearContacto(String nombre, Usuario usuario) {
 			ContactoIndividual contacto = new ContactoIndividual(nombre, usuario);
-			boolean resultado = this.listaContactos.add(contacto);
+			this.listaContactos.add(contacto);
 			return contacto;
 		}
 		
@@ -218,7 +217,10 @@ public class Usuario {
 	        public BuilderUsuario email(String email) {this.email=email;return this;}
 	        public BuilderUsuario password(String password) {this.password=password;return this;}
 	        public BuilderUsuario saludo(String saludo) {this.saludo=saludo;return this;}
-	        public BuilderUsuario imagenDePerfil(URL imagen) {this.imagen = imagen;return this;}
+	        public BuilderUsuario imagenDePerfil(URL imagen) {
+	        	if (imagen == null) return this;
+	        	this.imagen = imagen;return this;
+	        	}
 	        public BuilderUsuario listaDeContactos(List<Contacto> lista) {this.listaContactos.addAll(lista);return this;}
 	        public Usuario build() {return new Usuario(this);}
 	    }

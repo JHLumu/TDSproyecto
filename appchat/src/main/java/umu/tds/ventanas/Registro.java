@@ -3,7 +3,6 @@ package umu.tds.ventanas;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.FileDialog;
 import java.awt.Font;
 
 import javax.swing.JFrame;
@@ -18,11 +17,13 @@ import javax.swing.JOptionPane;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTextField;
 
@@ -35,10 +36,8 @@ import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
-
 import java.awt.Component;
 
-import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
@@ -72,19 +71,90 @@ public class Registro extends JFrame {
 			}
 		});
 	}
-
-	private boolean validacionCampos() {
-	    return AppChat.getInstancia().validarCampos(
-	        nombreField.getText(),
-	        apellidosField.getText(),
-	        telefonoField.getText(),
-	        emailField.getText(),
-	        new String(passwordField.getPassword()),
-	        new String(passwordField_1.getPassword()),
-	        fecha.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-	        imagenField.getText()
-	    );
+	
+	private boolean validacionTelefono() {
+		//Devuelve falso si telefono esta vacio o no cumple con el formato de 9 numeros sin espacios
+		String telefono = this.telefonoField.getText();
+		if (telefono.isEmpty()) return false;
+		System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono no es vacio.");
+		Pattern expresionRegularTelefonos = Pattern.compile("^[0-9]{9}$");
+		Matcher matcher = expresionRegularTelefonos.matcher(telefono);
+		boolean resultado = matcher.matches();
+		System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono cumple formato: " + resultado);
+		if (resultado) System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono: " + telefono);
+		return resultado;
 	}
+	
+	
+	private boolean validacionPasswords() {
+		//Validar el formato de las contraseñas (si añadimos)
+		if (this.passwordField.getPassword() == null || this.passwordField_1.getPassword() == null) return false;
+		String password = new String(this.passwordField.getPassword());
+		String password1 = new String(this.passwordField_1.getPassword());
+		boolean resultado = (password.equals(password1));
+		System.out.println("[DEBUG Registro validacionPasswords]: " + "Password son iguales: " + resultado);
+		if (resultado) System.out.println("[DEBUG Registro validacionPasswords]: " + "Password: " + password);
+		return resultado;
+	}
+	
+	private boolean validacionEmail() {
+		//Se sigue el formato estandar de RFC 5322 Y RFC 5321
+		String email = this.emailField.getText();
+		if (email.isEmpty()) return false;
+		Pattern expresionRegularEmails = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+		Matcher matcher = expresionRegularEmails.matcher(email);
+		boolean resultado = matcher.matches();
+		System.out.println("[DEBUG Registro validacionEmail]: " + "Email cumple formato: " + resultado);
+		if (resultado) System.out.println("[DEBUG Registro validacionEmail]: " + "Email: " + email);
+		return resultado;
+	}
+	
+	private boolean validacionFecha() {
+		//Se verifica si el usuario que se quiere registrado tiene al menos 16 años de edad.
+		Date instante = this.fecha.getDate();
+		if (instante == null) return false;
+		LocalDate fecha = instante.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		boolean resultado = ((LocalDate.now().getYear() - fecha.getYear()) >= 16);
+		System.out.println("[DEBUG Registro validacionFecha]: " + "Fecha cumple formato: " + resultado);
+		if (resultado) System.out.println("[DEBUG Registro validacionFecha]: " + "Fecha: " + fecha.toString());
+		return resultado;
+		
+	}
+	
+	private boolean validacionImagen() {
+		Image imagen = (AppChat.getInstancia().getImagen(this.imagenField.getText()));
+		boolean resultado = (imagen != null);
+		System.out.println("[DEBUG Registro validacionImagen]: " + "Imagen cumple formato: " + resultado);
+		return resultado;
+		
+	}
+	
+	private boolean validacionNombreCompleto() {
+		String nombre = this.nombreField.getText();
+		String apellidos = this.apellidosField.getText();
+		if (nombre.isEmpty() || apellidos.isEmpty()) return false;
+		Pattern expresionRegular = Pattern.compile("^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+([ -][A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*$");
+		Matcher matcherNombre = expresionRegular.matcher(nombre);
+		Matcher matcherApellidos = expresionRegular.matcher(apellidos);
+		boolean resultado1 = matcherNombre.matches();
+		boolean resultado2 = matcherApellidos.matches();
+		System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Nombre cumple formato: " + resultado1);
+		System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Apellidos cumple formato: " + resultado2);
+		if (resultado1 && resultado2) System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Nombre completo: " + nombre + 
+				 " " + apellidos);
+		return (resultado1 && resultado2);
+	}
+	
+	private boolean validacionCampos() {
+		
+		return (validacionNombreCompleto() && validacionTelefono() 
+				&& validacionPasswords() && validacionEmail() 
+				&& validacionFecha() && validacionImagen());
+			
+	}
+	
+
+
 /*	
 	private Image getImagen() {
 		String dir = file.getDirectory();
@@ -145,6 +215,7 @@ public class Registro extends JFrame {
 	 * Create the frame.
 	 */
 	public Registro() {
+		setResizable(false);
 		setTitle("Registro");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 597, 386);
@@ -358,7 +429,7 @@ public class Registro extends JFrame {
 		
 		
 		botonImagen.addActionListener(evento -> {
-			Image imagen = AppChat.getImagen(imagenField.getText());
+			Image imagen = AppChat.getInstancia().getImagen(imagenField.getText());
 		     if(imagen != null) {
 		    	 lblImagen_1.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
 		     } else {
@@ -401,12 +472,9 @@ public class Registro extends JFrame {
 			
 			
 			
-			if (validacionCampos() && registroUsuario()) {
-				
-				 JOptionPane.showMessageDialog(this, 
-		                    "Se ha registrado correctamente",
-		                    "AppChat",
-		                    JOptionPane.PLAIN_MESSAGE);
+			if (validacionCampos()) {
+	
+				 JOptionPane.showMessageDialog(this,"Se ha registrado correctamente","AppChat",JOptionPane.PLAIN_MESSAGE);
 				 this.dispose();
 				
 			}

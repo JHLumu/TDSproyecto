@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -25,7 +25,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
 
     public ContactoRenderer() {
         setLayout(new BorderLayout(5, 5));
-
+      
         imageLabel = new JLabel();
         nombreLabel = new JLabel();
         tipoOtelfLabel = new JLabel();
@@ -45,7 +45,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	AppChat controlador = AppChat.getInstancia();
         // Set the text fields
     	nombreLabel.setText(contacto.getNombre());
-
+    	
     	// Si es un ContactoIndividual, mostrar el número de teléfono
     	if (contacto instanceof ContactoIndividual) {
     	    String telefono = ((ContactoIndividual) contacto).getTelefono();
@@ -90,7 +90,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	    
     	    if (!localFile.exists()) {
     	        // Si el archivo no existe, descargarlo desde el URL
-    	        Image imageUrl = AppChat.getImagen(contacto.getImagen()); // Obtener el URL de la imagen
+    	        Image imageUrl = AppChat.getInstancia().getImagen(contacto.getImagen()); // Obtener el URL de la imagen
     	        if (imageUrl != null) {
     	            ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }

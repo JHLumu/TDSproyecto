@@ -7,9 +7,9 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
@@ -132,7 +132,8 @@ public class AppChat extends TDSObservable{
 	public boolean nuevoContacto(String nombre, String telefono) {
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Inicio de crear contacto.");
 		if (! catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
-		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre, catalogoUsuarios.getUsuario(telefono));
+		Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
+		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre,usuarioAsociado);
 		 if ( contacto == null) return false;
 		 else {
 			 contactoDAO.registrarContacto(contacto);
@@ -163,7 +164,7 @@ public class AppChat extends TDSObservable{
 	    return this.sesionUsuario.getListaContacto().stream()
 	            .filter(contacto -> contacto.getTipoContacto().equals("Individual")) // Filtrar sólo ContactoIndividual
 	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
-	            .toList(); // Convertir a lista
+	            .collect(Collectors.toList()); // Convertir a lista
 	}
 	
 	public List<Contacto> obtenerListaContactosGrupo() {
@@ -174,7 +175,7 @@ public class AppChat extends TDSObservable{
 	    return this.sesionUsuario.getListaContacto().stream()
 	            .filter(contacto -> contacto.getTipoContacto().equals("Grupo")) // Filtrar sólo Grupos
 	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
-	            .toList(); // Convertir a lista
+	            .collect(Collectors.toList()); // Convertir a lista
 	}
 
 
@@ -203,7 +204,7 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
-	public static Image getImagen(Object urlObj) {
+	public Image getImagen(Object urlObj) {
 	    try {
 	        URL url;
 
@@ -228,33 +229,6 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return null; // Retorna null en caso de error
-	}
-
-
-	public boolean validarCampos(String nombre, String apellidos, String telefono, String email, String contraseña, String confcontraseña,
-			LocalDate fechaNac, String imagenURL) {
-		//Debido a que en los requisitos de la aplicacion, no indica nada sobre un formato para los nombres y los apellidos, estos no se van a comprobar.
-				String password = new String(contraseña);
-				String password1 = new String(confcontraseña);
-				
-				//Comprobacion de que todos los campos obligatorias se han rellenado
-				if(nombre.isEmpty() || apellidos.isEmpty() || telefono.isEmpty()|| password.isEmpty() || password1.isEmpty() || (fechaNac == null) || (getImagen(imagenURL) == null)) return false;
-				
-				
-				else {
-					
-					System.out.println("[DEBUG Registro validacionCampos]: " + "Campos de Registro:");
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Nombre: " + nombre);
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Apellidos: " + apellidos);
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Telefono: " + telefono);
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Password: " + password);
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Confirmar Password: " + password1);
-					System.out.println("[DEBUG Registro validacionCampos]: "  + "Fecha: " + fechaNac);
-					
-					//Comprobacion sobre el formato de los datos y sobre la contraseña
-					if (!password.equals(password1)) return false;
-					return true;	
-				}
 	}
 
 	
