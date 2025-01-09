@@ -1,10 +1,13 @@
 package umu.tds.modelos;
 
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import umu.tds.modelos.Usuario.BuilderUsuario;
 import umu.tds.persistencia.FactoriaDAO;
 import umu.tds.persistencia.FactoriaDAOTDS;
 import umu.tds.persistencia.UsuarioDAO;
@@ -66,6 +69,7 @@ public class CatalogoUsuarios {
 						.map(c -> c.getNombre())
 						.collect(Collectors.toList());
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Lista de Contacto Usuario:" + lista);
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Imagen Usuario:" + usuario.getImagenPerfil().toExternalForm());
 			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

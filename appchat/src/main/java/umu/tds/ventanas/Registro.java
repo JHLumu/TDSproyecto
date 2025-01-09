@@ -154,45 +154,6 @@ public class Registro extends JFrame {
 	}
 	
 
-
-/*	
-	private Image getImagen() {
-		String dir = file.getDirectory();
-		String name = file.getFile();
-		File currentImage;
-		if ((dir != null) && (name != null)) {
-			currentImage = new File(dir,name);
-			
-			try {
-				Image img =ImageIO.read(currentImage);
-				if (img==null) {
-						JOptionPane.showMessageDialog(this, 
-	                    "El archivo seleccionado no es una imagen.",
-	                    "AppChat",
-	                    JOptionPane.ERROR_MESSAGE);
-				return null;}
-				return img;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(this, 
-	                    "Ha ocurrido un error al abrir el archivo.",
-	                    "AppChat",
-	                    JOptionPane.ERROR_MESSAGE);
-				return null;
-			}
-		}
-		
-		else{
-			JOptionPane.showMessageDialog(this, "No se ha seleccionado ninguna imagen.","AppChat",JOptionPane.ERROR_MESSAGE);
-			return null;
-			
-		}
-		
-	
-	}
-*/
-	
-
 	boolean registroUsuario() {
 		try {
 			return AppChat.getInstancia().registrarUsuario(
@@ -472,7 +433,7 @@ public class Registro extends JFrame {
 			
 			
 			
-			if (validacionCampos()) {
+			if (validacionCampos() && registroUsuario()) {
 	
 				 JOptionPane.showMessageDialog(this,"Se ha registrado correctamente","AppChat",JOptionPane.PLAIN_MESSAGE);
 				 this.dispose();

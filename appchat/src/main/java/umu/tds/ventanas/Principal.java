@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
@@ -158,7 +159,7 @@ public class Principal extends JFrame implements TDSObserver {
 		JButton btnUsuario = new JButton(this.controlador.getNombreUsuario());
 		btnUsuario.setForeground(new Color(0, 0, 0));
 		btnUsuario.setBackground(new Color(81, 116, 255));
-		btnUsuario.setIcon(new ImageIcon(Principal.class.getResource("/resources/avatar.png")));
+		btnUsuario.setIcon(new ImageIcon(AppChat.getInstancia().getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnUsuario);
 		
 		JPanel panelMensaje = new JPanel();

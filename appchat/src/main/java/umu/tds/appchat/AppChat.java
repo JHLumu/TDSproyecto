@@ -1,6 +1,7 @@
 package umu.tds.appchat;
 
 import java.awt.Image;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
@@ -229,6 +231,44 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return null; // Retorna null en caso de error
+	}
+	
+	public Image getFotoPerfilSesion() {
+		try {
+
+    	    // Directorio base del usuario de la sesión actual
+    	    String directorioBase = "imagenPerfilContactos\\" + 
+    	    						getNombreUsuario() +  "-" + 
+    	    						getTelefonoUsuario();
+
+    	    File directorio = new File(directorioBase);
+    	    if (!directorio.exists()) {
+    	        directorio.mkdirs(); // Crear directorio si no existe
+    	    }
+    	    
+    	    
+    	    File localFile;
+    	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
+    	    
+    	    if (!localFile.exists()) {
+    	        // Si el archivo no existe, descargarlo desde el URL
+    	        Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+    	        if (imageUrl != null) {  
+					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
+    	        }
+    	    }
+
+    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
+				Image localImage = ImageIO.read(localFile);
+				return localImage;
+    	    }
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	

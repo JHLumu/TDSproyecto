@@ -158,7 +158,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
 		String imagenPath = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
 		URL imagen = null;
-		if (imagenPath == null) imagen = new URL(imagenPath);
+		if (imagenPath != null) imagen = new URL(imagenPath);
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
