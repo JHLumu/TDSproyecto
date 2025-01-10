@@ -22,6 +22,7 @@ import java.awt.Color;
 import javax.swing.border.SoftBevelBorder;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 import umu.tds.modelos.Contacto;
@@ -180,14 +181,15 @@ public class ListaContactos extends JFrame implements TDSObserver {
 	// Implementación del método update de TDSObserver
     @Override
     public void update(TDSObservable o, Object arg) {
-        if (arg instanceof String) {
-            String evento = (String) arg;
-            if (evento.equals("nuevoContacto")) {
+    	if (arg instanceof Estado) {
+            Estado estadoActual = (Estado) arg;
+            
+            if (estadoActual.equals(Estado.INFO_CONTACTO)) {
                 actualizarListaContactos();
             }
-            // Puedes manejar otros eventos según sea necesario
         }
     }
+
 
     // Método para actualizar la lista de contactos en la UI
     private void actualizarListaContactos() {

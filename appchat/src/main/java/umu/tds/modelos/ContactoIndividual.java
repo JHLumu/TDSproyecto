@@ -41,5 +41,19 @@ public class ContactoIndividual extends Contacto {
         		"\nTeléfono: " + usuario.getTelefono() +
                "\nCorreo Electrónico: " + usuario.getEmail();
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Usuario || o instanceof ContactoIndividual)) return false;
+        if(o instanceof Usuario) {
+        	Usuario usuario = (Usuario) o;
+        	return this.getUsuario().equals(usuario);
+        } else {
+        	ContactoIndividual contacto = (ContactoIndividual) o;
+        	return this.getUsuario().equals(contacto.getUsuario());
+        }
+        
+    }
 }
 

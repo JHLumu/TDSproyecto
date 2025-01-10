@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,9 @@ import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.*;
+import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
+import umu.tds.utils.TDSObserver;
 
 //Clase Controlador entre modelos y ventanas
 public class AppChat extends TDSObservable{
@@ -142,8 +145,8 @@ public class AppChat extends TDSObservable{
 			 usuarioDAO.modificarUsuario(sesionUsuario);
 			 
 			// Notificar a los observadores sobre el nuevo contacto
-	            setChanged();
-	            notifyObservers("nuevoContacto");
+	            setChanged(sesionUsuario, Estado.INFO_CONTACTO);
+	            notifyObservers(sesionUsuario);
 	            
 			 return true;
 		 }
@@ -259,8 +262,19 @@ public class AppChat extends TDSObservable{
     	    }
 
     	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-				Image localImage = ImageIO.read(localFile);
-				return localImage;
+    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+    	    	Image localImage = ImageIO.read(localFile);
+    	        if (imageUrl != null) {  
+    	        	if(imageUrl.equals(localImage))
+    	        		return localImage;
+    					
+					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
+					localImage = ImageIO.read(localFile);
+					return localImage;
+    	        }
+				
+				
+				
     	    }
 
 		} catch (IOException e) {
@@ -270,6 +284,33 @@ public class AppChat extends TDSObservable{
 
 		return null;
 	}
+
+	public void cambiarFotoPerfil(URL nuevaFoto) {
+		this.sesionUsuario.cambiarImagen(nuevaFoto);
+		usuarioDAO.modificarUsuario(sesionUsuario);
+		setChanged(sesionUsuario, Estado.NUEVA_FOTO_USUARIO);
+		notifyObservers(sesionUsuario);
+			
+		//TO-DO Arreglar esta parte para cambiar la foto en la lista de contacto de otros usuarios	
+		List<Usuario> usuarioEsContacto = catalogoUsuarios.usuarioEnListaContacto(sesionUsuario);
+		usuarioEsContacto.stream()
+			
+			.forEach(u -> {
+					usuarioDAO.modificarUsuario(u);
+			        setChanged(u, Estado.INFO_CONTACTO);
+			        notifyObservers(u);
+			});
+	}
+
+	@Override 
+	public synchronized void addObserver(TDSObserver o) {
+    	super.addObserver(sesionUsuario, o);
+    }
+	
+	@Override 
+	public synchronized void deleteObserver(TDSObserver o) {
+    	super.deleteObserver(sesionUsuario, o);
+    }
 
 	
 }

@@ -132,6 +132,10 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				prop.setValor(obtenerIdsContactos(usuario.getListaContacto()));
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de contactos del usuario.");
 				}
+			else if (prop.getNombre().equals("imagen")) {
+				prop.setValor(usuario.getImagenPerfil().toExternalForm());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la foto de perfil del usuario.");
+				}
 			servPersistencia.modificarPropiedad(prop);
 		}
 		

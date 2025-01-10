@@ -15,6 +15,7 @@ import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
+import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
@@ -49,6 +50,7 @@ public class Principal extends JFrame implements TDSObserver {
 	private JPanel contentPane;
 	private JTextField textField;
 	private final AppChat controlador;
+	private JButton btnUsuario;
 	DefaultComboBoxModel<String> listaContactos;
 
 	/**
@@ -107,10 +109,10 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(comboBoxContactos);
 		
 		JButton btnEnv = new JButton("");
-		btnEnv.setPreferredSize(new Dimension(25, 25));
+		btnEnv.setPreferredSize(new Dimension(40, 40));
 		btnEnv.setForeground(new Color(255, 255, 255));
 		btnEnv.setBackground(new Color(81, 116, 255));
-		btnEnv.setIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")));
+		btnEnv.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnEnv);
 		
 		Component horizontalGlue_4 = Box.createHorizontalGlue();
@@ -119,10 +121,10 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		
 		JButton btnBuscar = new JButton("");
-		btnBuscar.setPreferredSize(new Dimension(25, 25));
+		btnBuscar.setPreferredSize(new Dimension(40, 40));
 		btnBuscar.setForeground(new Color(255, 255, 255));
 		btnBuscar.setBackground(new Color(81, 116, 255));
-		btnBuscar.setIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")));
+		btnBuscar.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnBuscar);
 		
 		Component horizontalGlue_3 = Box.createHorizontalGlue();
@@ -130,10 +132,10 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue_3);
 		
 		JButton btnPremium = new JButton("");
-		btnPremium.setPreferredSize(new Dimension(25, 25));
+		btnPremium.setPreferredSize(new Dimension(40, 40));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(new Color(81, 116, 255));
-		btnPremium.setIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")));
+		btnPremium.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnPremium);
 		
 		Component horizontalGlue_2 = Box.createHorizontalGlue();
@@ -141,10 +143,10 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue_2);
 		
 		JButton btnContactos = new JButton("");
-		btnContactos.setPreferredSize(new Dimension(25, 25));
+		btnContactos.setPreferredSize(new Dimension(40, 40));
 		btnContactos.setForeground(new Color(255, 255, 255));
 		btnContactos.setBackground(new Color(81, 116, 255));
-		btnContactos.setIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")));
+		btnContactos.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
 		btnContactos.addActionListener(evento -> {
 			ListaContactos frame = new ListaContactos();
 			frame.setVisible(true);
@@ -156,10 +158,16 @@ public class Principal extends JFrame implements TDSObserver {
 		horizontalGlue.setMaximumSize(new Dimension(100, 0));
 		panelNorte.add(horizontalGlue);
 		
-		JButton btnUsuario = new JButton(this.controlador.getNombreUsuario());
+		btnUsuario = new JButton(this.controlador.getNombreUsuario());
 		btnUsuario.setForeground(new Color(0, 0, 0));
 		btnUsuario.setBackground(new Color(81, 116, 255));
-		btnUsuario.setIcon(new ImageIcon(AppChat.getInstancia().getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		
+		btnUsuario.addActionListener(evento -> {
+				CambiarFoto frame = new CambiarFoto();
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+		});
 		panelNorte.add(btnUsuario);
 		
 		JPanel panelMensaje = new JPanel();
@@ -273,12 +281,15 @@ public class Principal extends JFrame implements TDSObserver {
 	// Implementación del método update de TDSObserver
     @Override
     public void update(TDSObservable o, Object arg) {
-        if (arg instanceof String) {
-            String evento = (String) arg;
-            if (evento.equals("nuevoContacto")) {
+    	if (arg instanceof Estado) {
+            Estado estadoActual = (Estado) arg;
+            
+            if (estadoActual.equals(Estado.INFO_CONTACTO)) {
                 actualizarListaContactos();
+            } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
+            	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
             }
-            // Puedes manejar otros eventos según sea necesario
+         
         }
     }
 

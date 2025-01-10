@@ -1,58 +1,97 @@
 package umu.tds.utils;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import umu.tds.modelos.Usuario;
 
 public class TDSObservable {
 
-    private boolean changed = false; // Indica si ha habido cambios
-    private Vector<TDSObserver> obs; // Lista de observadores
+	private final Map<Usuario, Set<Estado>> changed = new HashMap<>(); // Indica si ha habido cambios
+    private Map<Usuario, List<TDSObserver>> obs = new HashMap<>();
 
     public TDSObservable() {
-        obs = new Vector<>();
+        obs = new HashMap<>();
     }
 
     // Agregar un observador
-    public synchronized void addObserver(TDSObserver o) {
-        if (o == null) throw new NullPointerException();
-        if (!obs.contains(o)) {
-            obs.addElement(o);
-        }
+    public synchronized void addObserver(Usuario u, TDSObserver o) {
+    	obs
+        .computeIfAbsent(u, k -> new ArrayList<>())
+        .add(o);
     }
 
     // Eliminar un observador
-    public synchronized void deleteObserver(TDSObserver o) {
-        obs.removeElement(o);
+    public synchronized void deleteObserver(Usuario u, TDSObserver o) {
+    	 List<TDSObserver> observadores = obs.get(u);
+         if (observadores != null) {
+             observadores.remove(o);
+             if (observadores.isEmpty()) {
+                 obs.remove(u);
+             }
+         }
     }
 
     // Notificar a todos los observadores
-    public void notifyObservers(Object arg) {
-        Object[] arrLocal;
+   
+    public void notifyObservers(Usuario u) {
+    	List<TDSObserver> observadoresCopy;
+        Set<Estado> estadosCopy;
 
         synchronized (this) {
-            if (!changed) return; // Si no hay cambios, no notificar
-            arrLocal = obs.toArray();
-            clearChanged(); // Limpia el estado de "cambiado"
+            if (!hasChanged(u)) return; // Si no hay cambios, no notificar
+
+            List<TDSObserver> observadores = obs.get(u);
+            if (observadores == null || observadores.isEmpty()) {
+                clearChanged(u); // Limpia el estado de "cambiado" si no hay observadores
+                return;
+            }
+
+            // Crear copias para evitar ConcurrentModificationException y minimizar el tiempo de bloqueo
+            observadoresCopy = new ArrayList<>(observadores);
+            estadosCopy = new HashSet<>(changed.get(u));
+
+            clearChanged(u); // Limpia el estado de "cambiado"
         }
 
-        // Notificar a cada observador
-        for (int i = arrLocal.length - 1; i >= 0; i--) {
-            ((TDSObserver) arrLocal[i]).update(this, arg);
+        // Notificar a los observadores fuera del bloque sincronizado para evitar bloqueos prolongados
+        for (Estado est : estadosCopy) {
+            for (TDSObserver observer : observadoresCopy) {
+                try {
+                    observer.update(this, est);
+                } catch (Exception ex) {
+                    // Manejar la excepción, por ejemplo, registrar el error
+                    System.err.println("Error notificando al observador: " + ex.getMessage());
+                    // Opcional: Puedes continuar notificando a otros observadores o decidir cómo manejarlo
+                }
+            }
         }
     }
 
     // Marcar como cambiado
-    public synchronized void setChanged() {
-        changed = true;
+    public synchronized void setChanged(Usuario u, Estado est) {
+    	changed.computeIfAbsent(u, k -> new HashSet<>()).add(est);
     }
 
     // Limpiar el estado de "cambiado"
-    public synchronized void clearChanged() {
-        changed = false;
+    public synchronized void clearChanged(Usuario u) {
+    	changed.remove(u);
     }
 
     // Comprobar si ha cambiado
-    public synchronized boolean hasChanged() {
-        return changed;
+    public synchronized boolean hasChanged(Usuario u) {
+    	Set<Estado> cambios = changed.get(u);
+        return cambios != null && !cambios.isEmpty();
     }
+
+	public synchronized void addObserver(TDSObserver o) {	
+	}
+	
+	public synchronized void deleteObserver(TDSObserver o) {
+	}
 }
 

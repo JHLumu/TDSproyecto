@@ -127,6 +127,11 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			else if (pNombre.equals("miembros")) {
 				p.setValor(obtenerIdsMiembros(((Grupo) contacto).getMiembros()));
 				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
+			} 
+			
+			else if (pNombre.equals("imagen")) {
+				p.setValor(contacto.getImagen().toExternalForm());
+				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
 			}
 			
 			servPersistencia.modificarPropiedad(p);

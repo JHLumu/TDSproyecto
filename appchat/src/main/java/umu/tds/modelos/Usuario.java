@@ -4,19 +4,18 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Usuario {
 	
-	//El siguiente atributo se utiliza como identificador unico de usuario
+	//El siguiente atributo se utiliza como identificador unico de usuario para la persistencia
 		private int codigo;
 	
 	//Atributos de la Clase
 	//Como no se menciona nada en los requisitos sobre la posibilidad de cambiar algun dato del usuario
 	//las siguientes son finales
-	
 		private final String nombre;
 		private final String apellidos;
 		private final String telefono;
@@ -223,6 +222,18 @@ public class Usuario {
 	        	}
 	        public BuilderUsuario listaDeContactos(List<Contacto> lista) {this.listaContactos.addAll(lista);return this;}
 	        public Usuario build() {return new Usuario(this);}
+	    }
+	    
+	    @Override
+	    public boolean equals(Object o) {
+	        if (this == o) return true;
+	        if (!(o instanceof Usuario)) return false;
+	        Usuario usuario = (Usuario) o;
+	        return telefono.equals(usuario.telefono);
+	    }
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(telefono);
 	    }
 		
 }
