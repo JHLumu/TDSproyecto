@@ -185,7 +185,8 @@ public class ListaContactos extends JFrame implements TDSObserver {
             Estado estadoActual = (Estado) arg;
             
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
-                actualizarListaContactos();
+            	System.out.println("Actualizando contacto");
+                this.actualizarListaContactos();
             }
         }
     }

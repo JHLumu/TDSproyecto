@@ -3,6 +3,7 @@ package umu.tds.appchat;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -252,17 +253,16 @@ public class AppChat extends TDSObservable{
     	    
     	    File localFile;
     	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
-    	    
+    	    Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
     	    if (!localFile.exists()) {
     	        // Si el archivo no existe, descargarlo desde el URL
-    	        Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+    	        
     	        if (imageUrl != null) {  
 					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
 
     	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
     	    	Image localImage = ImageIO.read(localFile);
     	        if (imageUrl != null) {  
     	        	if(imageUrl.equals(localImage))
@@ -293,23 +293,20 @@ public class AppChat extends TDSObservable{
 			
 		//TO-DO Arreglar esta parte para cambiar la foto en la lista de contacto de otros usuarios	
 		List<Usuario> usuarioEsContacto = catalogoUsuarios.usuarioEnListaContacto(sesionUsuario);
-		usuarioEsContacto.stream()
-			
-			.forEach(u -> {
-					usuarioDAO.modificarUsuario(u);
-			        setChanged(u, Estado.INFO_CONTACTO);
-			        notifyObservers(u);
-			});
+		for(Usuario u : usuarioEsContacto){
+			this.setChanged(u, Estado.INFO_CONTACTO);
+			notifyObservers(u);
+		}
 	}
 
 	@Override 
 	public synchronized void addObserver(TDSObserver o) {
-    	super.addObserver(sesionUsuario, o);
+    	super.addObserver(this.sesionUsuario, o);
     }
 	
 	@Override 
 	public synchronized void deleteObserver(TDSObserver o) {
-    	super.deleteObserver(sesionUsuario, o);
+    	super.deleteObserver(this.sesionUsuario, o);
     }
 
 	

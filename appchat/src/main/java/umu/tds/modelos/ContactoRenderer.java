@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-
+import java.security.Principal;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -87,23 +87,26 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	    } else {
     	    	localFile = new File(directorio, contacto.getNombre() + "_GRUPO.png");
     	    }
-    	    
+    	    Image imageUrl = AppChat.getInstancia().getImagen(contacto.getImagen()); // Obtener el URL de la imagen
     	    if (!localFile.exists()) {
     	        // Si el archivo no existe, descargarlo desde el URL
-    	        Image imageUrl = AppChat.getInstancia().getImagen(contacto.getImagen()); // Obtener el URL de la imagen
     	        if (imageUrl != null) {
     	            ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
-
+    	    
     	    // Cargar la imagen local y establecerla en el JLabel
     	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-    	        Image localImage = ImageIO.read(localFile);
+    	    	Image localImage = ImageIO.read(localFile);
+    	        if(!imageUrl.equals(localImage)) {
+    	        	ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
+    	        	localImage = ImageIO.read(localFile);
+    	        }
     	        ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
     	        imageLabel.setIcon(imageIcon);
     	    } else {
     	        // Si no existe imagen local, usar un ícono predeterminado
-    	        imageLabel.setIcon(null); // Aquí puedes usar un ícono por defecto si lo prefieres
+    	        imageLabel.setIcon(new ImageIcon(ContactoRenderer.class.getResource("/resources/usuario_64.png")));
     	    }
 
     	} catch (IOException | IllegalStateException e) {

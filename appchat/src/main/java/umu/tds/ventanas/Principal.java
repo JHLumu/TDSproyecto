@@ -285,7 +285,7 @@ public class Principal extends JFrame implements TDSObserver {
             Estado estadoActual = (Estado) arg;
             
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
-                actualizarListaContactos();
+                this.actualizarListaContactos();
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
             	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
             }
@@ -306,5 +306,6 @@ public class Principal extends JFrame implements TDSObserver {
         AppChat.getInstancia().deleteObserver(this);
         super.dispose();
     }
+   
 
 }

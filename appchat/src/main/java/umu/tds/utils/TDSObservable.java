@@ -11,18 +11,24 @@ import umu.tds.modelos.Usuario;
 
 public class TDSObservable {
 
-	private final Map<Usuario, Set<Estado>> changed = new HashMap<>(); // Indica si ha habido cambios
-    private Map<Usuario, List<TDSObserver>> obs = new HashMap<>();
+	private final Map<Usuario, Set<Estado>> changed; // Indica si ha habido cambios
+    private final Map<Usuario, List<TDSObserver>> obs;
 
     public TDSObservable() {
         obs = new HashMap<>();
+        changed = new HashMap<>();
     }
 
     // Agregar un observador
     public synchronized void addObserver(Usuario u, TDSObserver o) {
-    	obs
-        .computeIfAbsent(u, k -> new ArrayList<>())
-        .add(o);
+    	obs.computeIfAbsent(u, k -> new ArrayList<>());
+
+        if (!obs.get(u).contains(o)) {
+            obs.get(u).add(o);
+            System.out.println("[DEBUG] Observador agregado: " + o + " para el usuario: " + u.getNombre());
+        } else {
+            System.out.println("[DEBUG] Observador ya existe: " + o + " para el usuario: " + u.getNombre());
+        }
     }
 
     // Eliminar un observador
@@ -30,6 +36,7 @@ public class TDSObservable {
     	 List<TDSObserver> observadores = obs.get(u);
          if (observadores != null) {
              observadores.remove(o);
+             System.out.println("[DEBUG] Observador eliminado: " + o + " para el usuario: " + u.getNombre());
              if (observadores.isEmpty()) {
                  obs.remove(u);
              }
@@ -74,7 +81,8 @@ public class TDSObservable {
 
     // Marcar como cambiado
     public synchronized void setChanged(Usuario u, Estado est) {
-    	changed.computeIfAbsent(u, k -> new HashSet<>()).add(est);
+    	changed.computeIfAbsent(u, k -> new HashSet<>());
+        changed.get(u).add(est);
     }
 
     // Limpiar el estado de "cambiado"
