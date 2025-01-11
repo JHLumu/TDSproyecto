@@ -30,10 +30,8 @@ import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.UIDefaults;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -42,6 +40,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javax.swing.border.LineBorder;
 
 
 public class Principal extends JFrame implements TDSObserver {
@@ -109,7 +108,12 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(comboBoxContactos);
 		
 		JButton btnEnv = new JButton("");
-		btnEnv.setPreferredSize(new Dimension(40, 40));
+		btnEnv.setMinimumSize(new Dimension(32, 32));
+		btnEnv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnEnv.setPreferredSize(new Dimension(32, 32));
 		btnEnv.setForeground(new Color(255, 255, 255));
 		btnEnv.setBackground(new Color(81, 116, 255));
 		btnEnv.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
@@ -121,7 +125,11 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		
 		JButton btnBuscar = new JButton("");
-		btnBuscar.setPreferredSize(new Dimension(40, 40));
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnBuscar.setPreferredSize(new Dimension(32, 32));
 		btnBuscar.setForeground(new Color(255, 255, 255));
 		btnBuscar.setBackground(new Color(81, 116, 255));
 		btnBuscar.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
@@ -132,7 +140,11 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue_3);
 		
 		JButton btnPremium = new JButton("");
-		btnPremium.setPreferredSize(new Dimension(40, 40));
+		btnPremium.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnPremium.setPreferredSize(new Dimension(32, 32));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(new Color(81, 116, 255));
 		btnPremium.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
@@ -143,7 +155,7 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue_2);
 		
 		JButton btnContactos = new JButton("");
-		btnContactos.setPreferredSize(new Dimension(40, 40));
+		btnContactos.setPreferredSize(new Dimension(32, 32));
 		btnContactos.setForeground(new Color(255, 255, 255));
 		btnContactos.setBackground(new Color(81, 116, 255));
 		btnContactos.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
@@ -177,18 +189,10 @@ public class Principal extends JFrame implements TDSObserver {
 		panelMensaje.setLayout(new BorderLayout(0, 0));
 		
 		JList<Mensaje> list = new JList <Mensaje>();
+		list.setBorder(new LineBorder(new Color(0, 0, 0)));
 		list.setPreferredSize(new Dimension(0, 25));
 		list.setCellRenderer(new MensajeRenderer());
-		list.setModel(new AbstractListModel<Mensaje>() {
-			private static final long serialVersionUID = 1L;
-			List<Mensaje> values = AppChat.getInstancia().obtenerListaMensajesRecientesPorUsuario();
-			public int getSize() {
-				return values.size();
-			}
-			public Mensaje getElementAt(int index) {
-				return values.get(index);
-			}
-		});
+		//REVISAR: Asignar list.model cuando se implementen los mensajes
 		panelMensaje.add(list);
 		
 		JPanel chat = new JPanel();
@@ -203,6 +207,7 @@ public class Principal extends JFrame implements TDSObserver {
 		contentPane.add(panelCentro, BorderLayout.CENTER);
 		
 		JPanel barraIntro = new JPanel();
+		barraIntro.setBackground(new Color(255, 255, 255));
 		panelCentro.add(barraIntro, BorderLayout.SOUTH);
 		GridBagLayout gbl_barraIntro = new GridBagLayout();
 		gbl_barraIntro.columnWidths = new int[]{20, 0, 96, 20, 20, 1, 0};
@@ -212,27 +217,34 @@ public class Principal extends JFrame implements TDSObserver {
 		barraIntro.setLayout(gbl_barraIntro);
 		
 		JButton Emoticono = new JButton("Emoticono");
+		Emoticono.setForeground(new Color(255, 255, 255));
+		Emoticono.setBackground(new Color(81, 116, 255));
+		Emoticono.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		
 		Emoticono.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BubbleText burbuja;
 				
-				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.GREEN,  AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT, 18);
+				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.WHITE,  AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT, 14);
 				textField.setText("");
 				chat.add(burbuja);
 			}
 		});
 		
 		GridBagConstraints gbc_Emoticono = new GridBagConstraints();
+		gbc_Emoticono.fill = GridBagConstraints.HORIZONTAL;
+		gbc_Emoticono.gridwidth = 2;
 		gbc_Emoticono.insets = new Insets(0, 0, 0, 5);
-		gbc_Emoticono.gridx = 1;
+		gbc_Emoticono.gridx = 0;
 		gbc_Emoticono.gridy = 0;
 		barraIntro.add(Emoticono, gbc_Emoticono);
 		
 		textField = new JTextField();
+		textField.setPreferredSize(new Dimension(20, 19));
 		textField.setFont(new Font("Segoe UI", Font.PLAIN, 10));
 		
 		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.fill = GridBagConstraints.BOTH;
 		gbc_textField.insets = new Insets(0, 0, 0, 5);
 		gbc_textField.gridx = 2;
 		gbc_textField.gridy = 0;
@@ -240,28 +252,18 @@ public class Principal extends JFrame implements TDSObserver {
 		textField.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Enviar");
+		btnNewButton.setForeground(new Color(255, 255, 255));
+		btnNewButton.setBackground(new Color(81, 116, 255));
+		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BubbleText burbuja = new BubbleText(chat,textField.getText(), Color.CYAN, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
-	
-				// Asocia las propiedades específicas a este componente
-				burbuja.setBackground(new Color(0, 0, 0, 0)); // Fondo transparente
-				burbuja.setForeground(Color.BLACK); // Texto negro
-				burbuja.setOpaque(false); // Asegúrate de que sea transparente
-				
-				UIDefaults bubbleTextOverrides = new UIDefaults();
-				bubbleTextOverrides.put("Component.background", new Color(0, 0, 0, 0)); // Fondo transparente
-				bubbleTextOverrides.put("Component.foreground", Color.BLACK); // Texto negro
-				bubbleTextOverrides.put("Component.border", BorderFactory.createEmptyBorder()); // Sin bordes
-
-				
-				burbuja.putClientProperty("Nimbus.Overrides", bubbleTextOverrides);
-				burbuja.putClientProperty("Nimbus.Overrides.InheritDefaults", true); // Hereda configuraciones generales de Nimbus
-				
+				BubbleText burbuja = new BubbleText(chat,textField.getText(), Color.WHITE, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
 				chat.add(burbuja);	
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.gridwidth = 2;
+		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton.anchor = GridBagConstraints.NORTH;
 		gbc_btnNewButton.gridx = 3;

@@ -53,7 +53,7 @@ public class Grupo extends Contacto {
 
     // Implementación del método abstracto
     @Override
-    public String getTipoContacto() {
-        return "Grupo";
+    public TipoContacto getTipoContacto() {
+        return TipoContacto.GRUPO;
     }
 }

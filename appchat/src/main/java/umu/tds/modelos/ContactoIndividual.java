@@ -31,8 +31,8 @@ public class ContactoIndividual extends Contacto {
 
     // Implementación del método abstracto
     @Override
-    public String getTipoContacto() {
-        return "Individual";
+    public TipoContacto getTipoContacto() {
+        return TipoContacto.INDIVIDUAL;
     }
 
     // Método para mostrar detalles del contacto

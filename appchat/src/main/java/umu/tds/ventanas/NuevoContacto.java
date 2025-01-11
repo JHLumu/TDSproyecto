@@ -48,6 +48,56 @@ public class NuevoContacto extends JFrame {
 		});
 	}
 
+	public void nuevoContacto() {
+
+		if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
+			
+			 JOptionPane.showMessageDialog(this, 
+	                    "ERROR: No se han rellenado los campos.",
+	                    "AppChat",
+	                    JOptionPane.ERROR_MESSAGE);
+			 return;
+		}
+		
+		int resultado = AppChat.getInstancia().nuevoContacto(nombreField.getText(),telefonoField.getText());
+			
+		//Si el resultado es -1 el teléfono no está registrado
+		if (resultado == -1) { 
+		
+		JOptionPane.showMessageDialog(this, 
+	                    "El teléfono no se encuentra registrado.",
+	                    "AppChat",
+	                    JOptionPane.ERROR_MESSAGE);
+			 this.dispose();
+		
+		
+		}
+		
+		else if (resultado == 0) {
+			
+			JOptionPane.showMessageDialog(this, 
+                    "El teléfono ya se encuentra registrado en la lista de contactos.",
+                    "AppChat",
+                    JOptionPane.ERROR_MESSAGE);	
+			
+		}
+		
+		
+		else {
+			
+			JOptionPane.showMessageDialog(this, 
+                    "Se ha registrado el teléfono como " + nombreField.getText(),
+                    "AppChat",
+                    JOptionPane.PLAIN_MESSAGE);
+					this.dispose();
+			
+		}
+			 
+			
+		
+	}
+	
+	
 	/**
 	 * Create the application.
 	 */
@@ -143,36 +193,49 @@ public class NuevoContacto extends JFrame {
 		botonAceptar.setBackground(new Color(79, 87, 255));
 		botonAceptar.setForeground(Color.WHITE);
 		botonAceptar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		botonAceptar.addActionListener(evento -> {
+		botonAceptar.addActionListener(evento -> {if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
 			
-			if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
-				
-				 JOptionPane.showMessageDialog(this, 
-		                    "ERROR: No se han rellenado los campos.",
-		                    "AppChat",
-		                    JOptionPane.ERROR_MESSAGE);	
-				
-			}
+			 JOptionPane.showMessageDialog(this, 
+	                    "ERROR: No se han rellenado los campos.",
+	                    "AppChat",
+	                    JOptionPane.ERROR_MESSAGE);
+			 return;
+		}
+		
+		int resultado = AppChat.getInstancia().nuevoContacto(nombreField.getText(),telefonoField.getText());
 			
-			else if (AppChat.getInstancia().nuevoContacto(nombreField.getText(),telefonoField.getText())) {
-				
-				 JOptionPane.showMessageDialog(this, 
-		                    "Se ha añadido correctamente al contacto.",
-		                    "AppChat",
-		                    JOptionPane.PLAIN_MESSAGE);
-				 this.dispose();
-			}
+		//Si el resultado es -1 el teléfono no está registrado
+		if (resultado == -1) { 
+		
+		JOptionPane.showMessageDialog(this, 
+	                    "El teléfono no se encuentra registrado.",
+	                    "AppChat",
+	                    JOptionPane.ERROR_MESSAGE);
+			 this.dispose();
+		
+		
+		}
+		
+		else if (resultado == 0) {
 			
-			else {
-				
-				 JOptionPane.showMessageDialog(this, 
-		                    "ERROR: El teléfono no está registrado.",
-		                    "AppChat",
-		                    JOptionPane.ERROR_MESSAGE);	
-				
-			}
+			JOptionPane.showMessageDialog(this, 
+                   "El teléfono ya se encuentra registrado en la lista de contactos.",
+                   "AppChat",
+                   JOptionPane.ERROR_MESSAGE);	
 			
-		});
+		}
+		
+		
+		else {
+			
+			JOptionPane.showMessageDialog(this, 
+                   "Se ha registrado el teléfono como " + nombreField.getText(),
+                   "AppChat",
+                   JOptionPane.PLAIN_MESSAGE);
+					this.dispose();
+			
+		}
+			});
 		
 		JButton botonCancelar = new JButton("Cancelar");
 		botonCancelar.setBorderPainted(false);
@@ -201,9 +264,7 @@ public class NuevoContacto extends JFrame {
 		
 		
 		
-		
-		
-		
+
 		
 	}
 

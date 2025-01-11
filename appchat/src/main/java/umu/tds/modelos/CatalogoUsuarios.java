@@ -1,13 +1,11 @@
 package umu.tds.modelos;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import umu.tds.modelos.Usuario.BuilderUsuario;
 import umu.tds.persistencia.FactoriaDAO;
 import umu.tds.persistencia.FactoriaDAOTDS;
 import umu.tds.persistencia.UsuarioDAO;
@@ -29,6 +27,8 @@ public class CatalogoUsuarios {
 		factoria = FactoriaDAO.getInstancia(FactoriaDAOTDS.class.getName());
 		usuarioDAO = factoria.getUsuarioDAO();
 		cargarCatalogo();
+		
+		
 	}
 	
 	public static CatalogoUsuarios getInstancia() {
@@ -65,6 +65,8 @@ public class CatalogoUsuarios {
 				usuarios.put(usuario.getTelefono(), usuario);
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "ID Usuario:" + usuario.getCodigo());
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Nombre Usuario:" + usuario.getNombre());
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Contraseña Usuario:" + usuario.getPassword());
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Telefono Usuario:" + usuario.getTelefono());
 				List<String> lista = usuario.getListaContacto().stream()
 						.map(c -> c.getNombre())
 						.collect(Collectors.toList());
@@ -79,16 +81,6 @@ public class CatalogoUsuarios {
 		
 	}
 	
-	/*
-	public List<Usuario> usuarioEnListaContacto (Usuario u){
-		List<Usuario> usuariosQueTienenAlActual = this.usuarios.values().stream()
-			    .filter(usuario -> usuario.getListaContacto().contains(u))
-			    .collect(Collectors.toList());
-		
-		return usuariosQueTienenAlActual;
-
-	}
-	*/
 	public List<Usuario> usuarioEnListaContacto(Usuario u) {
 	    // Validar si el usuario no es nulo
 	    if (u == null) {

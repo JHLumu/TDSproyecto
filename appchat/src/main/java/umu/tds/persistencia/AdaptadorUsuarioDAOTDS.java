@@ -166,7 +166,9 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
-				Usuario usuario = new BuilderUsuario(nombre,telefono)
+				Usuario usuario = new BuilderUsuario()
+									.nombre(nombre)
+									.telefono(telefono)
 									.apellidos(apellidos)
 									.email(email)
 									.password(password)

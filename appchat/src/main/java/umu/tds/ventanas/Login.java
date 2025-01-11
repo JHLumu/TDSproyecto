@@ -17,7 +17,6 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-
 import javax.swing.JPasswordField;
 
 import javax.swing.JButton;
@@ -25,9 +24,8 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 
-public class Login {
+public class Login extends JFrame{
 
-	private JFrame frmAppchat;
 	private JTextField textField;
 	private JPasswordField passwordField;
 
@@ -38,11 +36,10 @@ public class Login {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
-					
+					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 				    Login window = new Login();
-					window.frmAppchat.setVisible(true);
-					window.frmAppchat.setLocationRelativeTo(null);
+					window.setVisible(true);
+					window.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -61,23 +58,21 @@ public class Login {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmAppchat = new JFrame();
-		frmAppchat.setMinimumSize(new Dimension(500, 355));
-		frmAppchat.getContentPane().setMinimumSize(new Dimension(500, 350));
-		frmAppchat.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
-		frmAppchat.setForeground(new Color(0, 0, 0));
+
+		setMinimumSize(new Dimension(500, 355));
+		setBackground(Color.WHITE);
+		setForeground(Color.WHITE);
+		getContentPane().setMinimumSize(new Dimension(500, 350));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 		
-		frmAppchat.setTitle("AppChat");
-		frmAppchat.setBackground(new Color(255, 255, 255));
-		frmAppchat.getContentPane().setBackground(new Color(255, 255, 255));
-		frmAppchat.setBounds(100, 100, 500, 352);
-		frmAppchat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmAppchat.getContentPane().setLayout(new BorderLayout(0, 0));
+		setTitle("AppChat");
+		setBounds(100, 100, 500, 352);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		
 		JPanel panelCentro = new JPanel();
-		panelCentro.setBackground(new Color(255, 255, 253));
-		frmAppchat.getContentPane().add(panelCentro, BorderLayout.CENTER);
+		getContentPane().add(panelCentro, BorderLayout.CENTER);
 	
 		GridBagLayout gbl_panelCentro = new GridBagLayout();
 		gbl_panelCentro.columnWidths = new int[]{126, 0, 153, 101, 0};
@@ -132,7 +127,7 @@ public class Login {
 			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
 			//Si el login es correcto
 			if (AppChat.getInstancia().iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword()))){
-				this.frmAppchat.dispose();
+				this.dispose();
 				Principal frame = new Principal();
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
@@ -141,7 +136,7 @@ public class Login {
 			//Si el login falla
 			else {
 				
-				 JOptionPane.showMessageDialog(frmAppchat, 
+				 JOptionPane.showMessageDialog(this, 
 		                    "Login Fallido",
 		                    "AppChat",
 		                    JOptionPane.ERROR_MESSAGE);
@@ -159,8 +154,7 @@ public class Login {
 		panelCentro.add(botonLogin, gbc_botonLogin);
 		
 		JPanel panelSur = new JPanel();
-		panelSur.setBackground(new Color(255, 255, 253));
-		frmAppchat.getContentPane().add(panelSur, BorderLayout.SOUTH);
+		getContentPane().add(panelSur, BorderLayout.SOUTH);
 		panelSur.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JLabel labelRegistro = new JLabel("¿No tienes una cuenta aún?");
@@ -183,8 +177,7 @@ public class Login {
 		panelSur.add(botonRegistro);
 		
 		JPanel panelNorte = new JPanel();
-		panelNorte.setBackground(new Color(255, 255, 253));
-		frmAppchat.getContentPane().add(panelNorte, BorderLayout.NORTH);
+		getContentPane().add(panelNorte, BorderLayout.NORTH);
 		
 		JLabel nombreAPP = new JLabel("AppChat");
 		nombreAPP.setForeground(new Color(81, 116, 255));
@@ -193,12 +186,10 @@ public class Login {
 		panelNorte.add(nombreAPP);
 		
 		JPanel panelEste = new JPanel();
-		panelEste.setBackground(new Color(255, 255, 253));
-		frmAppchat.getContentPane().add(panelEste, BorderLayout.EAST);
+		getContentPane().add(panelEste, BorderLayout.EAST);
 		
 		JPanel panelOeste = new JPanel();
-		panelOeste.setBackground(new Color(255, 255, 253));
-		frmAppchat.getContentPane().add(panelOeste, BorderLayout.WEST);
+		getContentPane().add(panelOeste, BorderLayout.WEST);
 		
 		
 		
