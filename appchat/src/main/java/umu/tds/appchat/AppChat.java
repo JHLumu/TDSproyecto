@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
@@ -42,6 +43,7 @@ public class AppChat extends TDSObservable{
 	//Instancias de Catalogos
 	private CatalogoUsuarios catalogoUsuarios;
 	
+	private Usuario sesionUsuario;
 	
 	//Uso de factoria abstracta para obtener los tipos DAO
 	
@@ -57,12 +59,7 @@ public class AppChat extends TDSObservable{
 	};
 	
 	public static AppChat getInstancia() {return instancia;}
-	
-	//Usado hasta que se implemente el repositorio, se usa esto como prueba
-	private Usuario sesionUsuario;
-	private static HashMap<String,Usuario> usuariosRegistrados = new HashMap<String,Usuario>();
-	
-	//Para evitar tener dos metodos iguales podriamos usar un Optional para saludo
+
 	
 	public String getNombreUsuario() {
 		return this.sesionUsuario.getNombre();
@@ -78,7 +75,9 @@ public class AppChat extends TDSObservable{
 	
 		if (this.catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
 		
-		Usuario usuario = new Usuario.BuilderUsuario(nombre, telefono)
+		Usuario usuario = new Usuario.BuilderUsuario()
+				.nombre(nombre)
+				.telefono(telefono)
 				.apellidos(apellidos)
 				.email(email)
 				.password(password)
@@ -89,7 +88,6 @@ public class AppChat extends TDSObservable{
 		
 		usuarioDAO.registrarUsuario(usuario);
 		catalogoUsuarios.nuevoUsuario(usuario);
-		usuariosRegistrados.put(telefono,usuario); 
 		return true;
 	}
 	
@@ -135,17 +133,34 @@ public class AppChat extends TDSObservable{
 	}
 	
 	
-	public boolean nuevoContacto(String nombre, String telefono) {
-		System.out.println("\n[DEBUG Controlador nuevoContacto]: Inicio de crear contacto.");
-		if (! catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
+	public int nuevoContacto(String nombre, String telefono) {
+		if (!catalogoUsuarios.estaUsuarioRegistrado(telefono)) {
+			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono no se encuentra registrado.");
+			return -1;//-1 quiere decir que el telefono no está registrado
+		}
 		Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
+<<<<<<< HEAD
 		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre,usuarioAsociado);
 		 if ( contacto == null) return false;
 		 else {
 			 setChanged(Estado.INFO_CONTACTO);
 			 contactoDAO.registrarContacto(contacto);
 			 usuarioDAO.modificarUsuario(sesionUsuario);
+=======
+		if (!this.sesionUsuario.crearContacto(nombre,usuarioAsociado)) {
+			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono ya está registrado en la lista de contactos del usuario.");
+			return 0; //0 quiere decir que el teléfono ya está en la lista de contactos
+		}
+		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Se registra el contacto y se modifica el usuario.");
+		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Usuario asociado: " + usuarioAsociado);
+		ContactoIndividual contacto = this.sesionUsuario.recuperarContacto(telefono);
+		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto:" + contacto);
+		
+		contactoDAO.registrarContacto(contacto);
+		usuarioDAO.modificarUsuario(sesionUsuario);
+>>>>>>> refs/remotes/origin/main
 			 
+<<<<<<< HEAD
 			// Notificar a los observadores sobre el nuevo contacto
 	            
 	         notifyObservers(Estado.INFO_CONTACTO);
@@ -153,6 +168,14 @@ public class AppChat extends TDSObservable{
 			 return true;
 		 }
 	
+=======
+		// Notificar a los observadores sobre el nuevo contacto
+		System.out.println("\n[DEBUG Controlador nuevoContacto]: Se notifica a los observadores de añadir contacto.");
+	    setChanged(sesionUsuario, Estado.INFO_CONTACTO);
+	    notifyObservers(sesionUsuario);     
+	    return 1;
+		 
+>>>>>>> refs/remotes/origin/main
 	}
 	
 	public String[] obtenerListaContactos(){
@@ -169,7 +192,7 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals("Individual")) // Filtrar sólo ContactoIndividual
+	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) // Filtrar sólo ContactoIndividual
 	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
 	            .collect(Collectors.toList()); // Convertir a lista
 	}
@@ -180,7 +203,7 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals("Grupo")) // Filtrar sólo Grupos
+	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.GRUPO)) // Filtrar sólo Grupos
 	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
 	            .collect(Collectors.toList()); // Convertir a lista
 	}
@@ -225,7 +248,7 @@ public class AppChat extends TDSObservable{
 	        }
 
 	        // Descargar la imagen desde la URL
-	        System.out.println("[DEBUG getImagen]: Descargando imagen desde URL: " + url);
+	        System.out.println("[DEBUG getImagen]: Obteniendo imagen desde URL: " + url);
 	        return ImageIO.read(url);
 
 	    } catch (IOException e) {
@@ -254,17 +277,43 @@ public class AppChat extends TDSObservable{
     	    
     	    File localFile;
     	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
+<<<<<<< HEAD
     	    
     	    if (!localFile.exists() || localFile.equals(null)) {
     	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+=======
+    	    if (!localFile.exists()) {
+>>>>>>> refs/remotes/origin/main
     	        // Si el archivo no existe, descargarlo desde el URL
+<<<<<<< HEAD
+=======
+    	    	 Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+>>>>>>> refs/remotes/origin/main
     	        if (imageUrl != null) {  
 					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
 
+<<<<<<< HEAD
     	    Image localImage = ImageIO.read(localFile);
 			return localImage;			
+=======
+    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
+    	    	Image localImage = ImageIO.read(localFile);
+    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
+    	        if (imageUrl != null) {  
+    	        	if(imageUrl.equals(localImage))
+    	        		return localImage;
+    					
+					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
+					localImage = ImageIO.read(localFile);
+					return localImage;
+    	        }
+				
+				
+				
+    	    }
+>>>>>>> refs/remotes/origin/main
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

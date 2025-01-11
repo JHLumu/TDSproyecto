@@ -19,6 +19,7 @@ import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Usuario;
+import umu.tds.modelos.Contacto.TipoContacto;
 
 public class AdaptadorContactoDAO implements ContactoDAO {
 	private ServicioPersistencia servPersistencia;
@@ -61,6 +62,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se asocian sus propiedades comunes.");
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: Nombre de contacto: " + contacto);
 		propiedades.addAll(Arrays.asList(
 				new Propiedad("nombre", contacto.getNombre())
 				
@@ -68,7 +70,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		
 		//Propiedades si es ContactoIndividual
 		
-		if (contacto.getTipoContacto().equals("Individual")) {
+		if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo ContactoIndividual.");
 			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
@@ -80,7 +82,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		}
 		
 		//Propiedades si es Grupo
-		else if (contacto.getTipoContacto().equals("Grupo")) {
+		else if (contacto.getTipoContacto().equals(TipoContacto.GRUPO)) {
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo Grupo.");
 			Grupo aux = (Grupo) contacto;
 			propiedades.add(
@@ -156,7 +158,9 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
 		Entidad eContacto = servPersistencia.recuperarEntidad(id);
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
-		URL imagenString = new URL(servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen"));
+		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
+		URL imagen = null;
+		if (imagenString != null) imagen = new URL(imagenString); 
 		
 			
 		
@@ -175,7 +179,6 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera el usuario asociado a Contacto si es tipo ContactoIndividual.");
 			Usuario usuario = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idUsuario));
-			
 			contacto = new ContactoIndividual(nombre, usuario);
 			
 			
@@ -186,7 +189,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la lista de miembros si es tipo Grupo.");
 			String idMiembros = servPersistencia.recuperarPropiedadEntidad(eContacto, "miembros");
-			contacto = new Grupo(nombre, obtenerMiembrosporIds(idMiembros));
+			contacto = new Grupo(nombre, imagen, obtenerMiembrosporIds(idMiembros));
 			
 		}
 		contacto.setCodigo(id);

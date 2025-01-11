@@ -8,6 +8,7 @@ import java.util.Objects;
 //Tanto Grupos como Contactos Individuales son 
 //tratados de igual manera, aqui se define la 
 //estructura comun de ambos
+
 public abstract class Contacto implements Comparable<Contacto> {
 
     // Atributos comunes a todos los contactos
@@ -52,10 +53,9 @@ public abstract class Contacto implements Comparable<Contacto> {
 	public void setCodigo(int codigo) {
 		this.codigo = codigo;
 	}
-
     
     // Métodos abstractos (obligatorios en subclases)
-    public abstract String getTipoContacto();
+    public abstract TipoContacto getTipoContacto();
 
     
     @Override
@@ -102,5 +102,10 @@ public abstract class Contacto implements Comparable<Contacto> {
         // Si son del mismo tipo entonces se compara por nombre
         return this.nombre.compareTo(otro.nombre);
     }
+    
+    public static enum TipoContacto {
+    	INDIVIDUAL, GRUPO;
+    }
+    
 }
 

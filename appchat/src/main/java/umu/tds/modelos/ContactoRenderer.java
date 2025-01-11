@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.modelos.Contacto.TipoContacto;
 
 public class ContactoRenderer extends JPanel implements ListCellRenderer<Contacto> {
     
@@ -65,7 +66,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
 
     	    // Crear subdirectorio específico para el contacto
     	    String subcarpeta;
-    	    if (contacto.getTipoContacto().equals("Individual")) {
+    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
     	        String telefono = ((ContactoIndividual) contacto).getTelefono();
     	        subcarpeta = contacto.getNombre() + "-" + telefono;
     	    } else { // Caso para grupos
@@ -79,7 +80,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	    
     	    
     	    File localFile;
-    	    if (contacto.getTipoContacto().equals("Individual")) {
+    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
     	    // Ruta al archivo local
     	    	localFile = new File(directorio, contacto.getNombre() + "_" + ((ContactoIndividual) contacto).getTelefono() +".png");
     	    } else {

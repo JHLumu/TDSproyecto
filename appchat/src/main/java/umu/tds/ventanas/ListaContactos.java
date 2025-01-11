@@ -40,6 +40,7 @@ import java.awt.Toolkit;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.border.LineBorder;
 
 public class ListaContactos extends JFrame implements TDSObserver {
 
@@ -88,7 +89,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		panelCentral.setLayout(gbl_panelCentral);
 		
 		JLabel lblLista = new JLabel("Lista de Contactos");
-		lblLista.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		lblLista.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		GridBagConstraints gbc_lblLista = new GridBagConstraints();
 		gbc_lblLista.insets = new Insets(0, 0, 5, 5);
 		gbc_lblLista.gridx = 0;
@@ -96,7 +97,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		panelCentral.add(lblLista, gbc_lblLista);
 		
 		JLabel lblGrupo = new JLabel("Grupo");
-		lblGrupo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		lblGrupo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		GridBagConstraints gbc_lblGrupo = new GridBagConstraints();
 		gbc_lblGrupo.insets = new Insets(0, 0, 5, 5);
 		gbc_lblGrupo.gridx = 1;
@@ -105,7 +106,8 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		
 		
 		JList<Contacto> list = new JList<Contacto>();
-		list.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		list.setBackground(new Color(255, 255, 255));
+		list.setBorder(new LineBorder(new Color(0, 0, 0)));
 		listaContactos = new DefaultListModel<>();
         actualizarListaContactos(); // Cargar contactos inicialmente
         list.setCellRenderer(new ContactoRenderer());
@@ -118,18 +120,20 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		gbc_list.gridy = 1;
 		panelCentral.add(list, gbc_list);
 		
-		JPanel panel = new JPanel();
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.gridwidth = 2;
-		gbc_panel.insets = new Insets(0, 0, 5, 0);
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 1;
-		panelCentral.add(panel, gbc_panel);
-		panel.setLayout(new BorderLayout(0, 0));
+		JList list_1 = new JList();
+		list_1.setBackground(new Color(255, 255, 255));
+		list_1.setBorder(new LineBorder(new Color(0, 0, 0)));
+		GridBagConstraints gbc_list_1 = new GridBagConstraints();
+		gbc_list_1.gridwidth = 2;
+		gbc_list_1.insets = new Insets(0, 0, 5, 5);
+		gbc_list_1.fill = GridBagConstraints.BOTH;
+		gbc_list_1.gridx = 1;
+		gbc_list_1.gridy = 1;
+		panelCentral.add(list_1, gbc_list_1);
 		
-		JPanel panel_1 = new JPanel();
-		panel.add(panel_1, BorderLayout.NORTH);
+	
+		
+		
 		
 		JButton btnContacto = new JButton("Añadir Contacto");
 		GridBagConstraints gbc_btnContacto = new GridBagConstraints();
@@ -146,6 +150,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		
 		JButton btnGrupo = new JButton("Añadir Grupo");
 		GridBagConstraints gbc_btnGrupo = new GridBagConstraints();
+		gbc_btnGrupo.gridwidth = 2;
 		gbc_btnGrupo.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnGrupo.insets = new Insets(0, 0, 0, 5);
 		gbc_btnGrupo.gridx = 1;

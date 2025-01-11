@@ -2,16 +2,11 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import umu.tds.utils.Estado;
-import umu.tds.utils.TDSObservable;
 
 public class Usuario {
 	
@@ -135,9 +130,22 @@ public class Usuario {
 
 	//Funcionalidades
 		
-		public ContactoIndividual crearContacto(String nombre, Usuario usuario) {
+		
+		public boolean crearContacto(String nombre, Usuario usuario) {
 			ContactoIndividual contacto = new ContactoIndividual(nombre, usuario);
-			this.listaContactos.add(contacto);
+			if (this.listaContactos.contains(contacto)) return false;
+			return this.listaContactos.add(contacto);
+			
+		}
+		
+		public ContactoIndividual recuperarContacto(String telefono) {
+			ContactoIndividual contacto = null;
+			for (Contacto c : this.listaContactos) {
+				System.out.println(c.getTipoContacto());
+				if (c.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) System.out.println("me quiero matar");
+				if (c.getTipoContacto().equals(TipoContacto.INDIVIDUAL) && ((ContactoIndividual) c).getTelefono().equals(telefono)) {contacto = (ContactoIndividual) c; break;} 
+			}
+			System.out.println("es que no puedo MAS JAJSAJSAJSJASJA" + contacto.getNombre());
 			return contacto;
 		}
 		
@@ -210,12 +218,12 @@ public class Usuario {
 	    	private final List<Contacto> listaContactos; 
 	    	private boolean esPremium = false;
 	        
-	        public BuilderUsuario(String nombre, String telefono) {
-	        	this.nombre = nombre;
-	        	this.telefono = telefono;
+	        public BuilderUsuario() {
 	        	this.listaContactos = new LinkedList<Contacto>();
 	        }
 	        
+	        public BuilderUsuario nombre(String nombre) {this.nombre=nombre;return this;}
+	        public BuilderUsuario telefono(String telefono) {this.telefono=telefono;return this;}
 	        public BuilderUsuario apellidos(String apellidos) {this.apellidos=apellidos;return this;}
 	        public BuilderUsuario fechaNac(LocalDate fechaNac) {this.fechaNac=fechaNac;return this;}
 	        public BuilderUsuario email(String email) {this.email=email;return this;}

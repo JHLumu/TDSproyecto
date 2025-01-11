@@ -1,6 +1,10 @@
 package umu.tds.modelos;
 
 import java.net.MalformedURLException;
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +30,8 @@ public class CatalogoUsuarios {
 		factoria = FactoriaDAO.getInstancia(FactoriaDAOTDS.class.getName());
 		usuarioDAO = factoria.getUsuarioDAO();
 		cargarCatalogo();
+		
+		
 	}
 	
 	public static CatalogoUsuarios getInstancia() {
@@ -62,6 +68,8 @@ public class CatalogoUsuarios {
 				usuarios.put(usuario.getTelefono(), usuario);
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "ID Usuario:" + usuario.getCodigo());
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Nombre Usuario:" + usuario.getNombre());
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Contraseña Usuario:" + usuario.getPassword());
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Telefono Usuario:" + usuario.getTelefono());
 				List<String> lista = usuario.getListaContacto().stream()
 						.map(c -> c.getNombre())
 						.collect(Collectors.toList());
@@ -76,4 +84,50 @@ public class CatalogoUsuarios {
 		
 	}
 	
+<<<<<<< HEAD
+=======
+	public List<Usuario> usuarioEnListaContacto(Usuario u) {
+	    // Validar si el usuario no es nulo
+	    if (u == null) {
+	        System.err.println("[ERROR] El usuario proporcionado es nulo.");
+	        return null;  // Retorna una lista vacía si el usuario es nulo
+	    }
+
+	    System.out.println("[DEBUG] Buscando usuarios que tienen a " + u.getNombre() + " como contacto.");
+	    System.out.println("[DEBUG] Total de usuarios registrados: " + this.usuarios.size());
+
+	    // Filtrar usuarios que tienen al usuario 'u' en su lista de contactos
+	    List<Usuario> usuariosQueTienenAlActual = this.usuarios.values().stream()
+	        .filter(usuario -> {
+	            boolean contiene = usuario.getListaContacto().stream()
+	                .anyMatch(c -> {
+	                    if (c instanceof ContactoIndividual) {
+	                        ContactoIndividual cont = (ContactoIndividual) c;
+	                        boolean equals = cont.getUsuario().equals(u);
+	                        if (equals) {
+	                            System.out.println("[DEBUG] El usuario " + usuario.getNombre() + " tiene a " + u.getNombre() + " en su lista de contactos.");
+	                        }
+	                        return equals;
+	                    }
+	                    return false;  // Si no es ContactoIndividual, no lo considera
+	                });
+	            return contiene;
+	        })
+	        .collect(Collectors.toList());
+
+	    // Verificar el resultado del filtro
+	    System.out.println("[DEBUG] Total de usuarios que contienen a " + u.getNombre() + " en su lista de contactos: " + usuariosQueTienenAlActual.size());
+
+	    // Opcional: Mostrar los usuarios encontrados
+	    usuariosQueTienenAlActual.forEach(usuario -> 
+	        System.out.println("[DEBUG] Usuario encontrado: " + usuario.getNombre() + " - Teléfono: " + usuario.getTelefono())
+	    );
+
+	    return usuariosQueTienenAlActual;
+	}
+
+
+	
+	
+>>>>>>> refs/remotes/origin/main
 }
