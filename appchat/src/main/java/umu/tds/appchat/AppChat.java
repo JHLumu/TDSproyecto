@@ -139,14 +139,6 @@ public class AppChat extends TDSObservable{
 			return -1;//-1 quiere decir que el telefono no está registrado
 		}
 		Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
-<<<<<<< HEAD
-		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre,usuarioAsociado);
-		 if ( contacto == null) return false;
-		 else {
-			 setChanged(Estado.INFO_CONTACTO);
-			 contactoDAO.registrarContacto(contacto);
-			 usuarioDAO.modificarUsuario(sesionUsuario);
-=======
 		if (!this.sesionUsuario.crearContacto(nombre,usuarioAsociado)) {
 			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono ya está registrado en la lista de contactos del usuario.");
 			return 0; //0 quiere decir que el teléfono ya está en la lista de contactos
@@ -156,26 +148,14 @@ public class AppChat extends TDSObservable{
 		ContactoIndividual contacto = this.sesionUsuario.recuperarContacto(telefono);
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto:" + contacto);
 		
+		setChanged(Estado.INFO_CONTACTO);
 		contactoDAO.registrarContacto(contacto);
 		usuarioDAO.modificarUsuario(sesionUsuario);
->>>>>>> refs/remotes/origin/main
-			 
-<<<<<<< HEAD
-			// Notificar a los observadores sobre el nuevo contacto
-	            
-	         notifyObservers(Estado.INFO_CONTACTO);
-	            
-			 return true;
-		 }
-	
-=======
 		// Notificar a los observadores sobre el nuevo contacto
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Se notifica a los observadores de añadir contacto.");
-	    setChanged(sesionUsuario, Estado.INFO_CONTACTO);
-	    notifyObservers(sesionUsuario);     
+		notifyObservers(Estado.INFO_CONTACTO);    
 	    return 1;
-		 
->>>>>>> refs/remotes/origin/main
+
 	}
 	
 	public String[] obtenerListaContactos(){
@@ -277,43 +257,16 @@ public class AppChat extends TDSObservable{
     	    
     	    File localFile;
     	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
-<<<<<<< HEAD
     	    
+    	 // Si el archivo no existe, descargarlo desde el URL
     	    if (!localFile.exists() || localFile.equals(null)) {
     	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
-=======
-    	    if (!localFile.exists()) {
->>>>>>> refs/remotes/origin/main
-    	        // Si el archivo no existe, descargarlo desde el URL
-<<<<<<< HEAD
-=======
-    	    	 Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
->>>>>>> refs/remotes/origin/main
     	        if (imageUrl != null) {  
 					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
-
-<<<<<<< HEAD
     	    Image localImage = ImageIO.read(localFile);
 			return localImage;			
-=======
-    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-    	    	Image localImage = ImageIO.read(localFile);
-    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
-    	        if (imageUrl != null) {  
-    	        	if(imageUrl.equals(localImage))
-    	        		return localImage;
-    					
-					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
-					localImage = ImageIO.read(localFile);
-					return localImage;
-    	        }
-				
-				
-				
-    	    }
->>>>>>> refs/remotes/origin/main
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

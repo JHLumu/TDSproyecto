@@ -172,7 +172,7 @@ public class CambiarFoto extends JFrame{
         btnAceptarImagen.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panelDerecho.add(btnAceptarImagen, gbc_btnAceptarImagen);
 
-        bbtnAceptarImagen.addActionListener(evento -> {
+        btnAceptarImagen.addActionListener(evento -> {
 			Image imagen = AppChat.getInstancia().getImagen(textField.getText());
 		     if(imagen != null) {
 		    	try {
