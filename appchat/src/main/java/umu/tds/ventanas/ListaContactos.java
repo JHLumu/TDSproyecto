@@ -2,7 +2,6 @@ package umu.tds.ventanas;
 
 import java.awt.EventQueue;
 
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;

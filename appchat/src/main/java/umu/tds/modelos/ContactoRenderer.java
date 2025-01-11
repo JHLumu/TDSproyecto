@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import beans.Entidad;
@@ -22,7 +23,7 @@ import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Usuario.BuilderUsuario;
 
 public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
-	
+	//REVISAR: La persistencia de fecha
 	private ServicioPersistencia servPersistencia;
 	private static AdaptadorUsuarioDAOTDS instancia = new AdaptadorUsuarioDAOTDS();
 	private DateTimeFormatter formateador;
@@ -36,7 +37,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	private AdaptadorUsuarioDAOTDS(){
 		
 		servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
-		this.formateador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		this.formateador = DateTimeFormatter.ofPattern("d-MMM-y", new Locale("es", "ES"));
 		
 	};
 	
@@ -82,7 +83,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("password", usuario.getPassword()),
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
 						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
-						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().toString())
+						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -169,7 +170,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		LocalDate fecha = null;
-		if (!fechaString.equals("d MMM y")) fecha = LocalDate.parse(fechaString);
+		if (fechaString !=null) fecha = LocalDate.parse(fechaString, formateador);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
 				Usuario usuario = new BuilderUsuario()

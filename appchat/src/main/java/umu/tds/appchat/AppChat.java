@@ -69,6 +69,24 @@ public class AppChat extends TDSObservable{
 		return this.sesionUsuario.getTelefono();
 	}
 	
+	public String getApellidosUsuario() {
+		return this.sesionUsuario.getApellidos();
+	}
+	
+	public String getFechaNacimientoUsuario() {
+		System.out.println("[DEBUG AppChat getFechaNacimientoUsuario]: Fecha nacimiento usuario: " + this.sesionUsuario.getFechaNacimiento());
+		return this.sesionUsuario.getFechaNacimiento().toString();
+	}
+	
+	public String getCorreoUsuario() {
+		return this.sesionUsuario.getEmail();
+	}
+	
+	public String getSaludoUsuario() {
+		return this.sesionUsuario.getSaludo(); 
+	}
+	
+	
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
