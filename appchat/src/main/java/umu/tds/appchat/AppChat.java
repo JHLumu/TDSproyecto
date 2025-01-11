@@ -142,12 +142,13 @@ public class AppChat extends TDSObservable{
 		ContactoIndividual contacto = this.sesionUsuario.crearContacto(nombre,usuarioAsociado);
 		 if ( contacto == null) return false;
 		 else {
+			 setChanged(Estado.INFO_CONTACTO);
 			 contactoDAO.registrarContacto(contacto);
 			 usuarioDAO.modificarUsuario(sesionUsuario);
 			 
 			// Notificar a los observadores sobre el nuevo contacto
-	            setChanged(sesionUsuario, Estado.INFO_CONTACTO);
-	            notifyObservers(sesionUsuario);
+	            
+	         notifyObservers(Estado.INFO_CONTACTO);
 	            
 			 return true;
 		 }
@@ -253,29 +254,17 @@ public class AppChat extends TDSObservable{
     	    
     	    File localFile;
     	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
-    	    Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
-    	    if (!localFile.exists()) {
+    	    
+    	    if (!localFile.exists() || localFile.equals(null)) {
+    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
     	        // Si el archivo no existe, descargarlo desde el URL
-    	        
     	        if (imageUrl != null) {  
 					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
     	        }
     	    }
 
-    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-    	    	Image localImage = ImageIO.read(localFile);
-    	        if (imageUrl != null) {  
-    	        	if(imageUrl.equals(localImage))
-    	        		return localImage;
-    					
-					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
-					localImage = ImageIO.read(localFile);
-					return localImage;
-    	        }
-				
-				
-				
-    	    }
+    	    Image localImage = ImageIO.read(localFile);
+			return localImage;			
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -284,30 +273,35 @@ public class AppChat extends TDSObservable{
 
 		return null;
 	}
+	
+	public void setImagenPerfil(Image imagen) {
+		// Directorio base del usuario de la sesión actual
+	    String directorioBase = "imagenPerfilContactos\\" + 
+	    						getNombreUsuario() +  "-" + 
+	    						getTelefonoUsuario();
+
+	    File directorio = new File(directorioBase);
+	    if (!directorio.exists()) {
+	        directorio.mkdirs(); // Crear directorio si no existe
+	    }
+	    
+	    File localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
+	    try {
+			ImageIO.write((java.awt.image.RenderedImage) imagen, "png", localFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+	}
 
 	public void cambiarFotoPerfil(URL nuevaFoto) {
 		this.sesionUsuario.cambiarImagen(nuevaFoto);
+		setChanged(Estado.NUEVA_FOTO_USUARIO);
 		usuarioDAO.modificarUsuario(sesionUsuario);
-		setChanged(sesionUsuario, Estado.NUEVA_FOTO_USUARIO);
-		notifyObservers(sesionUsuario);
-			
-		//TO-DO Arreglar esta parte para cambiar la foto en la lista de contacto de otros usuarios	
-		List<Usuario> usuarioEsContacto = catalogoUsuarios.usuarioEnListaContacto(sesionUsuario);
-		for(Usuario u : usuarioEsContacto){
-			this.setChanged(u, Estado.INFO_CONTACTO);
-			notifyObservers(u);
-		}
+		
+		notifyObservers(Estado.NUEVA_FOTO_USUARIO);
 	}
-
-	@Override 
-	public synchronized void addObserver(TDSObserver o) {
-    	super.addObserver(this.sesionUsuario, o);
-    }
-	
-	@Override 
-	public synchronized void deleteObserver(TDSObserver o) {
-    	super.deleteObserver(this.sesionUsuario, o);
-    }
 
 	
 }

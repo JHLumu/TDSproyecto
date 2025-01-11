@@ -13,8 +13,6 @@ import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 
-import java.awt.Font;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
@@ -118,6 +116,7 @@ public class CambiarFoto extends JFrame{
 		    	try {
 					this.fotoPerfil = new URL(textField.getText());
 					this.fotoCorrecta = true;
+					AppChat.getInstancia().setImagenPerfil(imagen);
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

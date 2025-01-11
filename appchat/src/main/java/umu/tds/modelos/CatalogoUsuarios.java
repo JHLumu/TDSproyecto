@@ -1,13 +1,10 @@
 package umu.tds.modelos;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import umu.tds.modelos.Usuario.BuilderUsuario;
 import umu.tds.persistencia.FactoriaDAO;
 import umu.tds.persistencia.FactoriaDAOTDS;
 import umu.tds.persistencia.UsuarioDAO;
@@ -78,58 +75,5 @@ public class CatalogoUsuarios {
 		
 		
 	}
-	
-	/*
-	public List<Usuario> usuarioEnListaContacto (Usuario u){
-		List<Usuario> usuariosQueTienenAlActual = this.usuarios.values().stream()
-			    .filter(usuario -> usuario.getListaContacto().contains(u))
-			    .collect(Collectors.toList());
-		
-		return usuariosQueTienenAlActual;
-
-	}
-	*/
-	public List<Usuario> usuarioEnListaContacto(Usuario u) {
-	    // Validar si el usuario no es nulo
-	    if (u == null) {
-	        System.err.println("[ERROR] El usuario proporcionado es nulo.");
-	        return null;  // Retorna una lista vacía si el usuario es nulo
-	    }
-
-	    System.out.println("[DEBUG] Buscando usuarios que tienen a " + u.getNombre() + " como contacto.");
-	    System.out.println("[DEBUG] Total de usuarios registrados: " + this.usuarios.size());
-
-	    // Filtrar usuarios que tienen al usuario 'u' en su lista de contactos
-	    List<Usuario> usuariosQueTienenAlActual = this.usuarios.values().stream()
-	        .filter(usuario -> {
-	            boolean contiene = usuario.getListaContacto().stream()
-	                .anyMatch(c -> {
-	                    if (c instanceof ContactoIndividual) {
-	                        ContactoIndividual cont = (ContactoIndividual) c;
-	                        boolean equals = cont.getUsuario().equals(u);
-	                        if (equals) {
-	                            System.out.println("[DEBUG] El usuario " + usuario.getNombre() + " tiene a " + u.getNombre() + " en su lista de contactos.");
-	                        }
-	                        return equals;
-	                    }
-	                    return false;  // Si no es ContactoIndividual, no lo considera
-	                });
-	            return contiene;
-	        })
-	        .collect(Collectors.toList());
-
-	    // Verificar el resultado del filtro
-	    System.out.println("[DEBUG] Total de usuarios que contienen a " + u.getNombre() + " en su lista de contactos: " + usuariosQueTienenAlActual.size());
-
-	    // Opcional: Mostrar los usuarios encontrados
-	    usuariosQueTienenAlActual.forEach(usuario -> 
-	        System.out.println("[DEBUG] Usuario encontrado: " + usuario.getNombre() + " - Teléfono: " + usuario.getTelefono())
-	    );
-
-	    return usuariosQueTienenAlActual;
-	}
-
-
-	
 	
 }

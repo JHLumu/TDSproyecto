@@ -275,7 +275,8 @@ public class Principal extends JFrame implements TDSObserver {
 		gbc_horizontalGlue_1.gridy = 0;
 		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
-		AppChat.getInstancia().addObserver(this);
+		AppChat.getInstancia().addObserver(Estado.NUEVA_FOTO_USUARIO, this);
+		AppChat.getInstancia().addObserver(Estado.INFO_CONTACTO, this);
 	}
 	
 	// Implementación del método update de TDSObserver
@@ -303,7 +304,8 @@ public class Principal extends JFrame implements TDSObserver {
     // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra
     @Override
     public void dispose() {
-        AppChat.getInstancia().deleteObserver(this);
+        AppChat.getInstancia().deleteObserver(Estado.INFO_CONTACTO,this);
+        AppChat.getInstancia().deleteObserver(Estado.NUEVA_FOTO_USUARIO,this);
         super.dispose();
     }
    

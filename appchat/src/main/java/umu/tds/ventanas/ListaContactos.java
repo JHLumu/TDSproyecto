@@ -174,7 +174,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelSuperior.add(horizontalGlue);
 		
-		AppChat.getInstancia().addObserver(this);
+		AppChat.getInstancia().addObserver(Estado.INFO_CONTACTO, this);
 		
 	}
 	
@@ -204,7 +204,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
     // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra
     @Override
     public void dispose() {
-        AppChat.getInstancia().deleteObserver(this);
+        AppChat.getInstancia().deleteObserver(Estado.INFO_CONTACTO,this);
         super.dispose();
     }
 

@@ -27,6 +27,10 @@ import java.awt.Dimension;
 
 public class NuevoContacto extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JTextField nombreField;
 	private JTextField telefonoField;
 
