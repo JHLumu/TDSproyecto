@@ -188,9 +188,9 @@ public class ListaContactos extends JFrame implements TDSObserver {
     public void update(TDSObservable o, Object arg) {
     	if (arg instanceof Estado) {
             Estado estadoActual = (Estado) arg;
-            
+            System.out.println("[DEBUG ListaContactos update]: Estado recibido en ListaContactos: " + estadoActual);
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
-            	System.out.println("Actualizando contacto");
+            	System.out.println("[DEBUG ListaContactos update]: Actualizando contacto");
                 this.actualizarListaContactos();
             }
         }

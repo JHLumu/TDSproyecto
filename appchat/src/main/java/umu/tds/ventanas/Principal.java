@@ -41,6 +41,7 @@ import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.border.LineBorder;
+import javax.swing.border.BevelBorder;
 
 
 public class Principal extends JFrame implements TDSObserver {
@@ -89,6 +90,7 @@ public class Principal extends JFrame implements TDSObserver {
 		setTitle("AppChat");
 		
 		JPanel panelNorte = new JPanel();
+		panelNorte.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panelNorte.setBackground(new Color(255, 255, 255));
 		contentPane.add(panelNorte, BorderLayout.NORTH);
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
@@ -96,10 +98,10 @@ public class Principal extends JFrame implements TDSObserver {
 		JComboBox<String> comboBoxContactos = new JComboBox<String>();
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
-		comboBoxContactos.setSize(new Dimension(100, 20));
+		comboBoxContactos.setSize(new Dimension(150, 40));
 		comboBoxContactos.setBackground(new Color(81, 116, 255));
-		comboBoxContactos.setMaximumSize(new Dimension(100000, 16000));
-		comboBoxContactos.setMinimumSize(new Dimension(100, 20));
+		comboBoxContactos.setMaximumSize(new Dimension(100000, 30));
+		comboBoxContactos.setMinimumSize(new Dimension(150, 40));
 		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
 		
 		listaContactos = new DefaultComboBoxModel<String>();
@@ -107,16 +109,18 @@ public class Principal extends JFrame implements TDSObserver {
 		comboBoxContactos.setModel(listaContactos);
 		panelNorte.add(comboBoxContactos);
 		
-		JButton btnEnv = new JButton("");
-		btnEnv.setMinimumSize(new Dimension(32, 32));
+		JButton btnEnv = new JButton("Enviar");
+		btnEnv.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnEnv.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnEnv.setMinimumSize(new Dimension(80, 40));
 		btnEnv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnEnv.setPreferredSize(new Dimension(32, 32));
+		btnEnv.setPreferredSize(new Dimension(90, 40));
 		btnEnv.setForeground(new Color(255, 255, 255));
 		btnEnv.setBackground(new Color(81, 116, 255));
-		btnEnv.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnEnv.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnEnv);
 		
 		Component horizontalGlue_4 = Box.createHorizontalGlue();
@@ -124,41 +128,44 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue_4);
 		
 		
-		JButton btnBuscar = new JButton("");
+		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnBuscar.setPreferredSize(new Dimension(32, 32));
+		btnBuscar.setPreferredSize(new Dimension(90, 40));
 		btnBuscar.setForeground(new Color(255, 255, 255));
 		btnBuscar.setBackground(new Color(81, 116, 255));
-		btnBuscar.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnBuscar.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnBuscar);
 		
 		Component horizontalGlue_3 = Box.createHorizontalGlue();
 		horizontalGlue_3.setMaximumSize(new Dimension(100, 0));
 		panelNorte.add(horizontalGlue_3);
 		
-		JButton btnPremium = new JButton("");
+		JButton btnPremium = new JButton("Premium");
+		btnPremium.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnPremium.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnPremium.setPreferredSize(new Dimension(32, 32));
+		btnPremium.setPreferredSize(new Dimension(100, 40));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(new Color(81, 116, 255));
-		btnPremium.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnPremium.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnPremium);
 		
 		Component horizontalGlue_2 = Box.createHorizontalGlue();
 		horizontalGlue_2.setMaximumSize(new Dimension(100, 0));
 		panelNorte.add(horizontalGlue_2);
 		
-		JButton btnContactos = new JButton("");
-		btnContactos.setPreferredSize(new Dimension(32, 32));
+		JButton btnContactos = new JButton("Lista de Contactos");
+		btnContactos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnContactos.setPreferredSize(new Dimension(150, 32));
 		btnContactos.setForeground(new Color(255, 255, 255));
 		btnContactos.setBackground(new Color(81, 116, 255));
-		btnContactos.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnContactos.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		btnContactos.addActionListener(evento -> {
 			ListaContactos frame = new ListaContactos();
 			frame.setVisible(true);
@@ -171,9 +178,10 @@ public class Principal extends JFrame implements TDSObserver {
 		panelNorte.add(horizontalGlue);
 		
 		btnUsuario = new JButton(this.controlador.getNombreUsuario());
-		btnUsuario.setForeground(new Color(0, 0, 0));
+		btnUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnUsuario.setForeground(new Color(255, 255, 255));
 		btnUsuario.setBackground(new Color(81, 116, 255));
-		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		
 		btnUsuario.addActionListener(evento -> {
 				CambiarFoto frame = new CambiarFoto();
@@ -196,6 +204,7 @@ public class Principal extends JFrame implements TDSObserver {
 		panelMensaje.add(list);
 		
 		JPanel chat = new JPanel();
+		chat.setBorder(new LineBorder(new Color(0, 0, 0)));
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 	
 		JScrollPane scrollPane = new JScrollPane();
@@ -207,6 +216,7 @@ public class Principal extends JFrame implements TDSObserver {
 		contentPane.add(panelCentro, BorderLayout.CENTER);
 		
 		JPanel barraIntro = new JPanel();
+		barraIntro.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		barraIntro.setBackground(new Color(255, 255, 255));
 		panelCentro.add(barraIntro, BorderLayout.SOUTH);
 		GridBagLayout gbl_barraIntro = new GridBagLayout();
@@ -286,9 +296,10 @@ public class Principal extends JFrame implements TDSObserver {
     public void update(TDSObservable o, Object arg) {
     	if (arg instanceof Estado) {
             Estado estadoActual = (Estado) arg;
-            
+            System.out.println("[DEBUG Principal update] Estado recibido en ListaContactos: " + estadoActual);
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
                 this.actualizarListaContactos();
+                
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
             	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
             }

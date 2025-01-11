@@ -96,6 +96,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	    
     	    // Cargar la imagen local y establecerla en el JLabel
     	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
+    	    	  System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Cargando imagen desde: " + localFile.getAbsolutePath());
     	    	Image localImage = ImageIO.read(localFile);
     	        if(!imageUrl.equals(localImage)) {
     	        	ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
@@ -104,6 +105,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	        ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
     	        imageLabel.setIcon(imageIcon);
     	    } else {
+    	    	 System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Usando ícono predeterminado para: " + contacto.getNombre());
     	        // Si no existe imagen local, usar un ícono predeterminado
     	        imageLabel.setIcon(new ImageIcon(ContactoRenderer.class.getResource("/resources/usuario_64.png")));
     	    }

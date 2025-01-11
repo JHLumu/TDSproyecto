@@ -51,6 +51,7 @@ public class Login extends JFrame{
 	 * Create the application.
 	 */
 	public Login() {
+		getContentPane().setBackground(new Color(255, 255, 255));
 		initialize();
 	}
 
@@ -72,6 +73,7 @@ public class Login extends JFrame{
 		
 		
 		JPanel panelCentro = new JPanel();
+		panelCentro.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelCentro, BorderLayout.CENTER);
 	
 		GridBagLayout gbl_panelCentro = new GridBagLayout();
@@ -154,6 +156,7 @@ public class Login extends JFrame{
 		panelCentro.add(botonLogin, gbc_botonLogin);
 		
 		JPanel panelSur = new JPanel();
+		panelSur.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelSur, BorderLayout.SOUTH);
 		panelSur.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -177,6 +180,7 @@ public class Login extends JFrame{
 		panelSur.add(botonRegistro);
 		
 		JPanel panelNorte = new JPanel();
+		panelNorte.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelNorte, BorderLayout.NORTH);
 		
 		JLabel nombreAPP = new JLabel("AppChat");
@@ -186,9 +190,11 @@ public class Login extends JFrame{
 		panelNorte.add(nombreAPP);
 		
 		JPanel panelEste = new JPanel();
+		panelEste.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelEste, BorderLayout.EAST);
 		
 		JPanel panelOeste = new JPanel();
+		panelOeste.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelOeste, BorderLayout.WEST);
 		
 		

@@ -1,3 +1,4 @@
+
 package umu.tds.ventanas;
 
 import java.awt.EventQueue;
@@ -203,5 +204,5 @@ public class CambiarFoto extends JFrame{
             }
         });
     }
-
 }
+

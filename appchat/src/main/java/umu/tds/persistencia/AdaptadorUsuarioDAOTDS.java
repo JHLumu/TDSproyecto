@@ -3,6 +3,7 @@ package umu.tds.persistencia;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
@@ -80,7 +81,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("email", usuario.getEmail()),
 						new Propiedad("password", usuario.getPassword()),
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
-						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm())
+						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
+						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().toString())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -123,7 +125,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				prop.setValor(usuario.getPassword());
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la contraseña del usuario.");
 			}
-			else if (prop.getNombre().equals("fecha")) {
+			else if (prop.getNombre().equals("fecha de nacimiento")) {
 				prop.setValor(usuario.getFechaNacimiento().format(formateador));
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la fecha de nacimiento del usuario.");
 				}
@@ -161,9 +163,13 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
 		String imagenPath = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
+		String fechaString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de nacimiento");
 		URL imagen = null;
 		if (imagenPath != null) imagen = new URL(imagenPath);
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
+		
+		LocalDate fecha = null;
+		if (!fechaString.equals("d MMM y")) fecha = LocalDate.parse(fechaString);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
 				Usuario usuario = new BuilderUsuario()
@@ -173,6 +179,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 									.email(email)
 									.password(password)
 									.imagenDePerfil(imagen)
+									.fechaNac(fecha)
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);
