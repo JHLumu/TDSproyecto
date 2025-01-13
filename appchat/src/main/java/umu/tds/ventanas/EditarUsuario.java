@@ -6,6 +6,10 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import javax.swing.JLabel;
@@ -19,6 +23,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.JButton;
 import java.awt.Toolkit;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.MalformedURLException;
@@ -26,19 +32,20 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 import java.awt.Dimension;
 
-public class CambiarFoto extends JFrame {
+public class EditarUsuario extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JTextField textField;
     private URL fotoPerfil;
     private boolean fotoCorrecta;
+    private JTextArea saludoArea;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    CambiarFoto window = new CambiarFoto();
+                    EditarUsuario window = new EditarUsuario();
                     window.setVisible(true);
                     window.setLocationRelativeTo(null);
                 } catch (Exception e) {
@@ -48,19 +55,20 @@ public class CambiarFoto extends JFrame {
         });
     }
 
-    public CambiarFoto() {
-    	setResizable(false);
-        setIconImage(Toolkit.getDefaultToolkit().getImage(CambiarFoto.class.getResource("/Resources/chat.png")));
+    public EditarUsuario() {
+    	setResizable(true);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(EditarUsuario.class.getResource("/Resources/chat.png")));
         setTitle("AppChat");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setBounds(100, 100, 600, 400);
+        setBounds(100, 100, 622, 400);
 
         contentPane = new JPanel(new BorderLayout(10, 10));
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         setContentPane(contentPane);
 
         GridBagLayout gbl_panelIzquierdo = new GridBagLayout();
-        gbl_panelIzquierdo.columnWeights = new double[]{0.0, 1.0};
+        gbl_panelIzquierdo.columnWidths = new int[]{5, 0, 0, 5};
+        gbl_panelIzquierdo.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0};
         gbl_panelIzquierdo.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
         JPanel panelIzquierdo = new JPanel(gbl_panelIzquierdo);
         panelIzquierdo.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -68,7 +76,7 @@ public class CambiarFoto extends JFrame {
         contentPane.add(panelIzquierdo, BorderLayout.WEST);
 
         GridBagConstraints gbc_lblNombre = new GridBagConstraints();
-        gbc_lblNombre.gridx = 0;
+        gbc_lblNombre.gridx = 1;
         gbc_lblNombre.gridy = 0;
         gbc_lblNombre.insets = new Insets(5, 5, 5, 5);
         gbc_lblNombre.anchor = GridBagConstraints.WEST;
@@ -78,7 +86,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblNombre, gbc_lblNombre);
 
         GridBagConstraints gbc_lblNombreValor = new GridBagConstraints();
-        gbc_lblNombreValor.gridx = 1;
+        gbc_lblNombreValor.gridx = 2;
         gbc_lblNombreValor.gridy = 0;
         gbc_lblNombreValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblNombreValor.anchor = GridBagConstraints.WEST;
@@ -88,7 +96,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblNombreValor, gbc_lblNombreValor);
 
         GridBagConstraints gbc_lblApellido = new GridBagConstraints();
-        gbc_lblApellido.gridx = 0;
+        gbc_lblApellido.gridx = 1;
         gbc_lblApellido.gridy = 1;
         gbc_lblApellido.insets = new Insets(5, 5, 5, 5);
         gbc_lblApellido.anchor = GridBagConstraints.WEST;
@@ -98,7 +106,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblApellido, gbc_lblApellido);
 
         GridBagConstraints gbc_lblApellidoValor = new GridBagConstraints();
-        gbc_lblApellidoValor.gridx = 1;
+        gbc_lblApellidoValor.gridx = 2;
         gbc_lblApellidoValor.gridy = 1;
         gbc_lblApellidoValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblApellidoValor.anchor = GridBagConstraints.WEST;
@@ -108,7 +116,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblApellidoValor, gbc_lblApellidoValor);
 
         GridBagConstraints gbc_lblTelefono = new GridBagConstraints();
-        gbc_lblTelefono.gridx = 0;
+        gbc_lblTelefono.gridx = 1;
         gbc_lblTelefono.gridy = 2;
         gbc_lblTelefono.insets = new Insets(5, 5, 5, 5);
         gbc_lblTelefono.anchor = GridBagConstraints.WEST;
@@ -118,7 +126,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblTelefono, gbc_lblTelefono);
 
         GridBagConstraints gbc_lblTelefonoValor = new GridBagConstraints();
-        gbc_lblTelefonoValor.gridx = 1;
+        gbc_lblTelefonoValor.gridx = 2;
         gbc_lblTelefonoValor.gridy = 2;
         gbc_lblTelefonoValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblTelefonoValor.anchor = GridBagConstraints.WEST;
@@ -128,7 +136,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblTelefonoValor, gbc_lblTelefonoValor);
 
         GridBagConstraints gbc_lblEmail = new GridBagConstraints();
-        gbc_lblEmail.gridx = 0;
+        gbc_lblEmail.gridx = 1;
         gbc_lblEmail.gridy = 3;
         gbc_lblEmail.insets = new Insets(5, 5, 5, 5);
         gbc_lblEmail.anchor = GridBagConstraints.WEST;
@@ -138,7 +146,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblEmail, gbc_lblEmail);
 
         GridBagConstraints gbc_lblEmailValor = new GridBagConstraints();
-        gbc_lblEmailValor.gridx = 1;
+        gbc_lblEmailValor.gridx = 2;
         gbc_lblEmailValor.gridy = 3;
         gbc_lblEmailValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblEmailValor.anchor = GridBagConstraints.WEST;
@@ -148,7 +156,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblEmailValor, gbc_lblEmailValor);
 
         GridBagConstraints gbc_lblFechaNacimiento = new GridBagConstraints();
-        gbc_lblFechaNacimiento.gridx = 0;
+        gbc_lblFechaNacimiento.gridx = 1;
         gbc_lblFechaNacimiento.gridy = 4;
         gbc_lblFechaNacimiento.insets = new Insets(5, 5, 5, 5);
         gbc_lblFechaNacimiento.anchor = GridBagConstraints.WEST;
@@ -158,7 +166,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblFechaNacimiento, gbc_lblFechaNacimiento);
 
         GridBagConstraints gbc_lblFechaNacimientoValor = new GridBagConstraints();
-        gbc_lblFechaNacimientoValor.gridx = 1;
+        gbc_lblFechaNacimientoValor.gridx = 2;
         gbc_lblFechaNacimientoValor.gridy = 4;
         gbc_lblFechaNacimientoValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblFechaNacimientoValor.anchor = GridBagConstraints.WEST;
@@ -168,7 +176,7 @@ public class CambiarFoto extends JFrame {
         panelIzquierdo.add(lblFechaNacimientoValor, gbc_lblFechaNacimientoValor);
 
         GridBagConstraints gbc_lblSaludo = new GridBagConstraints();
-        gbc_lblSaludo.gridx = 0;
+        gbc_lblSaludo.gridx = 1;
         gbc_lblSaludo.gridy = 5;
         gbc_lblSaludo.insets = new Insets(5, 5, 5, 5);
         gbc_lblSaludo.anchor = GridBagConstraints.WEST;
@@ -176,22 +184,22 @@ public class CambiarFoto extends JFrame {
         lblSaludo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSaludo.setForeground(new Color(25, 25, 112));
         
-        GridBagConstraints gbc_lblSaludoValor = new GridBagConstraints();
-        gbc_lblSaludoValor.gridx = 1;
-        gbc_lblSaludoValor.gridy = 5;
-        gbc_lblSaludoValor.insets = new Insets(5, 5, 5, 5);
-        gbc_lblSaludoValor.anchor = GridBagConstraints.WEST;
-        gbc_lblSaludoValor.fill = GridBagConstraints.HORIZONTAL;
+        panelIzquierdo.add(lblSaludo, gbc_lblSaludo);
         
-        String saludoUsuario = AppChat.getInstancia().getSaludoUsuario();
-        JLabel lblSaludoValor;
-        if (saludoUsuario != null) {
-        	panelIzquierdo.add(lblSaludo, gbc_lblSaludo);
-            lblSaludoValor = new JLabel(saludoUsuario);
-            lblSaludoValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-            lblSaludoValor.setForeground(new Color(25, 25, 112));
-            panelIzquierdo.add(lblSaludoValor, gbc_lblSaludoValor);
-        	}
+        
+        JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.gridwidth = 2;
+		gbc_scrollPane.gridheight = 2;
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.insets = new Insets(5, 5, 0, 5);
+		gbc_scrollPane.gridx = 1;
+		gbc_scrollPane.gridy = 6;
+		panelIzquierdo.add(scrollPane, gbc_scrollPane);
+		
+		saludoArea = new JTextArea();
+		scrollPane.setViewportView(saludoArea);
+
         
         
 
@@ -256,12 +264,21 @@ public class CambiarFoto extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
         });
+        
+        String saludoUsuario = AppChat.getInstancia().getSaludoUsuario();
+        saludoArea.setText(saludoUsuario);
+        saludoArea.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        saludoArea.setForeground(new Color(25, 25, 112));
 
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (fotoCorrecta) {
                     AppChat.getInstancia().cambiarFotoPerfil(fotoPerfil);
+                };
+                
+                if(saludoUsuario ==null || !saludoUsuario.equals(saludoArea.getText())) {
+                	AppChat.getInstancia().cambiarSaludo(saludoArea.getText());
                 }
             }
         });

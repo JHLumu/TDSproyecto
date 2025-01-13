@@ -184,7 +184,7 @@ public class Principal extends JFrame implements TDSObserver {
 		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		
 		btnUsuario.addActionListener(evento -> {
-				CambiarFoto frame = new CambiarFoto();
+				EditarUsuario frame = new EditarUsuario();
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
 		});

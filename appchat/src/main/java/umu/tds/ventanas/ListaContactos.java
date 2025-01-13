@@ -16,6 +16,7 @@ import javax.swing.SwingConstants;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 
 import java.awt.Color;
 import javax.swing.border.SoftBevelBorder;
@@ -25,7 +26,10 @@ import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Contacto.TipoContacto;
+import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.ContactoRenderer;
+import umu.tds.modelos.Grupo;
 
 import javax.swing.border.BevelBorder;
 
@@ -33,9 +37,13 @@ import javax.swing.JList;
 
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.font.ImageGraphicAttribute;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -44,6 +52,7 @@ import javax.swing.border.LineBorder;
 public class ListaContactos extends JFrame implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
+	protected static final String ContactoIndividual = null;
 	private JPanel contentPane;
 	private DefaultListModel<Contacto> listaContactos;
 
@@ -111,6 +120,41 @@ public class ListaContactos extends JFrame implements TDSObserver {
         actualizarListaContactos(); // Cargar contactos inicialmente
         list.setCellRenderer(new ContactoRenderer());
         list.setModel(listaContactos);
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int index = list.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    Contacto contacto = list.getModel().getElementAt(index);
+                    EditarContacto frame;
+                    // Abres tu ventana pasando la info de 'contacto'
+                    if(contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
+                    	ContactoIndividual aux = ((ContactoIndividual) contacto);
+                    	frame = new EditarContacto(
+                                aux.getNombre(), 
+                                new ImageIcon(AppChat.getInstancia().getImagen(aux.getImagen())
+                                				.getScaledInstance(128, 128, Image.SCALE_SMOOTH)),
+                                aux.getTelefono(),
+                                aux.getSaludo()
+                               
+                            );
+                    	System.out.println(aux.getSaludo());
+                    } else {
+                    	Grupo aux = ((Grupo) contacto);
+                    	frame = new EditarContacto(
+                                aux.getNombre(), 
+                                new ImageIcon(AppChat.getInstancia().getImagen(aux.getImagen())
+                                				.getScaledInstance(128, 128, Image.SCALE_SMOOTH)),
+                                aux.getTipoContacto().toString(),
+                                null
+                            );
+                    }
+                    
+                    frame.setVisible(true);
+                    frame.setLocationRelativeTo(null);
+                }
+            }
+        });
 		
 		GridBagConstraints gbc_list = new GridBagConstraints();
 		gbc_list.insets = new Insets(0, 0, 5, 5);
@@ -203,6 +247,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
         for (Contacto contacto : contactos) {
             listaContactos.addElement(contacto); // Añadir cada contacto al modelo
         }
+        
     }
 
     // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra

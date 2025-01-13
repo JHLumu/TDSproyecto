@@ -83,7 +83,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("password", usuario.getPassword()),
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
 						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
-						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString())
+						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString()),
+						new Propiedad("saludo", usuario.getSaludo())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -139,6 +140,11 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				prop.setValor(usuario.getImagenPerfil().toExternalForm());
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la foto de perfil del usuario.");
 				}
+			else if (prop.getNombre().equals("saludo")) {
+				prop.setValor(usuario.getSaludo());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el saludo del usuario.");
+
+			}
 			servPersistencia.modificarPropiedad(prop);
 		}
 		
@@ -167,6 +173,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de nacimiento");
 		URL imagen = null;
 		if (imagenPath != null) imagen = new URL(imagenPath);
+		String saludo = servPersistencia.recuperarPropiedadEntidad(eUsuario, "saludo");
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
 		LocalDate fecha = null;
@@ -181,6 +188,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 									.password(password)
 									.imagenDePerfil(imagen)
 									.fechaNac(fecha)
+									.saludo(saludo)
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);

@@ -42,6 +42,10 @@ public class ContactoIndividual extends Contacto {
                "\nCorreo Electrónico: " + usuario.getEmail();
     }
     
+    public String getSaludo() {
+    	return usuario.getSaludo();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

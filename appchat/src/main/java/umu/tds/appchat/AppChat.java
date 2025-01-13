@@ -323,5 +323,11 @@ public class AppChat extends TDSObservable{
 		notifyObservers(Estado.NUEVA_FOTO_USUARIO);
 	}
 
+	public void cambiarSaludo(String saludo) {
+		this.sesionUsuario.setSaludo(saludo);
+		usuarioDAO.modificarUsuario(sesionUsuario);
+		
+	}
+
 	
 }

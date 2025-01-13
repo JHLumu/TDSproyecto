@@ -3,6 +3,8 @@ package umu.tds.modelos;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
@@ -16,6 +18,7 @@ import javax.swing.ListCellRenderer;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto.TipoContacto;
+import umu.tds.ventanas.EditarContacto;
 
 public class ContactoRenderer extends JPanel implements ListCellRenderer<Contacto> {
     
@@ -23,6 +26,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     private JLabel imageLabel;
     private JLabel nombreLabel;
     private JLabel tipoOtelfLabel;
+    private String saludo;
 
     public ContactoRenderer() {
         setLayout(new BorderLayout(5, 5));
@@ -49,6 +53,7 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	
     	// Si es un ContactoIndividual, mostrar el número de teléfono
     	if (contacto instanceof ContactoIndividual) {
+    		this.saludo = ((ContactoIndividual) contacto).getSaludo();
     	    String telefono = ((ContactoIndividual) contacto).getTelefono();
     	    tipoOtelfLabel.setText("Teléfono: " + telefono);
     	} else {

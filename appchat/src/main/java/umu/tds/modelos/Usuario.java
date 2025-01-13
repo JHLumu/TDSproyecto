@@ -251,6 +251,11 @@ public class Usuario {
 	        return Objects.hash(telefono);
 	    }
 
+		public void setSaludo(String saludo) {
+			this.saludo = saludo;
+			
+		}
+
 		
 		
 }
