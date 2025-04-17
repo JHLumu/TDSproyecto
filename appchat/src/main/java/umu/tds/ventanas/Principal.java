@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -15,12 +14,14 @@ import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
+import umu.tds.modelos.TDSEmojiPanel;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.DefaultComboBoxModel;
@@ -29,9 +30,8 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -41,6 +41,8 @@ import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.border.BevelBorder;
 
 
@@ -48,7 +50,7 @@ public class Principal extends JFrame implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField textField;
+	private JTextArea textArea;
 	private final AppChat controlador;
 	private JButton btnUsuario;
 	DefaultComboBoxModel<String> listaContactos;
@@ -132,6 +134,10 @@ public class Principal extends JFrame implements TDSObserver {
 		btnBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				BuscarConFiltro frame = new BuscarConFiltro();
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				
 			}
 		});
 		btnBuscar.setPreferredSize(new Dimension(90, 40));
@@ -204,11 +210,11 @@ public class Principal extends JFrame implements TDSObserver {
 		panelMensaje.add(list);
 		
 		JPanel chat = new JPanel();
-		chat.setBorder(new LineBorder(new Color(0, 0, 0)));
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 	
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setViewportView(chat);
+		JScrollPane scrollPane = new JScrollPane(chat);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		JPanel panelCentro = new JPanel();
 		panelCentro.setLayout(new BorderLayout(0,0));
@@ -226,18 +232,21 @@ public class Principal extends JFrame implements TDSObserver {
 		gbl_barraIntro.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		barraIntro.setLayout(gbl_barraIntro);
 		
-		JButton Emoticono = new JButton("Emoticono");
-		Emoticono.setForeground(new Color(255, 255, 255));
-		Emoticono.setBackground(new Color(81, 116, 255));
-		Emoticono.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		JButton emoticonoBtn = new JButton("Emoticono");
+		emoticonoBtn.setForeground(new Color(255, 255, 255));
+		emoticonoBtn.setBackground(new Color(81, 116, 255));
+		emoticonoBtn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
-		Emoticono.addActionListener(new ActionListener() {
+		emoticonoBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BubbleText burbuja;
+				JDialog emojiDialog = new JDialog();
+			    emojiDialog.setTitle("Select Emoji");
+			    emojiDialog.add(new TDSEmojiPanel(chat));
+			    emojiDialog.pack();
+			    emojiDialog.setLocationRelativeTo(null);
+			    emojiDialog.setModal(true);
+			    emojiDialog.setVisible(true);
 				
-				burbuja=new BubbleText(chat, (int)(Math.random()*24), Color.WHITE,  AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT, 14);
-				textField.setText("");
-				chat.add(burbuja);
 			}
 		});
 		
@@ -247,19 +256,26 @@ public class Principal extends JFrame implements TDSObserver {
 		gbc_Emoticono.insets = new Insets(0, 0, 0, 5);
 		gbc_Emoticono.gridx = 0;
 		gbc_Emoticono.gridy = 0;
-		barraIntro.add(Emoticono, gbc_Emoticono);
+		barraIntro.add(emoticonoBtn, gbc_Emoticono);
 		
-		textField = new JTextField();
-		textField.setPreferredSize(new Dimension(20, 19));
-		textField.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+		textArea = new JTextArea(1, 30);
+		textArea.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.setPreferredSize(new Dimension(300, 30));
+		textArea.getDocument().addDocumentListener(new DocumentListener() {
+			public void insertUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+			public void removeUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+			public void changedUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+			});
 		
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.fill = GridBagConstraints.BOTH;
 		gbc_textField.insets = new Insets(0, 0, 0, 5);
 		gbc_textField.gridx = 2;
 		gbc_textField.gridy = 0;
-		barraIntro.add(textField, gbc_textField);
-		textField.setColumns(10);
+		barraIntro.add(textArea, gbc_textField);
+		textArea.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.setForeground(new Color(255, 255, 255));
@@ -267,8 +283,9 @@ public class Principal extends JFrame implements TDSObserver {
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BubbleText burbuja = new BubbleText(chat,textField.getText(), Color.WHITE, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
-				chat.add(burbuja);	
+				BubbleText burbuja = new BubbleText(chat,textArea.getText(), Color.WHITE, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
+				textArea.setText("");
+				chat.add(burbuja);
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
@@ -288,6 +305,13 @@ public class Principal extends JFrame implements TDSObserver {
 		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
 	}
+	
+	private void ajustarTamañoAreaTexto() {
+		 int lineas = textArea.getLineCount();
+		 int altura = 20 * lineas; // Ajusta el valor según el tamaño de fuente
+		 textArea.setPreferredSize(new Dimension(300, altura));
+		 textArea.revalidate();
+		}
 	
 	// Implementación del método update de TDSObserver
     @Override
