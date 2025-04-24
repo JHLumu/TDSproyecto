@@ -39,8 +39,8 @@ public class Usuario {
 		
 	//Los siguientes atributos guardan los mensajes enviados y recibidos del usuario
 		
-		private final List<Mensaje> mensajesRecibidos;
-		private final List<Mensaje> mensajesEnviados;
+		private List<Mensaje> mensajesRecibidos;
+		private List<Mensaje> mensajesEnviados;
 		
 	//Constructores de la clase
 		
@@ -173,12 +173,16 @@ public class Usuario {
 	       //Agregar el mensaje a la lista de mensajes enviados
 			this.mensajesEnviados.add(mensaje);
 			
-	        // REVISAR: Llamar al receptor para que reciba el mensaje
-	        mensaje.getReceptor().recibirMensaje(mensaje);
 	    }
 
-	    private void recibirMensaje(Mensaje mensaje) {
+	    public void recibirMensaje(Mensaje mensaje) {
 	       //Se recibe el mensaje por parte del emisor y se guarda en la lista de mensajes recibidos
+	    	if (mensaje.esEmitidoPor(this)) {
+	            throw new IllegalArgumentException("El emisor del mensaje coincide con este usuario.");
+	        }
+
+	       //Agregar el mensaje a la lista de mensajes enviados
+			this.mensajesRecibidos.add(mensaje);
 	    }
 	    public List<Mensaje> getChatMensaje(Usuario otroUsuario) {
 	        //Uso de streams. Recupera aquellos mensajes
@@ -206,6 +210,17 @@ public class Usuario {
 			
 		}
 		
+		public void setMensajesRecibidos(List<Mensaje> lista) {
+			this.mensajesRecibidos = new LinkedList<Mensaje>(lista);
+			
+		}
+		
+		public void setMensajesEnviados(List<Mensaje> lista) {
+			this.mensajesEnviados = new LinkedList<Mensaje>(lista);
+			
+		}
+		
+		
 		public void setListaContacto(List<Contacto> lista) {this.listaContactos = new LinkedList<Contacto>(lista);}
 
 	    public static class BuilderUsuario {
@@ -220,9 +235,13 @@ public class Usuario {
 	    	private String saludo="";
 	    	private final List<Contacto> listaContactos; 
 	    	private boolean premium;
+			private final List<Mensaje> listaDeMensajesRecibidos;
+			private final List<Mensaje> listaDeMensajesEnviados;
 	        
 	        public BuilderUsuario() {
 	        	this.listaContactos = new LinkedList<Contacto>();
+	        	this.listaDeMensajesRecibidos = new LinkedList<Mensaje>();
+	        	this.listaDeMensajesEnviados = new LinkedList<Mensaje>();
 	        }
 	        
 	        public BuilderUsuario nombre(String nombre) {this.nombre=nombre;return this;}
@@ -238,6 +257,8 @@ public class Usuario {
 	        	this.imagen = imagen;return this;
 	        	}
 	        public BuilderUsuario listaDeContactos(List<Contacto> lista) {this.listaContactos.addAll(lista);return this;}
+	        public BuilderUsuario listaDeMensajesRecibidos(List<Mensaje> listaR) {this.listaDeMensajesRecibidos.addAll(listaR);return this;}
+	        public BuilderUsuario listaDeMensajesEnviados(List<Mensaje> listaE) {this.listaDeMensajesEnviados.addAll(listaE);return this;}
 	        public Usuario build() {return new Usuario(this);}
 	    }
 	    

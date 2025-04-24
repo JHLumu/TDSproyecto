@@ -82,6 +82,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("email", usuario.getEmail()),
 						new Propiedad("password", usuario.getPassword()),
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
+						new Propiedad("lista de mensajes recibidos", obtenerIdsMensajes(usuario.getMensajesRecibidos())),
+						new Propiedad("lista de mensajes enviados", obtenerIdsMensajes(usuario.getMensajesEnviados())),
 						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
 						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString()),
 						new Propiedad("saludo", usuario.getSaludo()),
@@ -137,6 +139,16 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				prop.setValor(obtenerIdsContactos(usuario.getListaContacto()));
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de contactos del usuario.");
 				}
+			else if (prop.getNombre().equals("lista de mensajes recibidos")) {
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Lista ID Mensajes Recibidos:" + this.obtenerIdsMensajes(usuario.getMensajesRecibidos()));
+				prop.setValor(obtenerIdsMensajes(usuario.getMensajesRecibidos()));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de mensajes recibidos del usuario.");
+				}
+			else if (prop.getNombre().equals("lista de mensajes enviados")) {
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Lista ID Mensajes Enviados:" + this.obtenerIdsMensajes(usuario.getMensajesEnviados()));
+				prop.setValor(obtenerIdsMensajes(usuario.getMensajesEnviados()));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de mensajes enviados del usuario.");
+				}
 			else if (prop.getNombre().equals("imagen")) {
 				prop.setValor(usuario.getImagenPerfil().toExternalForm());
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la foto de perfil del usuario.");
@@ -176,6 +188,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String password = servPersistencia.recuperarPropiedadEntidad(eUsuario, "password");
 		String telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
+		String idListaMensajesRecibidos = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de mensajes recibidos");
+		String idListaMensajesEnviados = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de mensajes enviados");
 		String imagenPath = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de nacimiento");
 		String premium = servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium");
@@ -205,6 +219,10 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Se recupera la entidad y sus propiedades primitivas.");
 		List<Contacto> lista = obtenerContactosAPartirDeIds(idLista);
 		usuario.setListaContacto(lista);
+		List<Mensaje> listaMensajesRecibidos = obtenerMensajesAPartirDeIds(idListaMensajesRecibidos);
+		usuario.setMensajesRecibidos(listaMensajesRecibidos);
+		List<Mensaje> listaMensajesEnviados = obtenerMensajesAPartirDeIds(idListaMensajesEnviados);
+		usuario.setMensajesEnviados(listaMensajesEnviados);
 		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Se crea y se añade al pool.");
 		
 		//Se recuperan los objetos referenciados y se actualiza el objeto: 
@@ -249,6 +267,29 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				Contacto contacto = (FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto)));
 				resultado.add(contacto);
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerContactosAPartirDeIds]: " + "Se recupera el contacto " + contacto.getNombre());
+			}
+		
+		}
+		return resultado;
+	}
+	
+	private String obtenerIdsMensajes(List<Mensaje> lista) {
+		String aux = lista.stream()
+				.map(c -> String.valueOf(c.getCodigo()))
+				.collect(Collectors.joining(" "));
+		return aux;
+				
+	}
+	
+	private List<Mensaje> obtenerMensajesAPartirDeIds(String idMensajes) throws NumberFormatException, MalformedURLException{
+		List<Mensaje> resultado = new LinkedList<Mensaje>();
+		if (idMensajes != null && !idMensajes.isEmpty()) {
+			
+			for (String idMensaje: idMensajes.split(" ")) {
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMensajesAPartirDeIds]: " + "idMensajes: " + idMensaje);
+				Mensaje mensaje = (FactoriaDAO.getFactoriaDAO().getMensajeDAO().recuperarMensaje(Integer.valueOf(idMensaje)));
+				resultado.add(mensaje);
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerContactosAPartirDeIds]: " + "Se recupera el contacto " + mensaje.getCodigo());
 			}
 		
 		}

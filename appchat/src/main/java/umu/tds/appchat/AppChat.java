@@ -4,17 +4,13 @@ import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
@@ -27,7 +23,6 @@ import umu.tds.persistencia.*;
 import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
-import umu.tds.utils.TDSObserver;
 
 //Clase Controlador entre modelos y ventanas
 public class AppChat extends TDSObservable{
@@ -242,7 +237,7 @@ public class AppChat extends TDSObservable{
 	
 	
 	//Esto es mas cosa del patron dao que del controlador
-	public List <Mensaje> obtenerListaMensajesRecientesPorUsuario(){
+	public List <Mensaje> obtenerChatContacto(Contacto contacto){
 		
 		/*
 		Usuario ana = new Usuario("Ana", "", "", LocalDate.now(),"", "");
@@ -256,11 +251,15 @@ public class AppChat extends TDSObservable{
 		};
 		return Arrays.asList(values);
 		*/
-		return new LinkedList<Mensaje>();
+		List<Mensaje> recibido = this.sesionUsuario.getChatMensaje(((ContactoIndividual) contacto).getUsuario());
+		
+		
+		return recibido;
 	}
 	
-	public void enviarMensaje(Contacto contacto) {
-		
+	public void enviarMensaje(Contacto contacto, Mensaje mensaje) {
+		this.sesionUsuario.enviarMensaje(mensaje);
+		((ContactoIndividual) contacto).getUsuario().recibirMensaje(mensaje);
 	}
 	
 	public Image getImagen(Object urlObj) {
