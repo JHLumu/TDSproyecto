@@ -84,7 +84,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
 						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
 						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString()),
-						new Propiedad("saludo", usuario.getSaludo())
+						new Propiedad("saludo", usuario.getSaludo()),
+						new Propiedad("premium", String.valueOf(usuario.isPremium()))
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -145,6 +146,12 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el saludo del usuario.");
 
 			}
+			
+			else if (prop.getNombre().equals("premium")) {
+				prop.setValor(String.valueOf(usuario.isPremium()));
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el estado premium del usuario a " + usuario.isPremium() + ".");
+			}
+			
 			servPersistencia.modificarPropiedad(prop);
 		}
 		
@@ -153,6 +160,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	@Override
 	public Usuario recuperarUsuario(int id) throws MalformedURLException {
 		System.out.println("\n[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Inicio de recuperar usuario.");
+		
 		//Si el objeto se encuentra en el pool, se retorna
 		PoolDAO poolUsuario = PoolDAO.getUnicaInstancia();
 		if (poolUsuario.contiene(id)) {
@@ -162,7 +170,6 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		
 		//Si no lo está, se recupera Entidad y aquellas Propiedades de campos primitivos
 		Entidad eUsuario = servPersistencia.recuperarEntidad(id);
-		
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eUsuario, "nombre");
 		String apellidos = servPersistencia.recuperarPropiedadEntidad(eUsuario, "apellidos");
 		String email = servPersistencia.recuperarPropiedadEntidad(eUsuario, "email");
@@ -171,12 +178,13 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String idLista = servPersistencia.recuperarPropiedadEntidad(eUsuario, "lista de contactos");
 		String imagenPath = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagen");
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de nacimiento");
-		URL imagen = null;
-		if (imagenPath != null) imagen = new URL(imagenPath);
+		String premium = servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium");
 		String saludo = servPersistencia.recuperarPropiedadEntidad(eUsuario, "saludo");
-		System.out.println("[DEBUG AdaptadorUsuarioDAOTDS recuperarUsuario]: " + "Lista ID Contactos:" + idLista);
 		
+		//Convertimos aquellos campos necesarios a objetos
+		URL imagen = null;
 		LocalDate fecha = null;
+		if (imagenPath != null) imagen = new URL(imagenPath);
 		if (fechaString !=null) fecha = LocalDate.parse(fechaString, formateador);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
@@ -189,6 +197,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 									.imagenDePerfil(imagen)
 									.fechaNac(fecha)
 									.saludo(saludo)
+									.premium(Boolean.valueOf(premium))
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);

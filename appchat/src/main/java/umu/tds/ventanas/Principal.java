@@ -15,6 +15,7 @@ import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.modelos.TDSEmojiPanel;
+import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -53,6 +54,7 @@ public class Principal extends JFrame implements TDSObserver {
 	private JTextArea textArea;
 	private final AppChat controlador;
 	private JButton btnUsuario;
+	private Color colorBotones;
 	DefaultComboBoxModel<String> listaContactos;
 
 	/**
@@ -80,6 +82,8 @@ public class Principal extends JFrame implements TDSObserver {
 		//Se obtiene la instancia del controlador
 		this.controlador = AppChat.getInstancia();
 		
+		this.colorBotones = this.controlador.getColorGUI(1);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 746, 425);
 		contentPane = new JPanel();
@@ -87,7 +91,7 @@ public class Principal extends JFrame implements TDSObserver {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
 		setForeground(new Color(0, 0, 0));
 		setTitle("AppChat");
 		
@@ -101,7 +105,7 @@ public class Principal extends JFrame implements TDSObserver {
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
 		comboBoxContactos.setSize(new Dimension(150, 40));
-		comboBoxContactos.setBackground(new Color(81, 116, 255));
+		comboBoxContactos.setBackground(this.colorBotones);
 		comboBoxContactos.setMaximumSize(new Dimension(100000, 30));
 		comboBoxContactos.setMinimumSize(new Dimension(150, 40));
 		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
@@ -121,7 +125,7 @@ public class Principal extends JFrame implements TDSObserver {
 		});
 		btnEnv.setPreferredSize(new Dimension(90, 40));
 		btnEnv.setForeground(new Color(255, 255, 255));
-		btnEnv.setBackground(new Color(81, 116, 255));
+		btnEnv.setBackground(this.colorBotones);
 		btnEnv.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/enviar.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnEnv);
 		
@@ -142,7 +146,7 @@ public class Principal extends JFrame implements TDSObserver {
 		});
 		btnBuscar.setPreferredSize(new Dimension(90, 40));
 		btnBuscar.setForeground(new Color(255, 255, 255));
-		btnBuscar.setBackground(new Color(81, 116, 255));
+		btnBuscar.setBackground(this.colorBotones);
 		btnBuscar.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/lupa.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnBuscar);
 		
@@ -154,11 +158,15 @@ public class Principal extends JFrame implements TDSObserver {
 		btnPremium.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnPremium.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				VentanaPremium frame = new VentanaPremium();
+				frame.setModal(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
 			}
 		});
 		btnPremium.setPreferredSize(new Dimension(100, 40));
 		btnPremium.setForeground(new Color(255, 255, 255));
-		btnPremium.setBackground(new Color(81, 116, 255));
+		btnPremium.setBackground(this.colorBotones);
 		btnPremium.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/moneda.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		panelNorte.add(btnPremium);
 		
@@ -170,10 +178,11 @@ public class Principal extends JFrame implements TDSObserver {
 		btnContactos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnContactos.setPreferredSize(new Dimension(150, 32));
 		btnContactos.setForeground(new Color(255, 255, 255));
-		btnContactos.setBackground(new Color(81, 116, 255));
+		btnContactos.setBackground(this.colorBotones);
 		btnContactos.setIcon(new ImageIcon(new ImageIcon(Principal.class.getResource("/resources/agenda.png")).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		btnContactos.addActionListener(evento -> {
 			ListaContactos frame = new ListaContactos();
+			frame.setModal(true);
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 		});
@@ -186,11 +195,12 @@ public class Principal extends JFrame implements TDSObserver {
 		btnUsuario = new JButton(this.controlador.getNombreUsuario());
 		btnUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnUsuario.setForeground(new Color(255, 255, 255));
-		btnUsuario.setBackground(new Color(81, 116, 255));
+		btnUsuario.setBackground(this.colorBotones);
 		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		
 		btnUsuario.addActionListener(evento -> {
 				EditarUsuario frame = new EditarUsuario();
+				frame.setModal(true);
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
 		});
@@ -234,7 +244,7 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		JButton emoticonoBtn = new JButton("Emoticono");
 		emoticonoBtn.setForeground(new Color(255, 255, 255));
-		emoticonoBtn.setBackground(new Color(81, 116, 255));
+		emoticonoBtn.setBackground(this.colorBotones);
 		emoticonoBtn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
 		emoticonoBtn.addActionListener(new ActionListener() {
@@ -279,7 +289,7 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.setForeground(new Color(255, 255, 255));
-		btnNewButton.setBackground(new Color(81, 116, 255));
+		btnNewButton.setBackground(this.colorBotones);
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -336,7 +346,7 @@ public class Principal extends JFrame implements TDSObserver {
     	for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
     }
 
-    // Opcional: Asegurarse de eliminar el observador cuando la ventana se cierra
+    
     @Override
     public void dispose() {
         super.dispose();

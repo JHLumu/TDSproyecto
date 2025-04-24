@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
+import umu.tds.appchat.AppChat;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
@@ -48,7 +50,7 @@ public class BuscarConFiltro extends JFrame {
 	
 	public BuscarConFiltro() {
 		setSize(350, 500);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(BuscarConFiltro.class.getResource("/Resources/chat.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
 		setTitle("Buscar");
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		

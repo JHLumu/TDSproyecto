@@ -1,5 +1,6 @@
 package umu.tds.appchat;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.*;
+import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -30,9 +32,11 @@ import umu.tds.utils.TDSObserver;
 //Clase Controlador entre modelos y ventanas
 public class AppChat extends TDSObservable{
 	
+	//Constantes
+	private static final double PRECIO_SUSCRIPCION = 9.99;
+	
 	//Servidor de persistencia elegido
 	public static String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
-	
 	
 	//Instancias de adaptadores
 	private ContactoDAO contactoDAO;
@@ -86,6 +90,10 @@ public class AppChat extends TDSObservable{
 		return this.sesionUsuario.getSaludo(); 
 	}
 	
+	public static double getPrecioSuscripcion() {
+		return PRECIO_SUSCRIPCION;
+	}
+	
 	
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
@@ -125,13 +133,36 @@ public class AppChat extends TDSObservable{
 		return true;
 		
 	}
-	/*
-	public static boolean cambiarImagen(Usuario usuario, URL imagen) {
-		//Se tiene que verificar si los datos son correctos ( se hace en la capa de presentacion¿?)
-		return usuario.cambiarImagen(imagen);
+	
+	public void setUsuarioPremium() {
+		this.sesionUsuario.setPremium(true);
+		this.usuarioDAO.modificarUsuario(sesionUsuario);
 	}
 	
-	*/
+	public boolean isUsuarioPremium() {
+		return this.sesionUsuario.isPremium();
+	}
+
+	public Color getColorGUI(int id) {
+		boolean premium = this.isUsuarioPremium();
+		if (id == 1) {
+			
+			if (premium) return ColoresAppChat.COLOR_PREMIUM;
+			else return ColoresAppChat.COLOR_NOPREMIUM;
+		}
+		
+		else if (id == 2) {
+			if (premium) return ColoresAppChat.COLOR_PREMIUM_2;
+			else return ColoresAppChat.COLOR_NOPREMIUM_2;
+		}
+		
+		else return null;
+	}
+	
+	public String getURLIcon() {
+		if (this.isUsuarioPremium()) return "/Resources/chat_premium.png";
+		else return "/Resources/chat.png";
+	}
 	
 	public boolean crearGrupo(Usuario u, String nombre, URL imagen) {
 		//Se tiene que verificar que el nombre no este vacio (se hace en la capa de presentacion¿?)

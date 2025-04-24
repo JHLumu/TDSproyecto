@@ -30,7 +30,7 @@ public class Usuario {
 		private String saludo;
 		
 	//El siguiente atributo es un booleano que representa si un usuario ha activado el Premium o no
-		private boolean esPremium = false;
+		private boolean premium = false;
 		
 		
 	//El siguiente atributo es una coleccion que representa una lista de Contactos y Grupos
@@ -68,7 +68,8 @@ public class Usuario {
 			this.imagenPerfil = b.imagen;
 			this.email = b.email;
 			this.password = b.password;
-			this.codigo = 0;	
+			this.codigo = 0;
+			this.premium = b.premium;
 		}
 
 	//Metodos getter y setter
@@ -85,12 +86,12 @@ public class Usuario {
 			this.saludo = saludo;
 		}
 
-		public boolean EsPremium() {
-			return esPremium;
+		public boolean isPremium() {
+			return premium;
 		}
 
-		private void setEsPremium(boolean esPremium) {
-			this.esPremium = esPremium;
+		public void setPremium(boolean esPremium) {
+			this.premium = esPremium;
 		}
 
 		public String getNombre() {
@@ -218,7 +219,7 @@ public class Usuario {
 	    	private String password;
 	    	private String saludo="";
 	    	private final List<Contacto> listaContactos; 
-	    	private boolean esPremium = false;
+	    	private boolean premium;
 	        
 	        public BuilderUsuario() {
 	        	this.listaContactos = new LinkedList<Contacto>();
@@ -231,6 +232,7 @@ public class Usuario {
 	        public BuilderUsuario email(String email) {this.email=email;return this;}
 	        public BuilderUsuario password(String password) {this.password=password;return this;}
 	        public BuilderUsuario saludo(String saludo) {this.saludo=saludo;return this;}
+	        public BuilderUsuario premium(boolean premium) {this.premium=premium; return this;}
 	        public BuilderUsuario imagenDePerfil(URL imagen) {
 	        	if (imagen == null) return this;
 	        	this.imagen = imagen;return this;

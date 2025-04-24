@@ -12,6 +12,7 @@ import java.awt.Component;
 import javax.swing.Box;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.SwingConstants;
 
 import javax.swing.BoxLayout;
@@ -22,6 +23,7 @@ import java.awt.Color;
 import javax.swing.border.SoftBevelBorder;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -49,13 +51,13 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
 
-public class ListaContactos extends JFrame implements TDSObserver {
+public class ListaContactos extends JDialog implements TDSObserver {
 
 	private static final long serialVersionUID = 1L;
 	protected static final String ContactoIndividual = null;
 	private JPanel contentPane;
 	private DefaultListModel<Contacto> listaContactos;
-
+	private Color colorPrimario;
 	/**
 	 * Launch the application.
 	 */
@@ -81,9 +83,12 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		setBounds(100, 100, 899, 417);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setIconImage(Toolkit.getDefaultToolkit().getImage(NuevoContacto.class.getResource("/Resources/chat.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
 		setForeground(new Color(0, 0, 0));
 		setTitle("AppChat");
+		
+		this.colorPrimario = AppChat.getInstancia().getColorGUI(1);
+		
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
@@ -188,7 +193,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		btnContacto.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		btnContacto.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnContacto.setForeground(new Color(255, 255, 255));
-		btnContacto.setBackground(new Color(81, 116, 255));
+		btnContacto.setBackground(this.colorPrimario);
 		btnContacto.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
 		JButton btnGrupo = new JButton("Añadir Grupo");
@@ -202,7 +207,7 @@ public class ListaContactos extends JFrame implements TDSObserver {
 		btnGrupo.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		btnGrupo.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnGrupo.setForeground(new Color(255, 255, 255));
-		btnGrupo.setBackground(new Color(81, 116, 255));
+		btnGrupo.setBackground(this.colorPrimario);
 		btnGrupo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnContacto.addActionListener(evento -> {
 			

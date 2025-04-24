@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.ColoresAppChat;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -122,7 +123,7 @@ public class Login extends JFrame{
 		
 		JButton botonLogin = new JButton("Login");
 		botonLogin.setForeground(new Color(255, 255, 255));
-		botonLogin.setBackground(new Color(81, 116, 255));
+		botonLogin.setBackground(ColoresAppChat.COLOR_NOPREMIUM);
 		botonLogin.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
 		botonLogin.addActionListener(evento -> {
@@ -184,7 +185,7 @@ public class Login extends JFrame{
 		getContentPane().add(panelNorte, BorderLayout.NORTH);
 		
 		JLabel nombreAPP = new JLabel("AppChat");
-		nombreAPP.setForeground(new Color(81, 116, 255));
+		nombreAPP.setForeground(ColoresAppChat.COLOR_NOPREMIUM);
 		nombreAPP.setBackground(new Color(255, 255, 253));
 		nombreAPP.setFont(new Font("Gill Sans Ultra Bold", Font.PLAIN, 35));
 		panelNorte.add(nombreAPP);

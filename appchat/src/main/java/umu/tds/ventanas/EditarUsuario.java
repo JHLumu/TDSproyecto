@@ -15,6 +15,8 @@ import java.awt.Image;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.ColoresAppChat;
+
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
@@ -22,6 +24,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.Toolkit;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -32,7 +36,7 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 import java.awt.Dimension;
 
-public class EditarUsuario extends JFrame {
+public class EditarUsuario extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
@@ -40,7 +44,9 @@ public class EditarUsuario extends JFrame {
     private URL fotoPerfil;
     private boolean fotoCorrecta;
     private JTextArea saludoArea;
-
+    private Color colorPrimario;
+    private Color colorSecundario;
+    
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -57,11 +63,14 @@ public class EditarUsuario extends JFrame {
 
     public EditarUsuario() {
     	setResizable(true);
-        setIconImage(Toolkit.getDefaultToolkit().getImage(EditarUsuario.class.getResource("/Resources/chat.png")));
+    	setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
         setTitle("AppChat");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 622, 400);
-
+        
+        this.colorPrimario = AppChat.getInstancia().getColorGUI(1);
+        this.colorSecundario = AppChat.getInstancia().getColorGUI(2);
+        
         contentPane = new JPanel(new BorderLayout(10, 10));
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         setContentPane(contentPane);
@@ -72,7 +81,7 @@ public class EditarUsuario extends JFrame {
         gbl_panelIzquierdo.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
         JPanel panelIzquierdo = new JPanel(gbl_panelIzquierdo);
         panelIzquierdo.setBorder(new LineBorder(new Color(0, 0, 0)));
-        panelIzquierdo.setBackground(new Color(200, 207, 251));
+        panelIzquierdo.setBackground(this.colorSecundario);
         contentPane.add(panelIzquierdo, BorderLayout.WEST);
 
         GridBagConstraints gbc_lblNombre = new GridBagConstraints();
@@ -242,7 +251,7 @@ public class EditarUsuario extends JFrame {
         gbc_btnAceptarImagen.gridy = 3;
         JButton btnAceptarImagen = new JButton("Aceptar");
         btnAceptarImagen.setForeground(new Color(255, 255, 255));
-        btnAceptarImagen.setBackground(new Color(81, 116, 255));
+        btnAceptarImagen.setBackground(this.colorPrimario);
         btnAceptarImagen.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panelDerecho.add(btnAceptarImagen, gbc_btnAceptarImagen);
 

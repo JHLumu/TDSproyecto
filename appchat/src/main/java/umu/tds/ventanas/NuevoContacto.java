@@ -118,7 +118,7 @@ public class NuevoContacto extends JFrame {
 		setResizable(false);
 		setMinimumSize(new Dimension(500, 355));
 		getContentPane().setMinimumSize(new Dimension(500, 350));
-		setIconImage(Toolkit.getDefaultToolkit().getImage(NuevoContacto.class.getResource("/Resources/chat.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
 		setForeground(new Color(0, 0, 0));
 		
 		setTitle("AppChat");
