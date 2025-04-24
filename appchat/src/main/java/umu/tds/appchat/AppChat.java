@@ -4,22 +4,23 @@ import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+
+import java.util.Comparator;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
+import umu.tds.modelos.Descuento;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
@@ -27,7 +28,6 @@ import umu.tds.persistencia.*;
 import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
-import umu.tds.utils.TDSObserver;
 
 //Clase Controlador entre modelos y ventanas
 public class AppChat extends TDSObservable{
@@ -94,6 +94,22 @@ public class AppChat extends TDSObservable{
 		return PRECIO_SUSCRIPCION;
 	}
 	
+	public double getDescuentoAplicable(List<Descuento> descuentosActivos) {
+		
+		Optional<Double> res =  descuentosActivos.stream()
+				.map(d -> d.calcularDescuento(sesionUsuario, PRECIO_SUSCRIPCION))
+				.max(new Comparator<Double>() {
+			
+					@Override
+					public int compare(Double o1, Double o2) {
+						return Double.compare(o1, o2);
+					}
+			
+				});
+		
+		return res.orElse(0.0);
+		
+	}
 	
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
@@ -134,8 +150,8 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
-	public void setUsuarioPremium() {
-		this.sesionUsuario.setPremium(true);
+	public void setUsuarioPremium(boolean premium) {
+		this.sesionUsuario.setPremium(premium);
 		this.usuarioDAO.modificarUsuario(sesionUsuario);
 	}
 	

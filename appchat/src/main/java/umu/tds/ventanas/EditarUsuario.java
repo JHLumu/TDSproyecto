@@ -6,7 +6,6 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -15,7 +14,6 @@ import java.awt.Image;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import umu.tds.appchat.AppChat;
-import umu.tds.utils.ColoresAppChat;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -27,14 +25,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 
 import java.awt.Toolkit;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.ImageIcon;
-import java.awt.Dimension;
 
 public class EditarUsuario extends JDialog {
 

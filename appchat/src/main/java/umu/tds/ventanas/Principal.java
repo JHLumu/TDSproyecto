@@ -15,7 +15,6 @@ import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.modelos.TDSEmojiPanel;
-import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -31,8 +30,10 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -55,6 +56,7 @@ public class Principal extends JFrame implements TDSObserver {
 	private final AppChat controlador;
 	private JButton btnUsuario;
 	private Color colorBotones;
+	private JComboBox<String> comboBoxContactos;
 	DefaultComboBoxModel<String> listaContactos;
 
 	/**
@@ -74,6 +76,32 @@ public class Principal extends JFrame implements TDSObserver {
 		});
 	}
 
+	private void actualizarColor(Component comp) {
+	    
+		if (comp instanceof JButton) {
+	        ((JButton) comp).setBackground(this.colorBotones);
+	    }
+	    
+		else if (comp.equals(this.comboBoxContactos)) {
+			this.comboBoxContactos.setBackground(this.colorBotones);
+		}
+	    
+	    else if (comp instanceof JPanel) {
+	        for (Component subComp : ((JPanel) comp).getComponents()) {
+	            actualizarColor(subComp);
+	        }
+	    }
+	}
+	
+	public void recargarPrincipal() {
+		this.colorBotones = this.controlador.getColorGUI(1);
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
+		for (Component comp : this.getContentPane().getComponents()) {
+			actualizarColor(comp);
+	    }
+		SwingUtilities.updateComponentTreeUI(this);
+	}
+	
 	/**
 	 * Create the frame.
 	 */
@@ -101,7 +129,7 @@ public class Principal extends JFrame implements TDSObserver {
 		contentPane.add(panelNorte, BorderLayout.NORTH);
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
-		JComboBox<String> comboBoxContactos = new JComboBox<String>();
+		this.comboBoxContactos = new JComboBox<String>();
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
 		comboBoxContactos.setSize(new Dimension(150, 40));
@@ -156,14 +184,36 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		JButton btnPremium = new JButton("Premium");
 		btnPremium.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnPremium.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				VentanaPremium frame = new VentanaPremium();
+		btnPremium.addActionListener(evento -> {
+	
+			if (this.controlador.isUsuarioPremium()) {
+				 
+				int res = JOptionPane.showConfirmDialog(this,
+						 "¿Desea cancelar la suscripción mensual?",
+						 "AppChat",
+						 JOptionPane.YES_NO_OPTION );
+				
+				if (res == JOptionPane.YES_OPTION) {
+					this.controlador.setUsuarioPremium(false);
+					this.recargarPrincipal();
+					JOptionPane.showMessageDialog(this, 
+		                    "Se ha cancelado la suscripción correctamente.",
+		                    "AppChat",
+		                    JOptionPane.INFORMATION_MESSAGE);
+					
+					}
+				
+			}
+			
+			else {
+				VentanaPremium frame = new VentanaPremium(this);
 				frame.setModal(true);
 				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
+				frame.setLocationRelativeTo(null);				
 			}
 		});
+		
+		
 		btnPremium.setPreferredSize(new Dimension(100, 40));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(this.colorBotones);

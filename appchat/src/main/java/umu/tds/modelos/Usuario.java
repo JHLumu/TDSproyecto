@@ -32,7 +32,6 @@ public class Usuario {
 	//El siguiente atributo es un booleano que representa si un usuario ha activado el Premium o no
 		private boolean premium = false;
 		
-		
 	//El siguiente atributo es una coleccion que representa una lista de Contactos y Grupos
 	//Se utiliza como colección un conjunto para así, evitar contactos y grupos repetidos 
 		private List<Contacto> listaContactos; 
@@ -41,6 +40,9 @@ public class Usuario {
 		
 		private final List<Mensaje> mensajesRecibidos;
 		private final List<Mensaje> mensajesEnviados;
+		
+	//El siguiente atributo se ha definido debido a la implementación de DescuentoPorFecha
+		private final LocalDate fechaRegistro;
 		
 	//Constructores de la clase
 		
@@ -57,6 +59,7 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(BuilderUsuario b) {
+			this.fechaRegistro = LocalDate.now();
 			this.listaContactos =b.listaContactos;
 			this.mensajesRecibidos = new LinkedList<Mensaje>();
 			this.mensajesEnviados = new LinkedList<Mensaje>();
@@ -131,6 +134,9 @@ public class Usuario {
 			this.codigo = id;
 		}
 
+		public LocalDate getFechaRegistro() {
+			return this.fechaRegistro;
+		}
 	//Funcionalidades
 		
 		

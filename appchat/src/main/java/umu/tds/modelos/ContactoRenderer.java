@@ -3,22 +3,17 @@ package umu.tds.modelos;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
-
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto.TipoContacto;
-import umu.tds.ventanas.EditarContacto;
+
 
 public class ContactoRenderer extends JPanel implements ListCellRenderer<Contacto> {
     
