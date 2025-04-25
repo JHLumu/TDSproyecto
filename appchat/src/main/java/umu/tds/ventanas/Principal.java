@@ -12,29 +12,36 @@ import javax.swing.border.EmptyBorder;
 
 import tds.BubbleText;
 import umu.tds.appchat.AppChat;
+import umu.tds.modelos.Contacto;
+import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.modelos.TDSEmojiPanel;
-import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+
 import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 import java.awt.GridBagLayout;
@@ -44,6 +51,9 @@ import java.awt.Insets;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import com.jtattoo.plaf.acryl.AcrylBorders.ComboBoxBorder;
+
 import javax.swing.border.BevelBorder;
 
 
@@ -55,7 +65,9 @@ public class Principal extends JFrame implements TDSObserver {
 	private final AppChat controlador;
 	private JButton btnUsuario;
 	private Color colorBotones;
-	DefaultComboBoxModel<String> listaContactos;
+	private JComboBox<Object> comboBoxContactos;
+	private JPanel chat;
+	private ComboBoxModel<Object> listaContactos;
 
 	/**
 	 * Launch the application.
@@ -74,6 +86,32 @@ public class Principal extends JFrame implements TDSObserver {
 		});
 	}
 
+	private void actualizarColor(Component comp) {
+	    
+		if (comp instanceof JButton) {
+	        ((JButton) comp).setBackground(this.colorBotones);
+	    }
+	    
+		else if (comp.equals(this.comboBoxContactos)) {
+			this.comboBoxContactos.setBackground(this.colorBotones);
+		}
+	    
+	    else if (comp instanceof JPanel) {
+	        for (Component subComp : ((JPanel) comp).getComponents()) {
+	            actualizarColor(subComp);
+	        }
+	    }
+	}
+	
+	public void recargarPrincipal() {
+		this.colorBotones = this.controlador.getColorGUI(1);
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
+		for (Component comp : this.getContentPane().getComponents()) {
+			actualizarColor(comp);
+	    }
+		SwingUtilities.updateComponentTreeUI(this);
+	}
+	
 	/**
 	 * Create the frame.
 	 */
@@ -101,7 +139,7 @@ public class Principal extends JFrame implements TDSObserver {
 		contentPane.add(panelNorte, BorderLayout.NORTH);
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
-		JComboBox<String> comboBoxContactos = new JComboBox<String>();
+		this.comboBoxContactos = new JComboBox<Object>();
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
 		comboBoxContactos.setSize(new Dimension(150, 40));
@@ -110,9 +148,22 @@ public class Principal extends JFrame implements TDSObserver {
 		comboBoxContactos.setMinimumSize(new Dimension(150, 40));
 		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
 		
-		listaContactos = new DefaultComboBoxModel<String>();
+		listaContactos = new DefaultComboBoxModel<Object>();
 		actualizarListaContactos(); // Cargar contactos inicialmente
 		comboBoxContactos.setModel(listaContactos);
+		comboBoxContactos.addActionListener(e -> {
+		    Object seleccionado = comboBoxContactos.getSelectedItem();
+		    
+		    if (seleccionado instanceof Contacto) {
+		        actualizarPanelChat();
+		    } else {
+		        // Es el placeholder, por ejemplo: "Contacto o Teléfono"
+		        // Podés limpiar el panel o no hacer nada
+		    	chat.removeAll();
+		    	chat.revalidate();
+		    	chat.repaint();
+		    }
+		});
 		panelNorte.add(comboBoxContactos);
 		
 		JButton btnEnv = new JButton("Enviar");
@@ -156,14 +207,36 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		JButton btnPremium = new JButton("Premium");
 		btnPremium.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnPremium.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				VentanaPremium frame = new VentanaPremium();
+		btnPremium.addActionListener(evento -> {
+	
+			if (this.controlador.isUsuarioPremium()) {
+				 
+				int res = JOptionPane.showConfirmDialog(this,
+						 "¿Desea cancelar la suscripción mensual?",
+						 "AppChat",
+						 JOptionPane.YES_NO_OPTION );
+				
+				if (res == JOptionPane.YES_OPTION) {
+					this.controlador.setUsuarioPremium(false);
+					this.recargarPrincipal();
+					JOptionPane.showMessageDialog(this, 
+		                    "Se ha cancelado la suscripción correctamente.",
+		                    "AppChat",
+		                    JOptionPane.INFORMATION_MESSAGE);
+					
+					}
+				
+			}
+			
+			else {
+				VentanaPremium frame = new VentanaPremium(this);
 				frame.setModal(true);
 				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
+				frame.setLocationRelativeTo(null);				
 			}
 		});
+		
+		
 		btnPremium.setPreferredSize(new Dimension(100, 40));
 		btnPremium.setForeground(new Color(255, 255, 255));
 		btnPremium.setBackground(this.colorBotones);
@@ -219,7 +292,7 @@ public class Principal extends JFrame implements TDSObserver {
 		//REVISAR: Asignar list.model cuando se implementen los mensajes
 		panelMensaje.add(list);
 		
-		JPanel chat = new JPanel();
+		chat = new JPanel();
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 	
 		JScrollPane scrollPane = new JScrollPane(chat);
@@ -279,12 +352,12 @@ public class Principal extends JFrame implements TDSObserver {
 			public void changedUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
 			});
 		
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.fill = GridBagConstraints.BOTH;
-		gbc_textField.insets = new Insets(0, 0, 0, 5);
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 0;
-		barraIntro.add(textArea, gbc_textField);
+		GridBagConstraints gbc_textArea = new GridBagConstraints();
+		gbc_textArea.fill = GridBagConstraints.BOTH;
+		gbc_textArea.insets = new Insets(0, 0, 0, 5);
+		gbc_textArea.gridx = 2;
+		gbc_textArea.gridy = 0;
+		barraIntro.add(textArea, gbc_textArea);
 		textArea.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Enviar");
@@ -293,9 +366,10 @@ public class Principal extends JFrame implements TDSObserver {
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BubbleText burbuja = new BubbleText(chat,textArea.getText(), Color.WHITE, AppChat.getInstancia().getNombreUsuario(), BubbleText.SENT,14);
+				Contacto contacto = (Contacto) comboBoxContactos.getSelectedItem();
+				controlador.enviarMensaje(contacto, textArea.getText());
+				actualizarPanelChat();
 				textArea.setText("");
-				chat.add(burbuja);
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
@@ -341,9 +415,63 @@ public class Principal extends JFrame implements TDSObserver {
 
     // Método para actualizar la lista de contactos en la UI
     private void actualizarListaContactos() {
-    	listaContactos.removeAllElements();
-    	listaContactos.addElement("Contacto o Teléfono");
-    	for (String nombreContacto: this.controlador.obtenerListaContactos()) listaContactos.addElement(nombreContacto);
+        DefaultComboBoxModel<Object> modelo = (DefaultComboBoxModel<Object>) listaContactos;
+        modelo.removeAllElements();
+        modelo.addElement("Contacto o Teléfono"); // Placeholder
+        for (Contacto contacto : this.controlador.obtenerListaContactos()) {
+            modelo.addElement(contacto);
+        }
+
+        // Establecer cómo se ve cada ítem en el combo
+        comboBoxContactos.setRenderer(new DefaultListCellRenderer() {
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                
+                if (value instanceof Contacto) {
+                    Contacto c = (Contacto) value;
+                    setText("🔸 " + c.getNombre()); // o cualquier otro formato
+                } else {
+                    setText(value.toString()); // para el placeholder
+                }
+                return this;
+            }
+        });
+        
+        this.revalidate();
+        this.repaint();
+    }
+    
+    private void actualizarPanelChat() {
+
+        List<Mensaje> mensajes = controlador.obtenerChatContacto((Contacto) comboBoxContactos.getSelectedItem());
+        this.chat.removeAll();
+        BubbleText bubble = null;
+
+        for (Mensaje mensaje : mensajes) {
+            String texto = mensaje.getTexto();
+            String autor = mensaje.getEmisor().getNombre();
+            
+            
+
+            if (mensaje.getEmisor().getTelefono().equals(controlador.getTelefonoUsuario())) {
+                bubble = new BubbleText(this.chat, texto, Color.white, autor, BubbleText.SENT, 14);
+            } else {
+                bubble = new BubbleText(this.chat, texto, Color.blue, ((Contacto) comboBoxContactos.getSelectedItem()).getNombre(), BubbleText.RECEIVED, 14);
+            }
+            this.chat.add(bubble);
+        }
+
+        // 4. Refrescar el panel
+        
+        this.chat.revalidate();
+        this.chat.repaint();
     }
 
     

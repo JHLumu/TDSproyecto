@@ -48,14 +48,15 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		ArrayList<Propiedad> propiedades = new ArrayList<Propiedad>();
 		propiedades.addAll(Arrays.asList(
 				new Propiedad("texto", mensaje.getTexto()),
-				new Propiedad("emoticono", mensaje.getEmoticono().toString()),
-				new Propiedad("emisor", mensaje.getEmisor().toString()),
-				new Propiedad("receptor", mensaje.getReceptor().toString()),
+				new Propiedad("emoticono", (mensaje.getEmoticono() != null) ? mensaje.getEmoticono().toString() : ""),
+				new Propiedad("emisor", String.valueOf(mensaje.getEmisor().getCodigo())),
+				new Propiedad("receptor", String.valueOf(mensaje.getReceptor().getCodigo())),
 				new Propiedad("fecha", mensaje.getFechaEnvio().toString())
 				));
 		eMensaje.setPropiedades(propiedades);
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
 		mensaje.setCodigo(eMensaje.getId());
+		System.out.println("dao mensaje registrado");
 		
 	}
 
@@ -69,12 +70,13 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		
 		Entidad eMensaje = servPersistencia.recuperarEntidad(id);
 		String texto = servPersistencia.recuperarPropiedadEntidad(eMensaje, "texto");
+		System.out.println("RECUPERADO TEXTO: " + texto);
 		
 		String idEmisor = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emisor");
 		Usuario emisor = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idEmisor));
 
 		
-		String idReceptor = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emisor");
+		String idReceptor = servPersistencia.recuperarPropiedadEntidad(eMensaje, "receptor");
 		Usuario receptor = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idReceptor));
 		
 		String emoticonoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emoticono");
@@ -87,14 +89,16 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		
 		Mensaje mensaje = null;
 		
-		if (emoticonoString != null) {
+		if (texto.isEmpty()) {
 			
 			emoticono = new ImageIcon(emoticonoString);
 			
 			mensaje = new Mensaje(emisor, receptor, emoticono);
-		} else {
-			mensaje = new Mensaje(emisor, receptor, texto);
 			
+		} else {
+			
+			mensaje = new Mensaje(emisor, receptor, texto);
+
 		}
 		
 		mensaje.setCodigo(id);

@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -16,6 +18,7 @@ import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
+import umu.tds.modelos.Descuento;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
@@ -89,6 +92,22 @@ public class AppChat extends TDSObservable{
 		return PRECIO_SUSCRIPCION;
 	}
 	
+	public double getDescuentoAplicable(List<Descuento> descuentosActivos) {
+		
+		Optional<Double> res =  descuentosActivos.stream()
+				.map(d -> d.calcularDescuento(sesionUsuario, PRECIO_SUSCRIPCION))
+				.max(new Comparator<Double>() {
+			
+					@Override
+					public int compare(Double o1, Double o2) {
+						return Double.compare(o1, o2);
+					}
+			
+				});
+		
+		return res.orElse(0.0);
+		
+	}
 	
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
@@ -129,8 +148,8 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
-	public void setUsuarioPremium() {
-		this.sesionUsuario.setPremium(true);
+	public void setUsuarioPremium(boolean premium) {
+		this.sesionUsuario.setPremium(premium);
 		this.usuarioDAO.modificarUsuario(sesionUsuario);
 	}
 	
@@ -202,12 +221,10 @@ public class AppChat extends TDSObservable{
 
 	}
 	
-	public String[] obtenerListaContactos(){
+	public List<Contacto> obtenerListaContactos(){
 		//REVISAR: Sorted falla
-		String[] nombresContactos = this.sesionUsuario.getListaContacto().stream()
-				.map(c -> c.getNombre())
-				.toArray(String[]::new);
-		return nombresContactos;
+		List<Contacto> contactos = this.sesionUsuario.getListaContacto();
+		return contactos;
 	}
 	
 	public List<Contacto> obtenerListaContactosIndividuales() {
@@ -251,15 +268,21 @@ public class AppChat extends TDSObservable{
 		};
 		return Arrays.asList(values);
 		*/
-		List<Mensaje> recibido = this.sesionUsuario.getChatMensaje(((ContactoIndividual) contacto).getUsuario());
-		
-		
-		return recibido;
+		List<Mensaje> chat = this.sesionUsuario.getChatMensaje(((ContactoIndividual) contacto).getUsuario());
+		int i = 0;
+		for(Mensaje m : chat) {
+			System.out.println("Lista Mensajes " + i + " : " + m);
+		}
+		return chat;
 	}
 	
-	public void enviarMensaje(Contacto contacto, Mensaje mensaje) {
+	public void enviarMensaje(Contacto contacto, String texto) {
+		Mensaje mensaje = new Mensaje(sesionUsuario, ((ContactoIndividual) contacto).getUsuario(), texto);
+		this.mensajeDAO.registrarMensaje(mensaje);
 		this.sesionUsuario.enviarMensaje(mensaje);
 		((ContactoIndividual) contacto).getUsuario().recibirMensaje(mensaje);
+		this.usuarioDAO.modificarUsuario(sesionUsuario);
+		this.usuarioDAO.modificarUsuario(((ContactoIndividual) contacto).getUsuario());
 	}
 	
 	public Image getImagen(Object urlObj) {

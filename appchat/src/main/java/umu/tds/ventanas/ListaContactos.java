@@ -18,12 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-
 import java.awt.Color;
-import javax.swing.border.SoftBevelBorder;
-
 import umu.tds.appchat.AppChat;
-import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -32,11 +28,7 @@ import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.ContactoRenderer;
 import umu.tds.modelos.Grupo;
-
-import javax.swing.border.BevelBorder;
-
 import javax.swing.JList;
-
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -45,7 +37,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.ImageGraphicAttribute;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -212,6 +203,7 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		btnContacto.addActionListener(evento -> {
 			
 			NuevoContacto frame = new NuevoContacto();
+			frame.setModal(true);
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 			

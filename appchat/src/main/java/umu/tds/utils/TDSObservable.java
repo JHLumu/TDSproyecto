@@ -1,22 +1,12 @@
 package umu.tds.utils;
 
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 

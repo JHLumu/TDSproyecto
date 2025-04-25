@@ -289,7 +289,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMensajesAPartirDeIds]: " + "idMensajes: " + idMensaje);
 				Mensaje mensaje = (FactoriaDAO.getFactoriaDAO().getMensajeDAO().recuperarMensaje(Integer.valueOf(idMensaje)));
 				resultado.add(mensaje);
-				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerContactosAPartirDeIds]: " + "Se recupera el contacto " + mensaje.getCodigo());
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMensajesAPartirDeIds]: " + "Se recupera el mensaje " + mensaje.getCodigo());
 			}
 		
 		}

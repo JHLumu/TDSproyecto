@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 public class Mensaje implements Comparable<Mensaje>{
 	
 	//Atributos de la clase
-	private Integer codigo;
+	private int codigo;
 	private String texto; 
 	private ImageIcon emoticono;
 	private final Usuario emisor;
@@ -31,6 +31,7 @@ public class Mensaje implements Comparable<Mensaje>{
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.fechaEnvio = LocalDateTime.now();
+		this.codigo = 0;
 	}
 	
 	
@@ -96,7 +97,7 @@ public class Mensaje implements Comparable<Mensaje>{
 	
 	@Override
 	public String toString() {
-		return emisor.getNombre() + " " + texto;
+		return emisor.getNombre() + " " + receptor.getNombre() + " " + texto + " Emoticono: " + (emoticono == null ? "false" : "true") + " " + fechaEnvio;
 	}
 
 
