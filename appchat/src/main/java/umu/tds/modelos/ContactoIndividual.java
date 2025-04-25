@@ -1,5 +1,8 @@
 package umu.tds.modelos;
 
+import java.awt.Image;
+import java.net.URL;
+
 //Clase que hereda de Contacto que representa 
 //el objeto simple en la estructura del patron
 //Composite
@@ -10,7 +13,7 @@ public class ContactoIndividual extends Contacto {
 
     // Constructor
     public ContactoIndividual(String nombre, Usuario usuario) {
-        super(nombre, usuario.getImagenPerfil());  // Llamamos al constructor de la clase base (Contacto)
+        super(nombre, usuario.getURLImagen());  // Llamamos al constructor de la clase base (Contacto)
         this.usuario = usuario;
         
     }
@@ -46,6 +49,15 @@ public class ContactoIndividual extends Contacto {
     	return usuario.getSaludo();
     }
     
+    public Image getImagenContacto() {
+    	return usuario.getFotoPerfilUsuario();
+    }
+    
+    @Override
+    public URL getURLImagen() {
+    	return usuario.getURLImagen();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,5 +71,6 @@ public class ContactoIndividual extends Contacto {
         }
         
     }
+    
 }
 

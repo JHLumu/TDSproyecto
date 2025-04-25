@@ -2,6 +2,7 @@ package umu.tds.appchat;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -32,6 +33,7 @@ public class AppChat extends TDSObservable{
 	
 	//Constantes
 	private static final double PRECIO_SUSCRIPCION = 9.99;
+	private static final String DIRECTORIO_IMAGENES_USUARIO = "imagenesUsuarios";
 	
 	//Servidor de persistencia elegido
 	public static String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
@@ -128,6 +130,22 @@ public class AppChat extends TDSObservable{
 		
 		usuarioDAO.registrarUsuario(usuario);
 		catalogoUsuarios.nuevoUsuario(usuario);
+		
+		//Se obtiene la carpeta con las imágenes de los contacto
+	    
+		File directorioBase = new File(DIRECTORIO_IMAGENES_USUARIO);
+		if (!directorioBase.exists()) directorioBase.mkdir();
+		File imagenUsuario = new File(directorioBase, nombre+"-"+telefono+".png");
+		try {
+			ImageIO.write((RenderedImage) getImagen(imagen), "png", imagenUsuario);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+
+		
 		return true;
 	}
 	
@@ -311,40 +329,10 @@ public class AppChat extends TDSObservable{
 
 	    return null; // Retorna null en caso de error
 	}
+
 	
 	public Image getFotoPerfilSesion() {
-		try {
-
-    	    // Directorio base del usuario de la sesión actual
-    	    String directorioBase = "imagenPerfilContactos\\" + 
-    	    						getNombreUsuario() +  "-" + 
-    	    						getTelefonoUsuario();
-
-    	    File directorio = new File(directorioBase);
-    	    if (!directorio.exists()) {
-    	        directorio.mkdirs(); // Crear directorio si no existe
-    	    }
-    	    
-    	    
-    	    File localFile;
-    	    localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
-    	    
-    	 // Si el archivo no existe, descargarlo desde el URL
-    	    if (!localFile.exists() || localFile.equals(null)) {
-    	    	Image imageUrl = getImagen(sesionUsuario.getImagenPerfil()); // Obtener el URL de la imagen
-    	        if (imageUrl != null) {  
-					ImageIO.write((java.awt.image.RenderedImage) imageUrl, "png", localFile);
-    	        }
-    	    }
-    	    Image localImage = ImageIO.read(localFile);
-			return localImage;			
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return null;
+		return this.sesionUsuario.getFotoPerfilUsuario();
 	}
 	
 	public void setImagenPerfil(Image imagen) {
@@ -369,7 +357,15 @@ public class AppChat extends TDSObservable{
 	}
 
 	public void cambiarFotoPerfil(URL nuevaFoto) {
-		this.sesionUsuario.cambiarImagen(nuevaFoto);
+		this.sesionUsuario.setURLImagen(nuevaFoto);
+		Image nuevaImagen = this.getImagen(nuevaFoto);
+		File fileImagenContacto = new File("imagenesUsuarios", this.sesionUsuario.getNombre()+"-"+ this.sesionUsuario.getTelefono() + ".png");
+		try {
+			ImageIO.write((RenderedImage) nuevaImagen, "png", fileImagenContacto);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		setChanged(Estado.NUEVA_FOTO_USUARIO);
 		usuarioDAO.modificarUsuario(sesionUsuario);
 		

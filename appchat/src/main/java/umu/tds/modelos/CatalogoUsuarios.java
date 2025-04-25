@@ -71,7 +71,7 @@ public class CatalogoUsuarios {
 						.map(c -> c.getNombre())
 						.collect(Collectors.toList());
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Lista de Contacto Usuario:" + lista);
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Imagen Usuario:" + usuario.getImagenPerfil().toExternalForm());
+				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Imagen Usuario:" + usuario.getURLImagen().toExternalForm());
 				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Estado Premium Usuario:" + usuario.isPremium());
 			}
 		} catch (MalformedURLException e) {

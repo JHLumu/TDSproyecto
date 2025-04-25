@@ -1,5 +1,8 @@
 package umu.tds.modelos;
 
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -7,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 import umu.tds.modelos.Contacto.TipoContacto;
 
@@ -85,7 +90,7 @@ public class Usuario {
 			return saludo;
 		}
 
-		private void CambiarSaludo(String saludo) {
+		public void setSaludo(String saludo) {
 			this.saludo = saludo;
 		}
 
@@ -118,9 +123,35 @@ public class Usuario {
 		}
 		
 		
-		public URL getImagenPerfil() {
+		public URL getURLImagen() {
 			return imagenPerfil;
 		}
+		
+		public void setURLImagen(URL imagen) {
+			this.imagenPerfil = imagen;
+		}
+		
+		public Image getFotoPerfilUsuario() {
+			File fileImagenContacto = new File("imagenesUsuarios", nombre+"-"+ telefono + ".png");
+    	    
+    		if (fileImagenContacto.exists()) {
+    			Image localImage;
+				try {
+					localImage = ImageIO.read(fileImagenContacto);
+					return localImage;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+    			
+    		}
+    		
+    		else return null;
+    		
+    		
+		}
+		
+
 		
 		public String getEmail() {
 			return email;
@@ -206,9 +237,7 @@ public class Usuario {
 	    	
 	    }
 	
-		public void cambiarImagen(URL imagen) {
-			this.imagenPerfil = imagen;
-		}
+		
 		
 		public List<Mensaje> getMensajesRecibidos() {
 			return new LinkedList<Mensaje>(this.mensajesRecibidos);
@@ -284,10 +313,6 @@ public class Usuario {
 	        return Objects.hash(telefono);
 	    }
 
-		public void setSaludo(String saludo) {
-			this.saludo = saludo;
-			
-		}
 
 		
 		

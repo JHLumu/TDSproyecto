@@ -37,14 +37,13 @@ public abstract class Contacto implements Comparable<Contacto> {
         this.nombre = nombre;
     }
 
-    public URL getImagen() {
-        return imagen;
-    }
-
     public void setImagen(URL imagen) {
         this.imagen = imagen;
     }
-
+    
+    public URL getURLImagen() {
+    	return this.imagen;
+    }
 
 	public int getCodigo() {
 		return this.codigo;

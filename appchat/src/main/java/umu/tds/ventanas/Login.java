@@ -27,6 +27,7 @@ import java.awt.Dimension;
 
 public class Login extends JFrame{
 
+	private static final long serialVersionUID = 1L;
 	private JTextField textField;
 	private JPasswordField passwordField;
 
@@ -48,30 +49,7 @@ public class Login extends JFrame{
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
-	public Login() {
-		getContentPane().setBackground(new Color(255, 255, 255));
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-
-		setMinimumSize(new Dimension(500, 355));
-		setBackground(Color.WHITE);
-		setForeground(Color.WHITE);
-		getContentPane().setMinimumSize(new Dimension(500, 350));
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
-		
-		setTitle("AppChat");
-		setBounds(100, 100, 500, 352);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		getContentPane().setLayout(new BorderLayout(0, 0));
-		
+	private void inicializacionPanelCentro() {
 		
 		JPanel panelCentro = new JPanel();
 		panelCentro.setBackground(new Color(255, 255, 255));
@@ -156,6 +134,13 @@ public class Login extends JFrame{
 		gbc_botonLogin.gridy = 4;
 		panelCentro.add(botonLogin, gbc_botonLogin);
 		
+	}
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	
+	private void inicializacionPanelSur() {
+		
 		JPanel panelSur = new JPanel();
 		panelSur.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelSur, BorderLayout.SOUTH);
@@ -180,6 +165,10 @@ public class Login extends JFrame{
 		
 		panelSur.add(botonRegistro);
 		
+	}
+	
+	private void inicializacionPanelNorte() {
+		
 		JPanel panelNorte = new JPanel();
 		panelNorte.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelNorte, BorderLayout.NORTH);
@@ -190,21 +179,46 @@ public class Login extends JFrame{
 		nombreAPP.setFont(new Font("Gill Sans Ultra Bold", Font.PLAIN, 35));
 		panelNorte.add(nombreAPP);
 		
+	}
+	
+	private void inicializacionPanelEste() {
+		
 		JPanel panelEste = new JPanel();
 		panelEste.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelEste, BorderLayout.EAST);
+		
+	}
+	
+	private void inicializacionPanelOeste() {
 		
 		JPanel panelOeste = new JPanel();
 		panelOeste.setBackground(new Color(255, 255, 255));
 		getContentPane().add(panelOeste, BorderLayout.WEST);
 		
-		
-		
-		
-		
-		
-		
-		
 	}
+	
+
+	/**
+	 * Create the application.
+	 */
+	public Login() {
+		getContentPane().setBackground(new Color(255, 255, 255));
+		setMinimumSize(new Dimension(500, 355));
+		setBackground(Color.WHITE);
+		setForeground(Color.WHITE);
+		getContentPane().setMinimumSize(new Dimension(500, 350));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
+		
+		setTitle("AppChat");
+		setBounds(100, 100, 500, 352);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(new BorderLayout(0, 0));
+		inicializacionPanelCentro();
+		inicializacionPanelSur();
+		inicializacionPanelNorte();
+		inicializacionPanelEste();
+		inicializacionPanelOeste();
+	}
+	
 
 }
