@@ -250,7 +250,11 @@ public class AppChat extends TDSObservable{
 	}
 
 
-	
+	public List<Contacto> obtenerListaChatMensajes(){
+		//REVISAR: Sorted falla
+		List<Contacto> contactos = this.sesionUsuario.getListaContactosConMensajes();
+		return contactos;
+	}
 	
 	
 	//Esto es mas cosa del patron dao que del controlador
@@ -381,6 +385,17 @@ public class AppChat extends TDSObservable{
 		usuarioDAO.modificarUsuario(sesionUsuario);
 		
 	}
+
+	public String getUltimoMensajeContacto(Contacto contacto) {
+		// TODO Auto-generated method stub
+		
+		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(((ContactoIndividual) contacto).getUsuario());
+		if (m != null)
+			return m.getTexto();
+		else
+			return null;
+	}
+	
 
 	
 }

@@ -2,9 +2,12 @@ package umu.tds.modelos;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -205,6 +208,44 @@ public class Usuario {
 	    	
 	    	
 	    }
+	    
+	    public Mensaje getUltimoChatMensaje(Usuario otroUsuario) {
+	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+	                .flatMap(mensajes -> mensajes.stream()
+	                        .filter(msg -> msg.getEmisor().equals(otroUsuario) || msg.getReceptor().equals(otroUsuario)))
+	                .max(Comparator.naturalOrder()) // Asumiendo que Mensaje implementa Comparable por fecha
+	                .orElse(null);
+	    }
+
+	    public List<Contacto> getListaContactosConMensajes() {
+	    	List<Contacto> contactos = this.listaContactos;
+	    	// Usuarios que ya están en la lista de contactos
+	        Set<Usuario> usuariosEnContactos = contactos.stream()
+	                .filter(c -> c instanceof ContactoIndividual) // Solo ContactoIndividual tiene Usuario
+	                .map(c -> ((ContactoIndividual) c).getUsuario())
+	                .collect(Collectors.toSet());
+
+	        // Usuarios con los que he chateado pero no son contactos, ni soy yo
+	        Set<Usuario> nuevosUsuarios = Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+	                .flatMap(List::stream)
+	                .flatMap(msg -> Stream.of(msg.getEmisor(), msg.getReceptor()))
+	                .filter(usuario -> !usuariosEnContactos.contains(usuario))
+	                .filter(usuario -> !usuario.equals(this))
+	                .collect(Collectors.toSet());
+
+	        // Crear nuevos ContactoIndividual para esos usuarios
+	        List<Contacto> nuevosContactos = nuevosUsuarios.stream()
+	                .map(usuario -> new ContactoIndividual(usuario.getTelefono(), usuario)) // Nombre = teléfono
+	                .collect(Collectors.toList());
+
+	        // Crear nueva lista combinando existentes + nuevos
+	        List<Contacto> todosLosContactos = new ArrayList<>(contactos);
+	        todosLosContactos.addAll(nuevosContactos);
+
+	        return todosLosContactos;
+	    }
+
+
 	
 		public void cambiarImagen(URL imagen) {
 			this.imagenPerfil = imagen;
@@ -288,7 +329,6 @@ public class Usuario {
 			this.saludo = saludo;
 			
 		}
-
 		
 		
 }

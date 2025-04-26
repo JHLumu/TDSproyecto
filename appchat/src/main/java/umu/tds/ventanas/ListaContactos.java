@@ -200,6 +200,7 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		btnGrupo.setForeground(new Color(255, 255, 255));
 		btnGrupo.setBackground(this.colorPrimario);
 		btnGrupo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		
 		btnContacto.addActionListener(evento -> {
 			
 			NuevoContacto frame = new NuevoContacto();

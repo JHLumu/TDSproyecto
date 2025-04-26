@@ -1,4 +1,4 @@
-package umu.tds.modelos;
+package umu.tds.ventanas;
 
 import java.awt.Color;
 import java.awt.GridLayout;

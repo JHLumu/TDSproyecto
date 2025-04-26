@@ -16,7 +16,6 @@ import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
-import umu.tds.modelos.TDSEmojiPanel;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
@@ -29,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,9 +38,12 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -67,7 +70,9 @@ public class Principal extends JFrame implements TDSObserver {
 	private Color colorBotones;
 	private JComboBox<Object> comboBoxContactos;
 	private JPanel chat;
-	private ComboBoxModel<Object> listaContactos;
+	private DefaultComboBoxModel<Object> listaContactosComboBox;
+	private DefaultListModel<Contacto> listaContactosLista;
+	private boolean seleccionPanel; // true para comboBox, false para lista
 
 	/**
 	 * Launch the application.
@@ -148,14 +153,15 @@ public class Principal extends JFrame implements TDSObserver {
 		comboBoxContactos.setMinimumSize(new Dimension(150, 40));
 		comboBoxContactos.setPreferredSize(new Dimension(100, 20));
 		
-		listaContactos = new DefaultComboBoxModel<Object>();
-		actualizarListaContactos(); // Cargar contactos inicialmente
-		comboBoxContactos.setModel(listaContactos);
+		listaContactosComboBox = new DefaultComboBoxModel<Object>();
+		actualizarListaContactosComboBox(); // Cargar contactos inicialmente
+		comboBoxContactos.setModel(listaContactosComboBox);
 		comboBoxContactos.addActionListener(e -> {
-		    Object seleccionado = comboBoxContactos.getSelectedItem();
-		    
-		    if (seleccionado instanceof Contacto) {
-		        actualizarPanelChat();
+		    Object seleccionado = null;
+		    this.seleccionPanel = true;
+		    if (comboBoxContactos.getSelectedIndex() != 0) {
+		    	seleccionado = comboBoxContactos.getSelectedItem();
+		        actualizarPanelChat((Contacto) seleccionado);
 		    } else {
 		        // Es el placeholder, por ejemplo: "Contacto o Teléfono"
 		        // Podés limpiar el panel o no hacer nada
@@ -285,11 +291,35 @@ public class Principal extends JFrame implements TDSObserver {
 		contentPane.add(panelMensaje, BorderLayout.WEST);
 		panelMensaje.setLayout(new BorderLayout(0, 0));
 		
-		JList<Mensaje> list = new JList <Mensaje>();
+		JList<Contacto> list = new JList <Contacto>();
 		list.setBorder(new LineBorder(new Color(0, 0, 0)));
 		list.setPreferredSize(new Dimension(0, 25));
 		list.setCellRenderer(new MensajeRenderer());
-		//REVISAR: Asignar list.model cuando se implementen los mensajes
+		listaContactosLista = new DefaultListModel<>();
+		actualizarListaContactosMensajes();
+		list.setModel(listaContactosLista);
+		list.addListSelectionListener(e -> {
+		    if (!e.getValueIsAdjusting()) { // Para evitar dobles eventos
+		        Contacto seleccionado = list.getSelectedValue();
+		        
+		        if(seleccionado instanceof Contacto && seleccionado != null){
+		        	this.seleccionPanel = false;
+		            actualizarPanelChat(seleccionado);
+		        }
+		    }
+		});
+		list.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		    	Contacto seleccionado = list.getSelectedValue();
+		        
+		        if(seleccionado instanceof Contacto && seleccionado != null){
+		        	Principal.this.seleccionPanel = false;
+		            actualizarPanelChat(seleccionado);
+		        }
+		    }
+		});
+
 		panelMensaje.add(list);
 		
 		chat = new JPanel();
@@ -366,9 +396,21 @@ public class Principal extends JFrame implements TDSObserver {
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Contacto contacto = (Contacto) comboBoxContactos.getSelectedItem();
-				controlador.enviarMensaje(contacto, textArea.getText());
-				actualizarPanelChat();
+				Contacto contacto = null;
+				if(seleccionPanel) {
+					if(comboBoxContactos.getSelectedIndex() != 0) {
+						contacto = (Contacto) comboBoxContactos.getSelectedItem();
+						controlador.enviarMensaje(contacto, textArea.getText());
+						actualizarPanelChat(contacto);
+					}
+					
+				}				
+				else {
+					contacto = list.getSelectedValue();
+					controlador.enviarMensaje(contacto, textArea.getText());
+					actualizarPanelChat(contacto);
+				}
+
 				textArea.setText("");
 			}
 		});
@@ -388,6 +430,7 @@ public class Principal extends JFrame implements TDSObserver {
 		gbc_horizontalGlue_1.gridy = 0;
 		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
+		AppChat.getInstancia().addObserver(Estado.INFO_CONTACTO, this);
 	}
 	
 	private void ajustarTamañoAreaTexto() {
@@ -404,7 +447,8 @@ public class Principal extends JFrame implements TDSObserver {
             Estado estadoActual = (Estado) arg;
             System.out.println("[DEBUG Principal update] Estado recibido en ListaContactos: " + estadoActual);
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
-                this.actualizarListaContactos();
+                this.actualizarListaContactosComboBox();
+                this.actualizarListaContactosMensajes();
                 
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
             	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
@@ -412,14 +456,13 @@ public class Principal extends JFrame implements TDSObserver {
          
         }
     }
-
-    // Método para actualizar la lista de contactos en la UI
-    private void actualizarListaContactos() {
-        DefaultComboBoxModel<Object> modelo = (DefaultComboBoxModel<Object>) listaContactos;
-        modelo.removeAllElements();
-        modelo.addElement("Contacto o Teléfono"); // Placeholder
+    
+    private void actualizarListaContactosComboBox() {
+        DefaultComboBoxModel<Object> modeloCombo = listaContactosComboBox;
+        modeloCombo.removeAllElements();
+        modeloCombo.addElement("Contacto o Teléfono"); // Placeholder
         for (Contacto contacto : this.controlador.obtenerListaContactos()) {
-            modelo.addElement(contacto);
+            modeloCombo.addElement(contacto);
         }
 
         // Establecer cómo se ve cada ítem en el combo
@@ -444,13 +487,27 @@ public class Principal extends JFrame implements TDSObserver {
             }
         });
         
+        
+        
         this.revalidate();
         this.repaint();
     }
     
-    private void actualizarPanelChat() {
+    private void actualizarListaContactosMensajes() {
+        
+    	DefaultListModel<Contacto> modelolista = listaContactosLista;
+        modelolista.removeAllElements();
 
-        List<Mensaje> mensajes = controlador.obtenerChatContacto((Contacto) comboBoxContactos.getSelectedItem());
+        for (Contacto contacto : this.controlador.obtenerListaChatMensajes()) {
+            modelolista.addElement(contacto);
+        }
+        
+        this.revalidate();
+        this.repaint();
+    }
+    private void actualizarPanelChat(Contacto contacto) {
+
+        List<Mensaje> mensajes = controlador.obtenerChatContacto(contacto);
         this.chat.removeAll();
         BubbleText bubble = null;
 
@@ -463,7 +520,7 @@ public class Principal extends JFrame implements TDSObserver {
             if (mensaje.getEmisor().getTelefono().equals(controlador.getTelefonoUsuario())) {
                 bubble = new BubbleText(this.chat, texto, Color.white, autor, BubbleText.SENT, 14);
             } else {
-                bubble = new BubbleText(this.chat, texto, Color.blue, ((Contacto) comboBoxContactos.getSelectedItem()).getNombre(), BubbleText.RECEIVED, 14);
+                bubble = new BubbleText(this.chat, texto, Color.blue, contacto.getNombre(), BubbleText.RECEIVED, 14);
             }
             this.chat.add(bubble);
         }

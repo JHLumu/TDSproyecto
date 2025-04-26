@@ -14,78 +14,105 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
-public class MensajeRenderer extends JPanel implements ListCellRenderer<Mensaje> {
-	
-	private static final long serialVersionUID = 1L;
-	private JLabel nameLabel;
-	private JLabel imageLabel;
-	private JLabel mensajeLabel;
+import umu.tds.appchat.AppChat;
+import umu.tds.modelos.Contacto.TipoContacto;
 
-	public MensajeRenderer() {
-		setLayout(new BorderLayout(5, 5));
+public class MensajeRenderer extends JPanel implements ListCellRenderer<Contacto> {
+    
+    private static final long serialVersionUID = 1L;
+    private JLabel imageLabel;
+    private JLabel nombreLabel;
+    private JLabel mensaje;
 
-		nameLabel = new JLabel();
-		imageLabel = new JLabel();
-		mensajeLabel = new JLabel();
+    public MensajeRenderer() {
+        setLayout(new BorderLayout(5, 5));
+      
+        imageLabel = new JLabel();
+        nombreLabel = new JLabel();
+        mensaje = new JLabel();
 
-		add(imageLabel, BorderLayout.WEST);
-		add(mensajeLabel, BorderLayout.CENTER);
-		add(nameLabel, BorderLayout.NORTH);
-	}
+        JPanel textPanel = new JPanel(new BorderLayout());
+        textPanel.add(nombreLabel, BorderLayout.CENTER);
+        textPanel.add(mensaje, BorderLayout.SOUTH);
 
-	@Override
-	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
-			boolean isSelected, boolean cellHasFocus) {
-		// Set the text
-		nameLabel.setText(mensaje.getEmisorNombre());
-		mensajeLabel.setText(mensaje.getTexto());
+        add(imageLabel, BorderLayout.WEST);
+        add(textPanel, BorderLayout.CENTER);
+    }
 
-		// Load the image from a random URL (for example, using "https://robohash.org")
-		try {
-/*
-			URL imageUrl = new URL("https://robohash.org/" + mensaje.getReceptor() + "?size=50x50");
-			Image image = ImageIO.read(imageUrl);
-			ImageIcon imageIcon = new ImageIcon(image.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-			imageLabel.setIcon(imageIcon);
-			
-*/
-			URL imageUrl = new URL("https://robohash.org/" + mensaje.getReceptor() + "?size=50x50");
-		    
-		    // Crear la carpeta local específica si no existe
-		    File directorio = new File("imagenPerfilContactos");
-		    if (!directorio.exists()) {
-		        directorio.mkdirs(); // Crear directorio y subdirectorios si es necesario
-		    }
-		    
-		    // Ruta del archivo local
-		    File localFile = new File(directorio, mensaje.getEmisorNombre()+".png");
-		    
-		    // Descargar y guardar la imagen
-		    Image image = ImageIO.read(imageUrl);
-		    ImageIO.write((java.awt.image.RenderedImage) image, "png", localFile);
-		    
-		    // Leer la imagen desde el archivo local
-		    Image localImage = ImageIO.read(localFile);
-		    ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-		    
-		    // Establecer el ícono en el JLabel
-		    imageLabel.setIcon(imageIcon);
+    @Override
+    public Component getListCellRendererComponent(JList<? extends Contacto> list, Contacto contacto, int index,
+            boolean isSelected, boolean cellHasFocus) {
+    	
+    	AppChat controlador = AppChat.getInstancia();
+        // Set the text fields
+    	nombreLabel.setText(contacto.getNombre());
+    	
+    	// Si es un ContactoIndividual, mostrar el número de teléfono
+    	if (contacto instanceof ContactoIndividual) {
+    	    String mensaje = controlador.getUltimoMensajeContacto(contacto);
+    	    this.mensaje.setText(mensaje);
+    	}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			imageLabel.setIcon(null); // Default to no image if there was an issue
-		}
+    	try {
+    	    // Obtener el usuario de la sesión actual
+    	    if (controlador.getNombreUsuario() == null) {
+    	        throw new IllegalStateException("Usuario de sesión actual no encontrado");
+    	    }
 
-		// Set background and foreground based on selection
-		if (isSelected) {
-			setBackground(list.getSelectionBackground());
-			setForeground(list.getSelectionForeground());
-		} else {
-			setBackground(list.getBackground());
-			setForeground(list.getForeground());
-		}
+    	    // Directorio base del usuario de la sesión actual
+    	    String directorioBase = "imagenPerfilContactos\\" + 
+    	    						controlador.getNombreUsuario() +  "-" + 
+    	    						controlador.getTelefonoUsuario();
 
-		return this;
-	}
+    	    // Crear subdirectorio específico para el contacto
+    	    String subcarpeta;
+    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
+    	        String telefono = ((ContactoIndividual) contacto).getTelefono();
+    	        subcarpeta = contacto.getNombre() + "-" + telefono;
+    	    } else { // Caso para grupos
+    	        subcarpeta = contacto.getNombre() + "-GRUPO";
+    	    }
+    	    
+    	    File directorio = new File(directorioBase, subcarpeta);
+    	    if (!directorio.exists()) {
+    	        directorio.mkdirs(); // Crear directorio si no existe
+    	    }
+    	    
+    	    
+    	    File localFile;
+    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
+    	    // Ruta al archivo local
+    	    	localFile = new File(directorio, contacto.getNombre() + "_" + ((ContactoIndividual) contacto).getTelefono() +".png");
+    	    } else {
+    	    	localFile = new File(directorio, contacto.getNombre() + "_GRUPO.png");
+    	    }
+    	    
+    	    // Cargar la imagen local y establecerla en el JLabel
+    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
+    	    	  System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Cargando imagen desde: " + localFile.getAbsolutePath());
+    	    	Image localImage = ImageIO.read(localFile);
+    	        ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+    	        imageLabel.setIcon(imageIcon);
+    	    } else {
+    	    	 System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Usando ícono predeterminado para: " + contacto.getNombre());
+    	        // Si no existe imagen local, usar un ícono predeterminado
+    	        imageLabel.setIcon(new ImageIcon(ContactoRenderer.class.getResource("/resources/usuario_64.png")));
+    	    }
 
+    	} catch (IOException | IllegalStateException e) {
+    	    e.printStackTrace();
+    	    imageLabel.setIcon(null); // En caso de error, no establecer imagen
+    	}
+
+        // Set background and foreground based on selection
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+
+        return this;
+    }
 }
