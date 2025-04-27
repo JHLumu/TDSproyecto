@@ -13,7 +13,6 @@ import javax.swing.border.EmptyBorder;
 import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
-import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.utils.Estado;
@@ -55,8 +54,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.jtattoo.plaf.acryl.AcrylBorders.ComboBoxBorder;
-
 import javax.swing.border.BevelBorder;
 
 
@@ -73,6 +70,12 @@ public class Principal extends JFrame implements TDSObserver {
 	private DefaultComboBoxModel<Object> listaContactosComboBox;
 	private DefaultListModel<Contacto> listaContactosLista;
 	private boolean seleccionPanel; // true para comboBox, false para lista
+	private JScrollPane scrollPane;
+	private JPanel panelMensaje;
+	private JPanel panelCentro;
+	private JPanel panelNorte;
+	private JPanel barraIntro;
+	private JList<Contacto> listaPanelChat;
 
 	/**
 	 * Launch the application.
@@ -117,34 +120,15 @@ public class Principal extends JFrame implements TDSObserver {
 		SwingUtilities.updateComponentTreeUI(this);
 	}
 	
-	/**
-	 * Create the frame.
-	 */
-	public Principal() {
+	private void inicializacionPanelNorte() {
 		
-		//Se obtiene la instancia del controlador
-		this.controlador = AppChat.getInstancia();
-		
-		this.colorBotones = this.controlador.getColorGUI(1);
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 746, 425);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
-		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
-		setForeground(new Color(0, 0, 0));
-		setTitle("AppChat");
-		
-		JPanel panelNorte = new JPanel();
+		 panelNorte = new JPanel();
 		panelNorte.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panelNorte.setBackground(new Color(255, 255, 255));
 		contentPane.add(panelNorte, BorderLayout.NORTH);
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
-		this.comboBoxContactos = new JComboBox<Object>();
+		comboBoxContactos = new JComboBox<Object>();
 		comboBoxContactos.setName("contacto o telefono");
 		comboBoxContactos.setToolTipText("");
 		comboBoxContactos.setSize(new Dimension(150, 40));
@@ -284,57 +268,24 @@ public class Principal extends JFrame implements TDSObserver {
 				frame.setLocationRelativeTo(null);
 		});
 		panelNorte.add(btnUsuario);
-		
-		JPanel panelMensaje = new JPanel();
-		panelMensaje.setPreferredSize(new Dimension(200, 0));
-		panelMensaje.setMaximumSize(new Dimension(500, 200));
-		contentPane.add(panelMensaje, BorderLayout.WEST);
-		panelMensaje.setLayout(new BorderLayout(0, 0));
-		
-		JList<Contacto> list = new JList <Contacto>();
-		list.setBorder(new LineBorder(new Color(0, 0, 0)));
-		list.setPreferredSize(new Dimension(0, 25));
-		list.setCellRenderer(new MensajeRenderer());
-		listaContactosLista = new DefaultListModel<>();
-		actualizarListaContactosMensajes();
-		list.setModel(listaContactosLista);
-		list.addListSelectionListener(e -> {
-		    if (!e.getValueIsAdjusting()) { // Para evitar dobles eventos
-		        Contacto seleccionado = list.getSelectedValue();
-		        
-		        if(seleccionado instanceof Contacto && seleccionado != null){
-		        	this.seleccionPanel = false;
-		            actualizarPanelChat(seleccionado);
-		        }
-		    }
-		});
-		list.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		    	Contacto seleccionado = list.getSelectedValue();
-		        
-		        if(seleccionado instanceof Contacto && seleccionado != null){
-		        	Principal.this.seleccionPanel = false;
-		            actualizarPanelChat(seleccionado);
-		        }
-		    }
-		});
 
-		panelMensaje.add(list);
+	}
+	
+	private void inicializacionPanelCentro() {
 		
 		chat = new JPanel();
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 	
-		JScrollPane scrollPane = new JScrollPane(chat);
+		scrollPane = new JScrollPane(chat);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
-		JPanel panelCentro = new JPanel();
+		panelCentro = new JPanel();
 		panelCentro.setLayout(new BorderLayout(0,0));
 		panelCentro.add(scrollPane, BorderLayout.CENTER);
 		contentPane.add(panelCentro, BorderLayout.CENTER);
 		
-		JPanel barraIntro = new JPanel();
+		barraIntro = new JPanel();
 		barraIntro.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		barraIntro.setBackground(new Color(255, 255, 255));
 		panelCentro.add(barraIntro, BorderLayout.SOUTH);
@@ -406,7 +357,7 @@ public class Principal extends JFrame implements TDSObserver {
 					
 				}				
 				else {
-					contacto = list.getSelectedValue();
+					contacto = listaPanelChat.getSelectedValue();
 					controlador.enviarMensaje(contacto, textArea.getText());
 					actualizarPanelChat(contacto);
 				}
@@ -430,8 +381,52 @@ public class Principal extends JFrame implements TDSObserver {
 		gbc_horizontalGlue_1.gridy = 0;
 		barraIntro.add(horizontalGlue_1, gbc_horizontalGlue_1);
 		
+		
 		AppChat.getInstancia().addObserver(Estado.INFO_CONTACTO, this);
 	}
+	
+	private void inicializacionPanelMensaje() {
+		
+		panelMensaje = new JPanel();
+		panelMensaje.setPreferredSize(new Dimension(200, 0));
+		panelMensaje.setMaximumSize(new Dimension(500, 200));
+		panelMensaje.setLayout(new BorderLayout(0, 0));
+		contentPane.add(panelMensaje, BorderLayout.WEST);
+		
+		listaPanelChat = new JList <Contacto>();
+		listaPanelChat.setBorder(new LineBorder(new Color(0, 0, 0)));
+		listaPanelChat.setPreferredSize(new Dimension(0, 25));
+		listaPanelChat.setCellRenderer(new MensajeRenderer());
+		listaContactosLista = new DefaultListModel<>();
+		actualizarListaContactosMensajes();
+		listaPanelChat.setModel(listaContactosLista);
+		listaPanelChat.addListSelectionListener(e -> {
+		    if (!e.getValueIsAdjusting()) { // Para evitar dobles eventos
+		        Contacto seleccionado = listaPanelChat.getSelectedValue();
+		        
+		        if(seleccionado instanceof Contacto && seleccionado != null){
+		        	this.seleccionPanel = false;
+		            actualizarPanelChat(seleccionado);
+		        }
+		    }
+		});
+		listaPanelChat.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		    	Contacto seleccionado = listaPanelChat.getSelectedValue();
+		        
+		        if(seleccionado instanceof Contacto && seleccionado != null){
+		        	Principal.this.seleccionPanel = false;
+		            actualizarPanelChat(seleccionado);
+		        }
+		    }
+		});
+		
+		panelMensaje.add(listaPanelChat);
+
+		
+	}
+
 	
 	private void ajustarTamañoAreaTexto() {
 		 int lineas = textArea.getLineCount();
@@ -451,7 +446,7 @@ public class Principal extends JFrame implements TDSObserver {
                 this.actualizarListaContactosMensajes();
                 
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
-            	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+            	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
             }
          
         }
@@ -531,11 +526,33 @@ public class Principal extends JFrame implements TDSObserver {
         this.chat.repaint();
     }
 
-    
-    @Override
-    public void dispose() {
-        super.dispose();
-    }
+	/**
+	 * Create the frame.
+	 */
+	public Principal() {
+		
+		//Se obtiene la instancia del controlador
+		this.controlador = AppChat.getInstancia();
+		
+		this.colorBotones = this.controlador.getColorGUI(1);
+		this.controlador.addObserver(Estado.NUEVA_FOTO_USUARIO, this);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 746, 425);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
+		setForeground(new Color(0, 0, 0));
+		setTitle("AppChat");
+		
+		inicializacionPanelNorte();
+		inicializacionPanelMensaje();
+		inicializacionPanelCentro();
+		
+	}
    
 
 }
+

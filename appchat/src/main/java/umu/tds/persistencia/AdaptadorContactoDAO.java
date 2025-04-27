@@ -74,10 +74,10 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo ContactoIndividual.");
 			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: URL de la imagen del contacto: "+ contacto.getImagen());
+			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: URL de la imagen del contacto: "+ contacto.getURLImagen());
 			propiedades.addAll( Arrays.asList(
 					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo())),
-					new Propiedad("imagen", contacto.getImagen().toExternalForm())
+					new Propiedad("imagen", contacto.getURLImagen().toExternalForm())
 					));
 		}
 		
@@ -116,7 +116,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			}
 			
 			else if (pNombre.equals("imagen")) {
-				p.setValor(String.valueOf(contacto.getImagen()));
+				p.setValor(String.valueOf(contacto.getURLImagen()));
 				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la imagen de contacto");
 			}
 			
@@ -132,7 +132,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			} 
 			
 			else if (pNombre.equals("imagen")) {
-				p.setValor(contacto.getImagen().toExternalForm());
+				p.setValor(contacto.getURLImagen().toExternalForm());
 				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
 			}
 			

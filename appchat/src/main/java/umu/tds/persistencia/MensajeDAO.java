@@ -1,7 +1,6 @@
 package umu.tds.persistencia;
 
 import java.net.MalformedURLException;
-import java.util.List;
 import umu.tds.modelos.Mensaje;
 
 public interface MensajeDAO {

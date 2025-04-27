@@ -1,6 +1,4 @@
 package umu.tds.ventanas;
-
-
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -53,7 +51,7 @@ public class Registro extends JFrame {
 	private JPasswordField passwordField_1;
 	private JDateChooser fecha;
 	private JTextArea saludoArea;
-	private JTextField imagenField;
+	private JTextField URLField;
 	private JTextField emailField;
 	/**
 	 * Launch the application.
@@ -122,7 +120,7 @@ public class Registro extends JFrame {
 	}
 	
 	private boolean validacionImagen() {
-		Image imagen = (AppChat.getInstancia().getImagen(this.imagenField.getText()));
+		Image imagen = (AppChat.getInstancia().getImagen(this.URLField.getText()));
 		boolean resultado = (imagen != null);
 		System.out.println("[DEBUG Registro validacionImagen]: " + "Imagen cumple formato: " + resultado);
 		return resultado;
@@ -164,7 +162,7 @@ public class Registro extends JFrame {
 					emailField.getText(),
 					new String(passwordField.getPassword()),
 					saludoArea.getText(), 
-					new URL(imagenField.getText()));
+					new URL(URLField.getText()));
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,29 +170,8 @@ public class Registro extends JFrame {
 		}
 	}
 	
-	/**
-	 * Create the frame.
-	 */
-	public Registro() {
-		setResizable(false);
-		setTitle("Registro");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 597, 386);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
-		setForeground(new Color(0, 0, 0));
-		setTitle("AppChat");
-		
-		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{20, 20, 136, 0, 121, 0, 20, 0};
-		gbl_contentPane.rowHeights = new int[]{20, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0};
-		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		contentPane.setLayout(gbl_contentPane);
-		
+	
+	private void inicializacionNombre() {
 		JLabel lblNombre = new JLabel("Nombre:");
 		lblNombre.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblNombre = new GridBagConstraints();
@@ -214,7 +191,10 @@ public class Registro extends JFrame {
 		contentPane.add(nombreField, gbc_nombreField);
 		nombreField.setColumns(10);
 		
+	}
 	
+	private void inicializacionApellidos() {
+		
 		JLabel lblApellidos = new JLabel("Apellidos:");
 		lblApellidos.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblApellidos = new GridBagConstraints();
@@ -234,6 +214,10 @@ public class Registro extends JFrame {
 		contentPane.add(apellidosField, gbc_apellidosField);
 		apellidosField.setColumns(10);
 		
+	}
+	
+	private void inicializacionTelefono() {
+		
 		JLabel lblTelfono = new JLabel("Tel\u00E9fono:");
 		lblTelfono.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblTelfono = new GridBagConstraints();
@@ -251,6 +235,10 @@ public class Registro extends JFrame {
 		gbc_telefonoField.gridy = 3;
 		contentPane.add(telefonoField, gbc_telefonoField);
 		telefonoField.setColumns(10);
+		
+	}
+	
+	private void inicializacionEmail() {
 		
 		JLabel lblEmail = new JLabel("email:");
 		lblEmail.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -270,6 +258,10 @@ public class Registro extends JFrame {
 		gbc_emailField.gridx = 4;
 		gbc_emailField.gridy = 3;
 		contentPane.add(emailField, gbc_emailField);
+		
+	}
+	
+	private void inicializacionPassword() {
 		
 		JLabel lblContrasea = new JLabel("Contrase\u00F1a:");
 		lblContrasea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -312,6 +304,10 @@ public class Registro extends JFrame {
 		gbc_passwordField_1.gridy = 4;
 		contentPane.add(passwordField_1, gbc_passwordField_1);
 		
+	}
+	
+	private void inicializacionFechaNacimiento() {
+		
 		JLabel lblFecha = new JLabel("Fecha:");
 		lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblFecha = new GridBagConstraints();
@@ -329,6 +325,72 @@ public class Registro extends JFrame {
 		gbc_fecha.gridy = 5;
 		contentPane.add(fecha, gbc_fecha);
 		
+	}
+	
+	private void inicializacionImagen() {
+		
+		JLabel lblImagen = new JLabel("Imagen:");
+		lblImagen.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		GridBagConstraints gbc_lblImagen = new GridBagConstraints();
+		gbc_lblImagen.anchor = GridBagConstraints.EAST;
+		gbc_lblImagen.insets = new Insets(0, 0, 5, 5);
+		gbc_lblImagen.gridx = 3;
+		gbc_lblImagen.gridy = 6;
+		contentPane.add(lblImagen, gbc_lblImagen);
+		
+		
+		JLabel lblImagen_1 = new JLabel("");
+		lblImagen_1.setIcon(new ImageIcon(Registro.class.getResource("/resources/usuario_64.png")));
+		GridBagConstraints gbc_lblImagen_1 = new GridBagConstraints();
+		gbc_lblImagen_1.gridwidth = 2;
+		gbc_lblImagen_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblImagen_1.gridx = 4;
+		gbc_lblImagen_1.gridy = 7;
+		contentPane.add(lblImagen_1, gbc_lblImagen_1);
+		
+		URLField = new JTextField();
+		GridBagConstraints gbc_URLField = new GridBagConstraints();
+		gbc_URLField.insets = new Insets(0, 0, 5, 5);
+		gbc_URLField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_URLField.gridx = 4;
+		gbc_URLField.gridy = 6;
+		contentPane.add(URLField, gbc_URLField);
+		URLField.setColumns(10);
+		
+		
+		JButton botonImagen = new JButton("Aceptar");
+		botonImagen.setBackground(new Color(79, 87, 255));
+		botonImagen.setForeground(Color.WHITE);
+		botonImagen.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		GridBagConstraints gbc_imagenField = new GridBagConstraints();
+		gbc_imagenField.insets = new Insets(0, 0, 5, 5);
+		gbc_imagenField.gridx = 5;
+		gbc_imagenField.gridy = 6;
+		
+		
+		botonImagen.addActionListener(evento -> {
+			
+			if ( ! URLField.getText().isEmpty() ) {
+			
+			Image imagen = AppChat.getInstancia().getImagen(URLField.getText());
+		     if(imagen != null) {
+		    	 lblImagen_1.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
+		     } else {
+		    	 JOptionPane.showMessageDialog(this, 
+		                 "No se pudo descargar la imagen desde la URL proporcionada.",
+		                 "AppChat",
+		                 JOptionPane.ERROR_MESSAGE);
+		     }
+		}
+		});
+		contentPane.add(botonImagen, gbc_imagenField);
+		
+	}
+	
+	
+	private void inicializacionSaludo() {
+		
+
 		JLabel lblSaludo = new JLabel("Saludo:");
 		lblSaludo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblSaludo = new GridBagConstraints();
@@ -350,59 +412,42 @@ public class Registro extends JFrame {
 		saludoArea = new JTextArea();
 		scrollPane.setViewportView(saludoArea);
 		
-		JLabel lblImagen = new JLabel("Imagen:");
-		lblImagen.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		GridBagConstraints gbc_lblImagen = new GridBagConstraints();
-		gbc_lblImagen.anchor = GridBagConstraints.EAST;
-		gbc_lblImagen.insets = new Insets(0, 0, 5, 5);
-		gbc_lblImagen.gridx = 3;
-		gbc_lblImagen.gridy = 6;
-		contentPane.add(lblImagen, gbc_lblImagen);
+	}
+	
+	
+	/**
+	 * Create the frame.
+	 */
+	public Registro() {
 		
+		setResizable(false);
+		setTitle("Registro");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 597, 386);
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
+		setForeground(new Color(0, 0, 0));
+		setTitle("AppChat");
 		
-		JLabel lblImagen_1 = new JLabel("");
-		lblImagen_1.setIcon(new ImageIcon(Registro.class.getResource("/resources/usuario_64.png")));
-		GridBagConstraints gbc_lblImagen_1 = new GridBagConstraints();
-		gbc_lblImagen_1.gridwidth = 2;
-		gbc_lblImagen_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblImagen_1.gridx = 4;
-		gbc_lblImagen_1.gridy = 7;
-		contentPane.add(lblImagen_1, gbc_lblImagen_1);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
 		
-		imagenField = new JTextField();
-		GridBagConstraints gbc_imagenlField = new GridBagConstraints();
-		gbc_imagenlField.insets = new Insets(0, 0, 5, 5);
-		gbc_imagenlField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_imagenlField.gridx = 4;
-		gbc_imagenlField.gridy = 6;
-		contentPane.add(imagenField, gbc_imagenlField);
-		imagenField.setColumns(10);
+		GridBagLayout gbl_contentPane = new GridBagLayout();
+		gbl_contentPane.columnWidths = new int[]{20, 20, 136, 0, 121, 0, 20, 0};
+		gbl_contentPane.rowHeights = new int[]{20, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0};
+		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		contentPane.setLayout(gbl_contentPane);
 		
-		
-		JButton botonImagen = new JButton("Aceptar");
-		botonImagen.setBackground(new Color(79, 87, 255));
-		botonImagen.setForeground(Color.WHITE);
-		botonImagen.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-		GridBagConstraints gbc_imagenField = new GridBagConstraints();
-		gbc_imagenField.insets = new Insets(0, 0, 5, 5);
-		gbc_imagenField.gridx = 5;
-		gbc_imagenField.gridy = 6;
-		
-		
-		botonImagen.addActionListener(evento -> {
-			Image imagen = AppChat.getInstancia().getImagen(imagenField.getText());
-		     if(imagen != null) {
-		    	 lblImagen_1.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
-		     } else {
-		    	 JOptionPane.showMessageDialog(this, 
-		                 "No se pudo descargar la imagen desde la URL proporcionada.",
-		                 "AppChat",
-		                 JOptionPane.ERROR_MESSAGE);
-		     }
-		});
-		contentPane.add(botonImagen, gbc_imagenField);
-		
-		
+		inicializacionNombre();
+		inicializacionApellidos();
+		inicializacionTelefono();
+		inicializacionPassword();
+		inicializacionEmail();
+		inicializacionFechaNacimiento();
+		inicializacionSaludo();
+		inicializacionImagen();
+	
 		
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();

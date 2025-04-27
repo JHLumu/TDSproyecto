@@ -84,7 +84,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("lista de contactos", obtenerIdsContactos(usuario.getListaContacto())),
 						new Propiedad("lista de mensajes recibidos", obtenerIdsMensajes(usuario.getMensajesRecibidos())),
 						new Propiedad("lista de mensajes enviados", obtenerIdsMensajes(usuario.getMensajesEnviados())),
-						new Propiedad("imagen", usuario.getImagenPerfil().toExternalForm()),
+						new Propiedad("imagen", usuario.getURLImagen().toExternalForm()),
 						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString()),
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("premium", String.valueOf(usuario.isPremium()))
@@ -150,7 +150,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la lista de mensajes enviados del usuario.");
 				}
 			else if (prop.getNombre().equals("imagen")) {
-				prop.setValor(usuario.getImagenPerfil().toExternalForm());
+				prop.setValor(usuario.getURLImagen().toExternalForm());
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado la foto de perfil del usuario.");
 				}
 			else if (prop.getNombre().equals("saludo")) {
