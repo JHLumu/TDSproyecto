@@ -12,6 +12,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import umu.tds.appchat.AppChat;
+
 
 public class ContactoRenderer extends JPanel implements ListCellRenderer<Contacto> {
     
@@ -47,15 +49,21 @@ public class ContactoRenderer extends JPanel implements ListCellRenderer<Contact
     	    String telefono = ((ContactoIndividual) contacto).getTelefono();
     	    tipoOtelfLabel.setText("Teléfono: " + telefono);
     	} else {
-    	    tipoOtelfLabel.setText("Tipo: " + contacto.getTipoContacto());
+    	    tipoOtelfLabel.setText("Grupo");
     	}
 
     	try {
-    	    
-    		ContactoIndividual contactoIndividual = (ContactoIndividual) contacto;
-    		//Incumple el patron de responsabilidad
-    		File fileImagenContacto = new File("imagenesUsuarios", contactoIndividual.getUsuario().getNombre()+"-"+ contactoIndividual.getTelefono()+".png");
-    	    
+    		File fileImagenContacto;
+    	    if(contacto instanceof ContactoIndividual) {
+	    		ContactoIndividual contactoIndividual = (ContactoIndividual) contacto;
+	    		//Incumple el patron de responsabilidad
+	    		fileImagenContacto = new File("imagenesUsuarios", contactoIndividual.getUsuario().getNombre()+"-"+ contactoIndividual.getTelefono()+".png");
+	    	} else {
+	    		Grupo contactoGrupo = (Grupo) contacto;
+	    		//Incumple el patron de responsabilidad
+	    		fileImagenContacto = new File("imagenesUsuarios\\"+ AppChat.getInstancia().getTelefonoUsuario(), "Grupo-" + contactoGrupo.getNombre()+"-"+ contactoGrupo.getAnfitrion() + ".png");
+	    	
+	    	}
     		if (fileImagenContacto.exists()) {
     			Image localImage = ImageIO.read(fileImagenContacto);
     			imageLabel.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));

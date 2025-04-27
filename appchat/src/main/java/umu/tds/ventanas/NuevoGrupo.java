@@ -24,17 +24,19 @@ import javax.swing.JDialog;
 
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.awt.Dimension;
 
 
-public class NuevoContacto extends JDialog {
+public class NuevoGrupo extends JDialog {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private JTextField nombreField;
-	private JTextField telefonoField;
+	private JTextField urlFoto;
 	private Color colorPrimario;
 
 	/**
@@ -45,7 +47,7 @@ public class NuevoContacto extends JDialog {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-					NuevoContacto window = new NuevoContacto();
+					NuevoGrupo window = new NuevoGrupo();
 					window.setVisible(true);
 					window.setLocationRelativeTo(null);
 				} catch (Exception e) {
@@ -55,49 +57,56 @@ public class NuevoContacto extends JDialog {
 		});
 	}
 
-	public void nuevoContacto() {
+	public void nuevoGrupo() {
 
-		if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
+		if ((nombreField.getText().isEmpty()) || (urlFoto.getText().isEmpty())) {
 			
-			 JOptionPane.showMessageDialog(NuevoContacto.this, 
+			 JOptionPane.showMessageDialog(this, 
 	                    "ERROR: No se han rellenado los campos.",
 	                    "AppChat",
 	                    JOptionPane.ERROR_MESSAGE);
 			 return;
 		}
+
+		int resultado;
+		try {
+			resultado = AppChat.getInstancia().nuevoGrupo(nombreField.getText(), new URL(urlFoto.getText()));
 		
-		int resultado = AppChat.getInstancia().nuevoContacto(nombreField.getText(),telefonoField.getText());
 			
-		//Si el resultado es -1 el teléfono no está registrado
-		if (resultado == -1) { 
-		
-		JOptionPane.showMessageDialog(NuevoContacto.this, 
-	                    "El teléfono no se encuentra registrado.",
+			if (resultado == -1) { 
+			
+			JOptionPane.showMessageDialog(this, 
+		                    "No se ha podido leer la imagen.",
+		                    "AppChat",
+		                    JOptionPane.ERROR_MESSAGE);
+				 this.dispose();
+			
+			
+			}
+			
+			else if (resultado == 1){
+				
+				JOptionPane.showMessageDialog(this, 
+	                    "Se ha registrado el Grupo como " + nombreField.getText(),
 	                    "AppChat",
-	                    JOptionPane.ERROR_MESSAGE);
-			 this.dispose();
-		
-		
-		}
-		
-		else if (resultado == 0) {
+	                    JOptionPane.PLAIN_MESSAGE);
+						this.dispose();
+				
+			} else {
+				JOptionPane.showMessageDialog(this, 
+	                    "Ya exite un Grupo con nombre: " + nombreField.getText(),
+	                    "AppChat",
+	                    JOptionPane.PLAIN_MESSAGE);
+						this.dispose();
+			}
+		} catch (MalformedURLException e) {
 			
-			JOptionPane.showMessageDialog(NuevoContacto.this, 
-                    "El teléfono ya se encuentra registrado en la lista de contactos.",
-                    "AppChat",
-                    JOptionPane.ERROR_MESSAGE);	
-			
-		}
-		
-		
-		else {
-			
-			JOptionPane.showMessageDialog(NuevoContacto.this, 
-                    "Se ha registrado el teléfono como " + nombreField.getText(),
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, 
+                    "URL mal formada",
                     "AppChat",
                     JOptionPane.PLAIN_MESSAGE);
 					this.dispose();
-			
 		}
 			 
 			
@@ -108,7 +117,7 @@ public class NuevoContacto extends JDialog {
 	/**
 	 * Create the application.
 	 */
-	public NuevoContacto() {
+	public NuevoGrupo() {
 		super();
 		initialize();
 	}
@@ -138,17 +147,17 @@ public class NuevoContacto extends JDialog {
 		getContentPane().add(panelCentro, BorderLayout.CENTER);
 		
 		GridBagLayout gbl_panelCentro = new GridBagLayout();
-		gbl_panelCentro.columnWidths = new int[]{126, 0, 153, 101, 0};
+		gbl_panelCentro.columnWidths = new int[]{126, 0, 0, 153, 101, 0};
 		gbl_panelCentro.rowHeights = new int[]{0, 0, 84, 0, 0, 15, 15, 0};
-		gbl_panelCentro.columnWeights = new double[]{1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_panelCentro.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
 		gbl_panelCentro.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panelCentro.setLayout(gbl_panelCentro);
 		
-		JLabel lblNewLabel = new JLabel("Introduzca el nombre del contacto y su teléfono.");
+		JLabel lblNewLabel = new JLabel("Introduzca el nombre y la URL de la foto de perfil");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.gridwidth = 4;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_lblNewLabel.gridwidth = 5;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 2;
 		panelCentro.add(lblNewLabel, gbc_lblNewLabel);
@@ -156,6 +165,7 @@ public class NuevoContacto extends JDialog {
 		JLabel lblNombre = new JLabel("Nombre");
 		lblNombre.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_lblNombre = new GridBagConstraints();
+		gbc_lblNombre.gridwidth = 2;
 		gbc_lblNombre.anchor = GridBagConstraints.WEST;
 		gbc_lblNombre.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNombre.gridx = 1;
@@ -167,28 +177,29 @@ public class NuevoContacto extends JDialog {
 		GridBagConstraints gbc_nombreField = new GridBagConstraints();
 		gbc_nombreField.insets = new Insets(0, 0, 5, 5);
 		gbc_nombreField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_nombreField.gridx = 2;
+		gbc_nombreField.gridx = 3;
 		gbc_nombreField.gridy = 3;
 		panelCentro.add(this.nombreField, gbc_nombreField);
 		this.nombreField.setColumns(10);
 		
-		JLabel lblTelefono = new JLabel("Telefono");
-		lblTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		GridBagConstraints gbc_lblTelefono = new GridBagConstraints();
-		gbc_lblTelefono.anchor = GridBagConstraints.WEST;
-		gbc_lblTelefono.insets = new Insets(0, 0, 5, 5);
-		gbc_lblTelefono.gridx = 1;
-		gbc_lblTelefono.gridy = 4;
-		panelCentro.add(lblTelefono, gbc_lblTelefono);
+		JLabel lblImagen = new JLabel("Foto(URL)");
+		lblImagen.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		GridBagConstraints gbc_lblImagen = new GridBagConstraints();
+		gbc_lblImagen.gridwidth = 2;
+		gbc_lblImagen.anchor = GridBagConstraints.WEST;
+		gbc_lblImagen.insets = new Insets(0, 0, 5, 5);
+		gbc_lblImagen.gridx = 1;
+		gbc_lblImagen.gridy = 4;
+		panelCentro.add(lblImagen, gbc_lblImagen);
 		
-		this.telefonoField = new JTextField();
-		this.telefonoField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		GridBagConstraints gbc_telefonoField = new GridBagConstraints();
-		gbc_telefonoField.insets = new Insets(0, 0, 5, 5);
-		gbc_telefonoField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_telefonoField.gridx = 2;
-		gbc_telefonoField.gridy = 4;
-		panelCentro.add(telefonoField, gbc_telefonoField);
+		this.urlFoto = new JTextField();
+		this.urlFoto.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		GridBagConstraints gbc_urlFoto = new GridBagConstraints();
+		gbc_urlFoto.insets = new Insets(0, 0, 5, 5);
+		gbc_urlFoto.fill = GridBagConstraints.HORIZONTAL;
+		gbc_urlFoto.gridx = 3;
+		gbc_urlFoto.gridy = 4;
+		panelCentro.add(urlFoto, gbc_urlFoto);
 	
 		
 		JPanel panelSur = new JPanel();
@@ -202,8 +213,8 @@ public class NuevoContacto extends JDialog {
 		botonAceptar.setForeground(Color.WHITE);
 		botonAceptar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		botonAceptar.addActionListener(evento -> {
-				nuevoContacto();
-			});
+			nuevoGrupo();
+		});
 		
 		JButton botonCancelar = new JButton("Cancelar");
 		botonCancelar.setBorderPainted(false);

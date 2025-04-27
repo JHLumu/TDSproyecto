@@ -53,47 +53,25 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Contacto
     	}
 
     	try {
-    	    // Obtener el usuario de la sesión actual
-    	    if (controlador.getNombreUsuario() == null) {
-    	        throw new IllegalStateException("Usuario de sesión actual no encontrado");
-    	    }
-
-    	    // Directorio base del usuario de la sesión actual
-    	    String directorioBase = "imagenPerfilContactos\\" + 
-    	    						controlador.getNombreUsuario() +  "-" + 
-    	    						controlador.getTelefonoUsuario();
-
-    	    // Crear subdirectorio específico para el contacto
-    	    String subcarpeta;
-    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
-    	        String telefono = ((ContactoIndividual) contacto).getTelefono();
-    	        subcarpeta = contacto.getNombre() + "-" + telefono;
-    	    } else { // Caso para grupos
-    	        subcarpeta = contacto.getNombre() + "-GRUPO";
-    	    }
-    	    
-    	    File directorio = new File(directorioBase, subcarpeta);
-    	    if (!directorio.exists()) {
-    	        directorio.mkdirs(); // Crear directorio si no existe
-    	    }
-    	    
-    	    
-    	    File localFile;
-    	    if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
-    	    // Ruta al archivo local
-    	    	localFile = new File(directorio, contacto.getNombre() + "_" + ((ContactoIndividual) contacto).getTelefono() +".png");
-    	    } else {
-    	    	localFile = new File(directorio, contacto.getNombre() + "_GRUPO.png");
-    	    }
-    	    
-    	    // Cargar la imagen local y establecerla en el JLabel
-    	    if (localFile.exists()) { // Asegurarse de que el archivo se creó o ya existía
-    	    	  System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Cargando imagen desde: " + localFile.getAbsolutePath());
-    	    	Image localImage = ImageIO.read(localFile);
-    	        ImageIcon imageIcon = new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-    	        imageLabel.setIcon(imageIcon);
-    	    } else {
-    	    	 System.out.println("[DEBUG ContactoRenderer getListCellRendererComponent]: Usando ícono predeterminado para: " + contacto.getNombre());
+    		File fileImagenContacto;
+    	    if(contacto instanceof ContactoIndividual) {
+	    		ContactoIndividual contactoIndividual = (ContactoIndividual) contacto;
+	    		//Incumple el patron de responsabilidad
+	    		fileImagenContacto = new File("imagenesUsuarios", contactoIndividual.getUsuario().getNombre()+"-"+ contactoIndividual.getTelefono()+".png");
+	    	} else {
+	    		Grupo contactoGrupo = (Grupo) contacto;
+	    		//Incumple el patron de responsabilidad
+	    		fileImagenContacto = new File("imagenesUsuarios\\"+controlador.getTelefonoUsuario(), "Grupo-" + contactoGrupo.getNombre()+"-"+ contactoGrupo.getAnfitrion() + ".png");
+	    	
+	    	}
+    		if (fileImagenContacto.exists()) {
+    			Image localImage = ImageIO.read(fileImagenContacto);
+    			imageLabel.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+    		}
+    		
+    		//Se obtiene la carpeta con las imágenes de los contacto
+    		else {
+    	    	System.out.println("[DEBUG MensajeRenderer getListCellRendererComponent]: Usando ícono predeterminado para: " + contacto.getNombre());
     	        // Si no existe imagen local, usar un ícono predeterminado
     	        imageLabel.setIcon(new ImageIcon(ContactoRenderer.class.getResource("/resources/usuario_64.png")));
     	    }

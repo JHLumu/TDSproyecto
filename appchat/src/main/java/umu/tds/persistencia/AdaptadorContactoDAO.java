@@ -21,11 +21,11 @@ import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Contacto.TipoContacto;
 
-public class AdaptadorContactoDAO implements ContactoDAO {
+	public class AdaptadorContactoDAO implements ContactoDAO {
 	private ServicioPersistencia servPersistencia;
 	private static AdaptadorContactoDAO instancia = new AdaptadorContactoDAO();
 	
-	public static AdaptadorContactoDAO getContactoIndividualDAO() {
+	public static AdaptadorContactoDAO getContactoDAO() {
 		return instancia;
 	}
 	
@@ -64,8 +64,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: Nombre de contacto: " + contacto);
 		propiedades.addAll(Arrays.asList(
-				new Propiedad("nombre", contacto.getNombre())
-				
+				new Propiedad("nombre", contacto.getNombre()),
+				new Propiedad("imagen", contacto.getURLImagen().toExternalForm())
 				));
 		
 		//Propiedades si es ContactoIndividual
@@ -75,9 +75,9 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: URL de la imagen del contacto: "+ contacto.getURLImagen());
-			propiedades.addAll( Arrays.asList(
+			propiedades.addAll(Arrays.asList(
 					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo())),
-					new Propiedad("imagen", contacto.getURLImagen().toExternalForm())
+					new Propiedad("tipo", "INDIVIDUAL")
 					));
 		}
 		
@@ -85,9 +85,12 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		else if (contacto.getTipoContacto().equals(TipoContacto.GRUPO)) {
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo Grupo.");
 			Grupo aux = (Grupo) contacto;
-			propiedades.add(
-					new Propiedad("miembros", obtenerIdsMiembros(aux.getMiembros()))
-					);
+			propiedades.addAll( Arrays.asList(
+					new Propiedad("miembros", obtenerIdsMiembros(aux.getMiembros())),
+					new Propiedad("anfitrion", aux.getAnfitrion()),
+					new Propiedad("tipo", "GRUPO")
+					));
+			System.out.println(contacto.toString());
 		}
 		
 		//Se asocia a la entidad las propiedaddes y se registra la entidad
@@ -95,8 +98,12 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		eContacto = servPersistencia.registrarEntidad(eContacto);
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene id " + eContacto.getId());
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene usuario referencia " + servPersistencia.recuperarPropiedadEntidad(eContacto, "usuario"));
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene nombre " + servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre"));
+		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene anfitrion " + servPersistencia.recuperarPropiedadEntidad(eContacto, "anfitrion"));
+
 		contacto.setCodigo(eContacto.getId());
-	
+		System.out.println("[DEBUG registrarContacto] Acabó y setCodigo() a → " + contacto.getCodigo());
+
 		
 	}
 
@@ -131,11 +138,6 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
 			} 
 			
-			else if (pNombre.equals("imagen")) {
-				p.setValor(contacto.getURLImagen().toExternalForm());
-				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
-			}
-			
 			servPersistencia.modificarPropiedad(p);
 			System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se guardan los cambios de contacto.");
 		}
@@ -145,12 +147,12 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 
 	@Override
 	public Contacto recuperarContacto(int id) throws NumberFormatException, MalformedURLException {
-		System.out.println("\n[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Inicio de recuperar contacto.");
+		System.out.println("\n[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Inicio de recuperar contacto. " + id);
 		//Si el objeto se encuentra en el pool, se retorna
 		
 		PoolDAO poolContacto = PoolDAO.getUnicaInstancia();
 		if (poolContacto.contiene(id)) {
-			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Contacto se encuentra en el Pool. Se devuelve contacto");
+			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Contacto se encuentra en el Pool. Se devuelve contacto " + id);
 			return (Contacto) poolContacto.getObjeto(id);
 			
 		}
@@ -159,6 +161,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		Entidad eContacto = servPersistencia.recuperarEntidad(id);
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
 		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
+		String tipo = servPersistencia.recuperarPropiedadEntidad(eContacto, "tipo");
 		URL imagen = null;
 		if (imagenString != null) imagen = new URL(imagenString); 
 		
@@ -175,7 +178,7 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 		Contacto contacto = null;
 		
 		//Si tiene asignado un Usuario, es Contacto Individual; si no, es Grupo
-		if ((idUsuario!=null)) {
+		if ("INDIVIDUAL".equals(tipo)) {
 			
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera el usuario asociado a Contacto si es tipo ContactoIndividual.");
 			Usuario usuario = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idUsuario));
@@ -189,7 +192,8 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 			
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la lista de miembros si es tipo Grupo.");
 			String idMiembros = servPersistencia.recuperarPropiedadEntidad(eContacto, "miembros");
-			contacto = new Grupo(nombre, imagen, obtenerMiembrosporIds(idMiembros));
+			String anfitrion = servPersistencia.recuperarPropiedadEntidad(eContacto, "anfitrion");
+			contacto = new Grupo(nombre, imagen, anfitrion, obtenerMiembrosporIds(idMiembros));
 			
 		}
 		contacto.setCodigo(id);
@@ -201,22 +205,28 @@ public class AdaptadorContactoDAO implements ContactoDAO {
 	
 	//Funciones auxiliares
 	
-	private String obtenerIdsMiembros(ContactoIndividual[] grupo) {
-		String aux = Stream.of(grupo)
+	private String obtenerIdsMiembros(List<Contacto> lista) {
+		
+		String aux = lista.stream()
 				.map(c -> String.valueOf(c.getCodigo()))
 				.collect(Collectors.joining(" "));
-		System.out.println("\n[DEBUG AdaptadorContactoDAO obtenerIdsMiembros]: Resultado:" + aux);
 		return aux;
 
 	}
 	
-	private ContactoIndividual[] obtenerMiembrosporIds(String idsMiembros) throws NumberFormatException, MalformedURLException{
-		List<ContactoIndividual> resultado = new LinkedList<ContactoIndividual>();
-		if (idsMiembros == null) return resultado.toArray(new ContactoIndividual[0]);
-		for (String idMiembro: idsMiembros.split(" ")) {
-		resultado.add((ContactoIndividual) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idMiembro)));
+	private List<Contacto> obtenerMiembrosporIds(String idsMiembros) throws NumberFormatException, MalformedURLException{
+		List<Contacto> resultado = new LinkedList<Contacto>();
+		if (idsMiembros != null && !idsMiembros.isEmpty()) {
+			
+			for (String idContacto: idsMiembros.split(" ")) {
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMiembrosAPartirDeIds]: " + "idContacto: " + idContacto);
+				Contacto contacto = (FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto)));
+				resultado.add(contacto);
+				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMiembrosAPartirDeIds]: " + "Se recupera el contacto " + contacto.getNombre());
+			}
+		
 		}
-		return resultado.toArray(new ContactoIndividual[0]);
+		return resultado;
 	}
 	
 

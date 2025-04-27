@@ -23,7 +23,7 @@ public class FactoriaDAOTDS extends FactoriaDAO {
 
 	@Override
 	public ContactoDAO getContactoDAO() {
-		return AdaptadorContactoDAO.getContactoIndividualDAO();
+		return AdaptadorContactoDAO.getContactoDAO();
 	}
 
 	

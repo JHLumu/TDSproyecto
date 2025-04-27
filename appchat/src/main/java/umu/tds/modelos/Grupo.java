@@ -3,31 +3,37 @@ package umu.tds.modelos;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 
 public class Grupo extends Contacto {
 
     // Atributos específicos para Grupo
-    private final HashSet<ContactoIndividual> miembros;
+	private final String anfitrion;
+    private List<Contacto> miembros;
 
     // Constructor para crear un grupo con miembros sin imagen
-    public Grupo(String nombre, ContactoIndividual... usuarios) {
-        super(nombre);
-        this.miembros = new HashSet<>();
-        Collections.addAll(this.miembros, usuarios);
+    public Grupo(String nombre, URL imagen, String anfitrion) {
+    	super(nombre, imagen);
+    	this.anfitrion = anfitrion;
+    	this.miembros = new LinkedList<>();
     }
 
     // Constructor para crear un grupo con miembros y con imagen
-    public Grupo(String nombre, URL imagen, ContactoIndividual... usuarios) {
-        super(nombre, imagen);
-        this.miembros = new HashSet<>();
-        Collections.addAll(this.miembros, usuarios);
+    public Grupo(String nombre, URL imagen, String anfitrion, List<Contacto> contactos) {
+        this(nombre, imagen, anfitrion);
+        this.miembros = contactos;
     }
 
     // Métodos getter y setter
-    public ContactoIndividual[] getMiembros() {
-        return this.miembros.toArray(new ContactoIndividual[0]);
+    public List <Contacto> getMiembros() {
+        return miembros;
+    }
+    
+    public String getAnfitrion() {
+    	return anfitrion;
     }
 
     // Redefinición de equals y hashCode

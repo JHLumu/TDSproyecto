@@ -18,7 +18,8 @@ public class ListaContactos extends JDialog implements TDSObserver {
 	private static final long serialVersionUID = 1L;
 	protected static final String ContactoIndividual = null;
 	private JPanel contentPane;
-	private DefaultListModel<Contacto> listaContactos;
+	private DefaultListModel<Contacto> listaContactosIndividuales;
+	private DefaultListModel<Contacto> listaContactosGrupos;
 	private Color colorPrimario;
 
 	public static void main(String[] args) {
@@ -61,24 +62,22 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		gbc_lblGrupo.gridy = 0;
 		panelCentral.add(lblGrupo, gbc_lblGrupo);
 
-		JList<Contacto> list = inicializacionListaContactos();
-		GridBagConstraints gbc_list = new GridBagConstraints();
-		gbc_list.insets = new Insets(0, 0, 5, 5);
-		gbc_list.fill = GridBagConstraints.BOTH;
-		gbc_list.gridx = 0;
-		gbc_list.gridy = 1;
-		panelCentral.add(list, gbc_list);
+		JList<Contacto> list = inicializacionListaIndividual();
+		GridBagConstraints gbc_listaIndividual = new GridBagConstraints();
+		gbc_listaIndividual.insets = new Insets(0, 0, 5, 5);
+		gbc_listaIndividual.fill = GridBagConstraints.BOTH;
+		gbc_listaIndividual.gridx = 0;
+		gbc_listaIndividual.gridy = 1;
+		panelCentral.add(list, gbc_listaIndividual);
 
-		JList<?> list_1 = new JList<>();
-		list_1.setBackground(Color.WHITE);
-		list_1.setBorder(new LineBorder(Color.BLACK));
-		GridBagConstraints gbc_list_1 = new GridBagConstraints();
-		gbc_list_1.gridwidth = 2;
-		gbc_list_1.insets = new Insets(0, 0, 5, 5);
-		gbc_list_1.fill = GridBagConstraints.BOTH;
-		gbc_list_1.gridx = 1;
-		gbc_list_1.gridy = 1;
-		panelCentral.add(list_1, gbc_list_1);
+		JList<Contacto> listaGrupal = inicializacionListaGrupos();
+		GridBagConstraints gbc_listaGrupal = new GridBagConstraints();
+		gbc_listaGrupal.gridwidth = 2;
+		gbc_listaGrupal.insets = new Insets(0, 0, 5, 5);
+		gbc_listaGrupal.fill = GridBagConstraints.BOTH;
+		gbc_listaGrupal.gridx = 1;
+		gbc_listaGrupal.gridy = 1;
+		panelCentral.add(listaGrupal, gbc_listaGrupal);
 
 		JButton btnContacto = inicializacionBotonContacto();
 		GridBagConstraints gbc_btnContacto = new GridBagConstraints();
@@ -88,7 +87,7 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		gbc_btnContacto.gridy = 2;
 		panelCentral.add(btnContacto, gbc_btnContacto);
 
-		JButton btnGrupo = new JButton("Añadir Grupo");
+		JButton btnGrupo = inicializacionBotonGrupo();
 		GridBagConstraints gbc_btnGrupo = new GridBagConstraints();
 		gbc_btnGrupo.gridwidth = 2;
 		gbc_btnGrupo.fill = GridBagConstraints.HORIZONTAL;
@@ -96,25 +95,48 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		gbc_btnGrupo.gridx = 1;
 		gbc_btnGrupo.gridy = 2;
 		panelCentral.add(btnGrupo, gbc_btnGrupo);
+		
+		
+	}
+
+	private JList<Contacto> inicializacionListaIndividual() {
+		JList<Contacto> listaIndividual = new JList<>();
+		listaIndividual.setBackground(Color.WHITE);
+		listaIndividual.setBorder(new LineBorder(Color.BLACK));
+		listaContactosIndividuales = new DefaultListModel<>();
+		actualizarListaIndividual();
+		listaIndividual.setCellRenderer(new ContactoRenderer());
+		listaIndividual.setModel(listaContactosIndividuales);
+		return listaIndividual;
+	}
+	
+	private JList<Contacto> inicializacionListaGrupos() {
+		JList<Contacto> listaGrupos = new JList<>();
+		listaGrupos.setBackground(Color.WHITE);
+		listaGrupos.setBorder(new LineBorder(Color.BLACK));
+		listaContactosGrupos = new DefaultListModel<>();
+		actualizarListaGrupos();
+		listaGrupos.setCellRenderer(new ContactoRenderer());
+		listaGrupos.setModel(listaContactosGrupos);
+		return listaGrupos;
+	}
+
+	private JButton inicializacionBotonGrupo() {
+		JButton btnGrupo = new JButton("Añadir Grupo");
 		btnGrupo.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		btnGrupo.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnGrupo.setForeground(Color.WHITE);
 		btnGrupo.setBackground(this.colorPrimario);
 		btnGrupo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		
+		btnGrupo.addActionListener(evento -> {
+			NuevoGrupo frame = new NuevoGrupo();
+			frame.setModal(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+		});
+		return btnGrupo;
 	}
-
-	private JList<Contacto> inicializacionListaContactos() {
-		JList<Contacto> list = new JList<>();
-		list.setBackground(Color.WHITE);
-		list.setBorder(new LineBorder(Color.BLACK));
-		listaContactos = new DefaultListModel<>();
-		actualizarListaContactos();
-		list.setCellRenderer(new ContactoRenderer());
-		list.setModel(listaContactos);
-		return list;
-	}
-
+	
 	private JButton inicializacionBotonContacto() {
 		JButton btnContacto = new JButton("Añadir Contacto");
 		btnContacto.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -157,10 +179,22 @@ public class ListaContactos extends JDialog implements TDSObserver {
 	}
 
 	private void actualizarListaContactos() {
-		listaContactos.clear();
+		actualizarListaIndividual();
+		actualizarListaGrupos();
+	}
+	private void actualizarListaIndividual() {
+		listaContactosIndividuales.clear();
 		List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactosIndividuales();
 		for (Contacto contacto : contactos) {
-			listaContactos.addElement(contacto);
+			listaContactosIndividuales.addElement(contacto);
+		}
+	}
+	
+	private void actualizarListaGrupos() {
+		listaContactosGrupos.clear();
+		List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactosGrupo();
+		for (Contacto contacto : contactos) {
+			listaContactosGrupos.addElement(contacto);
 		}
 	}
 

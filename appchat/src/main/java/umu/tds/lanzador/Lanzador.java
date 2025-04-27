@@ -35,7 +35,7 @@ public class Lanzador {
 					"jesus@appchat.com",
 					"4321",
 					"Hola soy Jesús, estoy usando App Chat!", 
-					new URL("https://e7.pngegg.com/pngimages/1013/301/png-clipart-luigi-illustration-super-mario-bros-new-super-mario-bros-luigi-luigi-super-mario-bros-hand-thumbnail.png")
+					new URL("https://static.wikia.nocookie.net/las-aventuras-de-super-mario-bros-3/images/6/6d/Luigi.png/revision/latest?cb=20151118165038&path-prefix=es")
 					);
 			System.out.println("[DEBUG Lanzador registro]: Se han registrado a los integrantes del grupo.");
 		} catch (MalformedURLException e) {
@@ -46,20 +46,12 @@ public class Lanzador {
 
 	public static void main(final String[] args){
 		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					if (CatalogoUsuarios.getInstancia().getUsuario("123456789")==null) registro();
-					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-				    Login window = new Login();
-					window.setVisible(true);
-					window.setLocationRelativeTo(null);
-					
-				} catch (Exception e) {				
-					e.printStackTrace();
-				}
-			}
-		});
+		try {
+			registro();
+			
+		} catch (Exception e) {				
+			e.printStackTrace();
+		}
 	}
 	
 }

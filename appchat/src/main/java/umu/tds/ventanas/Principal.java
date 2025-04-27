@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.utils.Estado;
@@ -474,9 +475,17 @@ public class Principal extends JFrame implements TDSObserver {
                 
                 if (value instanceof Contacto) {
                     Contacto c = (Contacto) value;
-                    setText("🔸 " + c.getNombre()); // o cualquier otro formato
+                    if(c.getTipoContacto() == TipoContacto.INDIVIDUAL)
+                    	setText("🔸 " + c.getNombre()); // o cualquier otro formato
+                    else
+                    	setText("G🔸 " + c.getNombre());
                 } else {
-                    setText(value.toString()); // para el placeholder
+                	if (value != null) {
+                	    setText(value.toString());
+                	} else {
+                	    setText(""); // o "Seleccionar..." si quieres mostrar algo por defecto
+                	}
+                    //setText(value.toString()); // para el placeholder
                 }
                 return this;
             }

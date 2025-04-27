@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
@@ -226,7 +229,7 @@ public class AppChat extends TDSObservable{
 		}
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Se registra el contacto y se modifica el usuario.");
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Usuario asociado: " + usuarioAsociado);
-		ContactoIndividual contacto = this.sesionUsuario.recuperarContacto(telefono);
+		ContactoIndividual contacto = this.sesionUsuario.recuperarContactoIndividual(telefono);
 		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto:" + contacto);
 		
 		setChanged(Estado.INFO_CONTACTO);
@@ -238,6 +241,52 @@ public class AppChat extends TDSObservable{
 	    return 1;
 
 	}
+	
+	
+	public int nuevoGrupo(String nombre, URL urlImagen) {
+	    // Primero comprobamos si ya existe un grupo con ese nombre
+	    if (this.sesionUsuario.recuperarGrupo(nombre) != null) {
+	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Ya existe un grupo con ese nombre.");
+	        return 0; // 0 significa que ya existe
+	    }
+
+	    // Si no existe, seguimos
+	    Image imagen = getImagen(urlImagen);
+	    if (imagen != null) {
+	        // Crear directorio si no existe
+	        File directorioBase = new File(DIRECTORIO_IMAGENES_USUARIO + "\\" + getTelefonoUsuario());
+	        if (!directorioBase.exists()) {
+	            directorioBase.mkdir();
+	        }
+
+	        // Guardar la imagen del grupo
+	        File imagenGrupo = new File(directorioBase, "Grupo-" + nombre + "-" + getTelefonoUsuario() + ".png");
+	        try {
+	            ImageIO.write((RenderedImage) imagen, "png", imagenGrupo);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+
+	        // Crear el grupo y registrarlo
+	        
+	        this.sesionUsuario.crearGrupo(nombre, urlImagen);
+	        Grupo grupo = this.sesionUsuario.recuperarGrupo(nombre);
+
+	        // Notificar cambios
+	        setChanged(Estado.INFO_CONTACTO);
+	        contactoDAO.registrarContacto(grupo);
+	        usuarioDAO.modificarUsuario(sesionUsuario);
+
+	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Se notifica a los observadores de añadir grupo.");
+	        notifyObservers(Estado.INFO_CONTACTO);
+	        
+	        return 1; // 1 significa creado correctamente
+	    } else {
+	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Imagen no válida.");
+	        return -1; // Imagen inválida
+	    }
+	}
+
 	
 	public List<Contacto> obtenerListaContactos(){
 		//REVISAR: Sorted falla
@@ -290,12 +339,17 @@ public class AppChat extends TDSObservable{
 		};
 		return Arrays.asList(values);
 		*/
-		List<Mensaje> chat = this.sesionUsuario.getChatMensaje(((ContactoIndividual) contacto).getUsuario());
-		int i = 0;
-		for(Mensaje m : chat) {
-			System.out.println("Lista Mensajes " + i + " : " + m);
-		}
-		return chat;
+		if(contacto instanceof ContactoIndividual) {
+			List<Mensaje> chat = this.sesionUsuario.getChatMensaje(((ContactoIndividual) contacto).getUsuario());
+			int i = 0;
+			for(Mensaje m : chat) {
+				System.out.println("Lista Mensajes " + i + " : " + m);
+			}
+			return chat;
+		} else
+			return new LinkedList<Mensaje>();
+		
+		
 	}
 	
 	public void enviarMensaje(Contacto contacto, String texto) {

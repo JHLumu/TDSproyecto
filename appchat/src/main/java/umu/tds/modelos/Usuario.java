@@ -180,7 +180,7 @@ public class Usuario {
 			return this.listaContactos.add(contacto);
 			
 		}
-		
+		/*
 		public ContactoIndividual recuperarContacto(String telefono) {
 			ContactoIndividual contacto = null;
 			for (Contacto c : this.listaContactos) {
@@ -191,9 +191,39 @@ public class Usuario {
 			System.out.println("es que no puedo MAS JAJSAJSAJSJASJA" + contacto.getNombre());
 			return contacto;
 		}
-		
+		*/
+		public ContactoIndividual recuperarContactoIndividual(String telefono) {
+		    for (Contacto contacto : this.listaContactos) {
+		        if (contacto.getTipoContacto() == TipoContacto.INDIVIDUAL) {
+		            ContactoIndividual individual = (ContactoIndividual) contacto;
+		            if (individual.getTelefono().equals(telefono)) {
+		                System.out.println("[DEBUG recuperarContactoIndividual]: Contacto Individual encontrado: " + individual.getNombre());
+		                return individual;
+		            }
+		        }
+		    }
+		    System.out.println("[DEBUG recuperarContactoIndividual]: No se encontró contacto individual con teléfono: " + telefono);
+		    return null;
+		}
+
+		public Grupo recuperarGrupo(String nombre) {
+		    for (Contacto contacto : this.listaContactos) {
+		        if (contacto.getTipoContacto() == TipoContacto.GRUPO) {
+		            Grupo grupo = (Grupo) contacto;
+		            if (grupo.getNombre().equals(nombre)) {
+		                System.out.println("[DEBUG recuperarGrupo]: Grupo encontrado: " + grupo.getNombre());
+		                return grupo;
+		            }
+		        }
+		    }
+		    System.out.println("[DEBUG recuperarGrupo]: No se encontró grupo con nombre: " + nombre);
+		    return null;
+		}
+
+
 		public boolean crearGrupo(String nombre, URL imagen) {
-			return (this.listaContactos.add(new Grupo(nombre, imagen)));
+			Grupo contacto = new Grupo(nombre, imagen, this.telefono);
+			return this.listaContactos.add(contacto);
 		}
 		
 		public boolean crearGrupo(String nombre) {
