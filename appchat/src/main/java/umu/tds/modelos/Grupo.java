@@ -62,4 +62,9 @@ public class Grupo extends Contacto {
     public TipoContacto getTipoContacto() {
         return TipoContacto.GRUPO;
     }
+
+	public void eliminarMiembro(ContactoIndividual c) {
+		// TODO Auto-generated method stub
+		this.miembros.remove(c);
+	}
 }

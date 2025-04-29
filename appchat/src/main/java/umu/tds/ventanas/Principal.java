@@ -401,25 +401,19 @@ public class Principal extends JFrame implements TDSObserver {
 		listaContactosLista = new DefaultListModel<>();
 		actualizarListaContactosMensajes();
 		listaPanelChat.setModel(listaContactosLista);
-		listaPanelChat.addListSelectionListener(e -> {
-		    if (!e.getValueIsAdjusting()) { // Para evitar dobles eventos
-		        Contacto seleccionado = listaPanelChat.getSelectedValue();
-		        
-		        if(seleccionado instanceof Contacto && seleccionado != null){
-		        	this.seleccionPanel = false;
-		            actualizarPanelChat(seleccionado);
-		        }
-		    }
-		});
 		listaPanelChat.addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseClicked(MouseEvent e) {
-		    	Contacto seleccionado = listaPanelChat.getSelectedValue();
-		        
-		        if(seleccionado instanceof Contacto && seleccionado != null){
-		        	Principal.this.seleccionPanel = false;
-		            actualizarPanelChat(seleccionado);
+		    	int index = listaPanelChat.locationToIndex(e.getPoint());
+		        if (index != -1) {
+		        	Contacto seleccionado = listaPanelChat.getSelectedValue();
+			        
+			        if(seleccionado instanceof Contacto && seleccionado != null){
+			        	Principal.this.seleccionPanel = false;
+			            actualizarPanelChat(seleccionado);
+			        }
 		        }
+		    	
 		    }
 		});
 		
@@ -513,8 +507,8 @@ public class Principal extends JFrame implements TDSObserver {
 
         List<Mensaje> mensajes = controlador.obtenerChatContacto(contacto);
         this.chat.removeAll();
-        BubbleText bubble = null;
-
+        BubbleText bubble;
+  
         for (Mensaje mensaje : mensajes) {
             String texto = mensaje.getTexto();
             String autor = mensaje.getEmisor().getNombre();
@@ -530,7 +524,6 @@ public class Principal extends JFrame implements TDSObserver {
         }
 
         // 4. Refrescar el panel
-        
         this.chat.revalidate();
         this.chat.repaint();
     }

@@ -1,6 +1,9 @@
 package umu.tds.ventanas;
 
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -12,6 +15,7 @@ import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoRenderer;
+import umu.tds.modelos.Grupo;
 
 public class ListaContactos extends JDialog implements TDSObserver {
 
@@ -118,6 +122,22 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		actualizarListaGrupos();
 		listaGrupos.setCellRenderer(new ContactoRenderer());
 		listaGrupos.setModel(listaContactosGrupos);
+		listaGrupos.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		    	int index = listaGrupos.locationToIndex(e.getPoint());
+		        if (index != -1) {
+			    	Contacto seleccionado = listaGrupos.getSelectedValue();
+			        
+			        if(seleccionado instanceof Grupo && seleccionado != null){
+			        	GestionarGrupo frame = new GestionarGrupo(seleccionado);
+						frame.setModal(true);
+						frame.setVisible(true);
+						frame.setLocationRelativeTo(null);
+			        }
+		        }
+		    }
+		});
 		return listaGrupos;
 	}
 

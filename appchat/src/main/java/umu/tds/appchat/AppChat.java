@@ -445,6 +445,37 @@ public class AppChat extends TDSObservable{
 		else
 			return null;
 	}
+
+	public List<Contacto> obtenerListaMiembrosGrupo(Grupo grupo) {
+		
+		return grupo.getMiembros();
+	}
+
+	public void nuevoMiembroGrupo(Grupo grupo, Contacto seleccionado) {
+		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
+		System.out.println("\n[DEBUG Controlador nuevoMiembro]: Miembro -> " + seleccionado);
+		ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(((ContactoIndividual) seleccionado).getTelefono());
+		recuperado.nuevoMiembro(miembro);
+		setChanged(Estado.INFO_CONTACTO);
+		contactoDAO.modificarContacto(recuperado);
+		usuarioDAO.modificarUsuario(sesionUsuario);
+		// Notificar a los observadores sobre el nuevo contacto
+		System.out.println("\n[DEBUG Controlador nuevoMiembro]: Se notifica a los observadores de añadir miembro.");
+		notifyObservers(Estado.INFO_CONTACTO);   
+	}
+
+	public void eliminarMiembroGrupo(Grupo grupo, Contacto seleccionado) {
+		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
+		System.out.println("\n[DEBUG Controlador eliminarMiembro]: Miembro -> " + seleccionado);
+		ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(((ContactoIndividual) seleccionado).getTelefono());
+		recuperado.eliminarMiembro(miembro);
+		setChanged(Estado.INFO_CONTACTO);
+		contactoDAO.modificarContacto(recuperado);
+		usuarioDAO.modificarUsuario(sesionUsuario);
+		// Notificar a los observadores sobre el nuevo contacto
+		System.out.println("\n[DEBUG Controlador eliminarMiembro]: Se notifica a los observadores de eliminar miembro.");
+		notifyObservers(Estado.INFO_CONTACTO);   
+	}
 	
 
 	
