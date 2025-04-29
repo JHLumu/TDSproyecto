@@ -46,31 +46,33 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Contacto
         // Set the text fields
     	nombreLabel.setText(contacto.getNombre());
     	
-    	// Si es un ContactoIndividual, mostrar el número de teléfono
-    	if (contacto instanceof ContactoIndividual) {
-    	    String mensaje = controlador.getUltimoMensajeContacto(contacto);
-    	    this.mensaje.setText(mensaje);
-    	}
+	    String mensaje = controlador.getUltimoMensajeContacto(contacto);
+	    this.mensaje.setText(mensaje);
 
     	try {
-    		File fileImagenContacto;
+    		File fileImagenContacto = null;
+    		
     	    if(contacto instanceof ContactoIndividual) {
+    	    	
 	    		ContactoIndividual contactoIndividual = (ContactoIndividual) contacto;
 	    		//Incumple el patron de responsabilidad
+	    		if(controlador.esContacto(contacto))
 	    		fileImagenContacto = new File("imagenesUsuarios", contactoIndividual.getUsuario().getNombre()+"-"+ contactoIndividual.getTelefono()+".png");
 	    	} else {
 	    		Grupo contactoGrupo = (Grupo) contacto;
 	    		//Incumple el patron de responsabilidad
-	    		fileImagenContacto = new File("imagenesUsuarios\\"+controlador.getTelefonoUsuario(), "Grupo-" + contactoGrupo.getNombre()+"-"+ contactoGrupo.getAnfitrion() + ".png");
+	    		fileImagenContacto = controlador.getGrupoFoto(contactoGrupo);
 	    	
 	    	}
-    		if (fileImagenContacto.exists()) {
+    	    
+    		if (fileImagenContacto != null &&  fileImagenContacto.exists()) {
     			Image localImage = ImageIO.read(fileImagenContacto);
     			imageLabel.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
     		}
     		
     		//Se obtiene la carpeta con las imágenes de los contacto
     		else {
+    			
     	    	System.out.println("[DEBUG MensajeRenderer getListCellRendererComponent]: Usando ícono predeterminado para: " + contacto.getNombre());
     	        // Si no existe imagen local, usar un ícono predeterminado
     	        imageLabel.setIcon(new ImageIcon(ContactoRenderer.class.getResource("/resources/usuario_64.png")));

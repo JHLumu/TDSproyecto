@@ -69,7 +69,7 @@ public abstract class Contacto implements Comparable<Contacto> {
             return Objects.equals(((ContactoIndividual) this).getUsuario().getTelefono(),
                     ((ContactoIndividual) contacto).getUsuario().getTelefono());
         } else if (this instanceof Grupo && contacto instanceof Grupo) {
-            return Objects.equals(this.nombre, contacto.nombre);
+            return Objects.equals(this.nombre, contacto.nombre) && Objects.equals(((Grupo)this).getAnfitrion(), ((Grupo) contacto).getAnfitrion()) ;
         }
 
         return false;

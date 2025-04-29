@@ -254,61 +254,56 @@ public class Usuario {
 	       //Agregar el mensaje a la lista de mensajes enviados
 			this.mensajesRecibidos.add(mensaje);
 	    }
-	    public List<Mensaje> getChatMensaje(Usuario otroUsuario) {
-	        //Uso de streams. Recupera aquellos mensajes
-	    	List<Mensaje> aux = Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
-	    			.flatMap(mensajes -> mensajes.stream()
-	    					.filter(msg -> msg.getEmisor().equals(otroUsuario) || msg.getReceptor().equals(otroUsuario)))
-	    			.sorted()
-	    			.collect(Collectors.toList());
-	    	int i = 0;
-			for(Mensaje m : aux) {
-				System.out.println("Lista Mensajes filtrado " + i + " : " + m);
-			}
-	    	return aux;
-	    	
+	    
+	    public List<Mensaje> getChatMensaje(Contacto contacto) {
+	    	List<Mensaje> mensajes = new LinkedList<Mensaje>();
+
+	        if (contacto instanceof ContactoIndividual) {
+	            return mensajes = getMensajesIndividual((ContactoIndividual) contacto);
+	        } else if (contacto instanceof Grupo) {
+	            return mensajes = getMensajesGrupo((Grupo) contacto);
+	        }
+			return mensajes; 
 	    	
 	    }
 	    
-	    public Mensaje getUltimoChatMensaje(Usuario otroUsuario) {
-	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
-	                .flatMap(mensajes -> mensajes.stream()
-	                        .filter(msg -> msg.getEmisor().equals(otroUsuario) || msg.getReceptor().equals(otroUsuario)))
+	    public Mensaje getUltimoChatMensaje(Contacto contacto) {
+	        List<Mensaje> mensajesFiltrados;
+
+	        if (contacto instanceof ContactoIndividual) {
+	            mensajesFiltrados = getMensajesIndividual((ContactoIndividual) contacto);
+	        } else if (contacto instanceof Grupo) {
+	            mensajesFiltrados = getMensajesGrupo((Grupo) contacto);
+	        } else {
+	            return null;
+	        }
+
+	        return mensajesFiltrados.stream()
 	                .max(Comparator.naturalOrder()) // Asumiendo que Mensaje implementa Comparable por fecha
 	                .orElse(null);
 	    }
 
-	    public List<Contacto> getListaContactosConMensajes() {
-	    	List<Contacto> contactos = this.listaContactos;
-	    	// Usuarios que ya están en la lista de contactos
-	        Set<Usuario> usuariosEnContactos = contactos.stream()
-	                .filter(c -> c instanceof ContactoIndividual) // Solo ContactoIndividual tiene Usuario
-	                .map(c -> ((ContactoIndividual) c).getUsuario())
-	                .collect(Collectors.toSet());
-
-	        // Usuarios con los que he chateado pero no son contactos, ni soy yo
-	        Set<Usuario> nuevosUsuarios = Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+	    private List<Mensaje> getMensajesGrupo(Grupo contacto) {
+	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
 	                .flatMap(List::stream)
-	                .flatMap(msg -> Stream.of(msg.getEmisor(), msg.getReceptor()))
-	                .filter(usuario -> !usuariosEnContactos.contains(usuario))
-	                .filter(usuario -> !usuario.equals(this))
-	                .collect(Collectors.toSet());
-
-	        // Crear nuevos ContactoIndividual para esos usuarios
-	        List<Contacto> nuevosContactos = nuevosUsuarios.stream()
-	                .map(usuario -> new ContactoIndividual(usuario.getTelefono(), usuario)) // Nombre = teléfono
+	                .filter(msg -> msg.getIDGrupo() != -1)
+	                .filter(msg -> msg.getGrupo().equals(contacto))
+	                .sorted()
 	                .collect(Collectors.toList());
-
-	        // Crear nueva lista combinando existentes + nuevos
-	        List<Contacto> todosLosContactos = new ArrayList<>(contactos);
-	        todosLosContactos.addAll(nuevosContactos);
-
-	        return todosLosContactos;
 	    }
 
-
-	
-		
+	    private List<Mensaje> getMensajesIndividual(ContactoIndividual contacto) {
+	        Usuario otroUsuario = contacto.getUsuario();
+	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+	                .flatMap(List::stream)
+	                .filter(msg -> msg.getIDGrupo() == -1)
+	                .filter(msg ->
+	                    (msg.getEmisor().equals(this) && msg.getReceptor().equals(otroUsuario)) ||
+	                    (msg.getReceptor().equals(this) && msg.getEmisor().equals(otroUsuario))
+	                )
+	                .sorted()
+	                .collect(Collectors.toList());
+	    }
 		
 		public List<Mensaje> getMensajesRecibidos() {
 			return new LinkedList<Mensaje>(this.mensajesRecibidos);
@@ -332,6 +327,87 @@ public class Usuario {
 		
 		
 		public void setListaContacto(List<Contacto> lista) {this.listaContactos = new LinkedList<Contacto>(lista);}
+		
+		
+	
+		public List<Contacto> getListaContactosConMensajes() {
+		    Set<Usuario> usuariosConMensajes = obtenerUsuariosConMensajesIndividuales(); // solo individuales
+		    Set<Grupo> gruposConMensajes = obtenerGruposConMensajes(); // solo grupos
+
+		    List<Contacto> contactosIndividuales = obtenerContactosIndividualesConMensajes(usuariosConMensajes);
+		    List<Contacto> nuevosContactos = crearContactosIndividualesNuevos(usuariosConMensajes, contactosIndividuales);
+
+		    List<Contacto> gruposExistentes = obtenerGruposExistentesConMensajes(gruposConMensajes);
+		    List<Contacto> nuevosGrupos = crearGruposNuevos(gruposConMensajes, gruposExistentes);
+
+		    List<Contacto> todosLosContactos = new ArrayList<>();
+		    todosLosContactos.addAll(contactosIndividuales);
+		    todosLosContactos.addAll(nuevosContactos);
+		    todosLosContactos.addAll(gruposExistentes);
+		    todosLosContactos.addAll(nuevosGrupos);
+
+		    return todosLosContactos;
+		}
+
+		private Set<Usuario> obtenerUsuariosConMensajesIndividuales() {
+			return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+		            .flatMap(List::stream)
+		            .filter(msg -> msg.getIDGrupo() == -1)
+		            .flatMap(msg -> {
+		                Usuario emisor = msg.getEmisor();
+		                Usuario receptor = msg.getReceptor();
+		                if (emisor.equals(this)) return Stream.of(receptor);
+		                else return Stream.of(emisor);
+		            })
+		            .collect(Collectors.toSet());
+		}
+
+		private Set<Grupo> obtenerGruposConMensajes() {
+		    return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+		            .flatMap(List::stream)
+		            .filter(msg -> msg.getIDGrupo() != -1)
+		            .map(Mensaje::getGrupo)
+		            .filter(Objects::nonNull)
+		            .collect(Collectors.toSet());
+		}
+
+		private List<Contacto> obtenerContactosIndividualesConMensajes(Set<Usuario> usuariosConMensajes) {
+		    return this.listaContactos.stream()
+		            .filter(c -> c instanceof ContactoIndividual)
+		            .filter(c -> usuariosConMensajes.contains(((ContactoIndividual) c).getUsuario()))
+		            .collect(Collectors.toList());
+		}
+
+		private List<Contacto> crearContactosIndividualesNuevos(Set<Usuario> usuariosConMensajes, List<Contacto> existentes) {
+		    Set<Usuario> usuariosExistentes = existentes.stream()
+		            .map(c -> ((ContactoIndividual) c).getUsuario())
+		            .collect(Collectors.toSet());
+
+		    return usuariosConMensajes.stream()
+		            .filter(u -> !usuariosExistentes.contains(u))
+		            .map(u -> new ContactoIndividual(u.getTelefono(), u))
+		            .collect(Collectors.toList());
+		}
+
+		private List<Contacto> obtenerGruposExistentesConMensajes(Set<Grupo> gruposConMensajes) {
+		    return this.listaContactos.stream()
+		            .filter(c -> c instanceof Grupo)
+		            .filter(c -> gruposConMensajes.contains((Grupo) c))
+		            .collect(Collectors.toList());
+		}
+
+		private List<Contacto> crearGruposNuevos(Set<Grupo> gruposConMensajes, List<Contacto> existentes) {
+		    Set<Grupo> gruposExistentes = existentes.stream()
+		            .map(c -> (Grupo) c)
+		            .collect(Collectors.toSet());
+
+		    return gruposConMensajes.stream()
+		            .filter(g -> !gruposExistentes.contains(g))
+		            .collect(Collectors.toList());
+		}
+		
+		
+
 
 	    public static class BuilderUsuario {
 	    	//Atributos, iguales que la clase Usuario

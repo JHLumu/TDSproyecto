@@ -13,6 +13,7 @@ public class Mensaje implements Comparable<Mensaje>{
 	private final Usuario emisor;
 	private final Usuario receptor;
 	private LocalDateTime fechaEnvio;
+	private final Grupo grupo;
 	
 	//A
 		
@@ -26,12 +27,13 @@ public class Mensaje implements Comparable<Mensaje>{
 	 * @param contenido el contenido del mensaje
 	 *
 	 */
-	public Mensaje(Usuario emisor, Usuario receptor, String texto) {
+	public Mensaje(Usuario emisor, Usuario receptor, String texto, Grupo grupo) {
 		this.texto = texto;
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.fechaEnvio = LocalDateTime.now();
 		this.codigo = 0;
+		this.grupo = grupo;
 	}
 	
 	
@@ -43,12 +45,13 @@ public class Mensaje implements Comparable<Mensaje>{
 	 * @param contenido el contenido del mensaje
 	 *
 	 */
-	public Mensaje(Usuario emisor, Usuario receptor, ImageIcon emoticono) {
-		this(emisor,receptor, "");
+	public Mensaje(Usuario emisor, Usuario receptor, ImageIcon emoticono, Grupo grupo) {
+		this(emisor,receptor, "", grupo);
 		this.emoticono = emoticono;
 	}
 
-//Metodos getter y setter
+
+	//Metodos getter y setter
 	public String getTexto() {
 		return texto;
 	}
@@ -100,21 +103,23 @@ public class Mensaje implements Comparable<Mensaje>{
 		return emisor.getNombre() + " " + receptor.getNombre() + " " + texto + " Emoticono: " + (emoticono == null ? "false" : "true") + " " + fechaEnvio;
 	}
 
-
-	@Override
 	//Un mensaje A va despues de un mensaje B si A ha ocurrido despues de B.
+	@Override
 	public int compareTo(Mensaje o) {
-		
-		if (this.fechaEnvio.isAfter(o.getFechaEnvio())) 
-			
-			return 1;
-		
-		else if (this.fechaEnvio.isEqual(o.getFechaEnvio())) {
-			
-			return 0;
-		}
-		
-		else return -1;
+	    return this.fechaEnvio.compareTo(o.getFechaEnvio());
+	}
+
+
+
+	public int getIDGrupo() {
+		if(grupo!= null)
+			return this.grupo.getCodigo();
+		else
+			return -1;
+	}
+	
+	public Grupo getGrupo() {
+		return this.grupo;
 	}
 
 

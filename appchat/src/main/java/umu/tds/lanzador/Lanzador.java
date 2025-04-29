@@ -37,6 +37,16 @@ public class Lanzador {
 					"Hola soy Jesús, estoy usando App Chat!", 
 					new URL("https://static.wikia.nocookie.net/las-aventuras-de-super-mario-bros-3/images/6/6d/Luigi.png/revision/latest?cb=20151118165038&path-prefix=es")
 					);
+			AppChat.getInstancia().registrarUsuario(
+					"Jose Luis", 
+					"Martinez", 
+					"123454321", 
+					LocalDate.of(2004, 7, 22),
+					"josel@appchat.com",
+					"1234",
+					"Hola soy Jose Luis, estoy usando App Chat!", 
+					new URL("https://e7.pngegg.com/pngimages/80/18/png-clipart-nintendo-bowser-illustration-super-mario-bros-bowser-mario-sonic-at-the-olympic-winter-games-bowser-heroes-super-mario-bros.png")
+					);
 			System.out.println("[DEBUG Lanzador registro]: Se han registrado a los integrantes del grupo.");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

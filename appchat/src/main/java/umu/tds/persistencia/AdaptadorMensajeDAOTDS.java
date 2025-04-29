@@ -11,6 +11,7 @@ import beans.Entidad;
 import beans.Propiedad;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
+import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 
@@ -51,7 +52,8 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 				new Propiedad("emoticono", (mensaje.getEmoticono() != null) ? mensaje.getEmoticono().toString() : ""),
 				new Propiedad("emisor", String.valueOf(mensaje.getEmisor().getCodigo())),
 				new Propiedad("receptor", String.valueOf(mensaje.getReceptor().getCodigo())),
-				new Propiedad("fecha", mensaje.getFechaEnvio().toString())
+				new Propiedad("fecha", mensaje.getFechaEnvio().toString()),
+				new Propiedad("grupo", String.valueOf(mensaje.getIDGrupo()))
 				));
 		eMensaje.setPropiedades(propiedades);
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
@@ -82,6 +84,9 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		String emoticonoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emoticono");
 		ImageIcon emoticono = null;
 		
+		String grupoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "grupo");
+		Grupo grupo = (Grupo) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.parseInt(grupoString));
+		
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "fecha");
 		LocalDateTime fecha = null ;
 		
@@ -93,11 +98,11 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 			
 			emoticono = new ImageIcon(emoticonoString);
 			
-			mensaje = new Mensaje(emisor, receptor, emoticono);
+			mensaje = new Mensaje(emisor, receptor, emoticono, grupo);
 			
 		} else {
 			
-			mensaje = new Mensaje(emisor, receptor, texto);
+			mensaje = new Mensaje(emisor, receptor, texto, grupo);
 
 		}
 		

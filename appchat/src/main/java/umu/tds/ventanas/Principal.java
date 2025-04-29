@@ -14,6 +14,8 @@ import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Contacto.TipoContacto;
+import umu.tds.modelos.ContactoIndividual;
+import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeRenderer;
 import umu.tds.utils.Estado;
@@ -21,7 +23,6 @@ import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JButton;
@@ -38,7 +39,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
@@ -349,20 +349,15 @@ public class Principal extends JFrame implements TDSObserver {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Contacto contacto = null;
-				if(seleccionPanel) {
-					if(comboBoxContactos.getSelectedIndex() != 0) {
-						contacto = (Contacto) comboBoxContactos.getSelectedItem();
-						controlador.enviarMensaje(contacto, textArea.getText());
-						actualizarPanelChat(contacto);
-					}
-					
+				if(seleccionPanel && (comboBoxContactos.getSelectedIndex() != 0)) {
+					contacto = (Contacto) comboBoxContactos.getSelectedItem();	
 				}				
 				else {
 					contacto = listaPanelChat.getSelectedValue();
-					controlador.enviarMensaje(contacto, textArea.getText());
-					actualizarPanelChat(contacto);
 				}
-
+				if(controlador.enviarMensaje(contacto, textArea.getText()));
+				actualizarPanelChat(contacto);
+				actualizarListaContactosMensajes();
 				textArea.setText("");
 			}
 		});
@@ -504,23 +499,12 @@ public class Principal extends JFrame implements TDSObserver {
         this.repaint();
     }
     private void actualizarPanelChat(Contacto contacto) {
-
-        List<Mensaje> mensajes = controlador.obtenerChatContacto(contacto);
         this.chat.removeAll();
-        BubbleText bubble;
+        List<BubbleText> burbujas = controlador.pintarMensajesBurbuja(contacto, this.chat);
   
-        for (Mensaje mensaje : mensajes) {
-            String texto = mensaje.getTexto();
-            String autor = mensaje.getEmisor().getNombre();
-            
-            
+        for (BubbleText burbuja : burbujas) {
 
-            if (mensaje.getEmisor().getTelefono().equals(controlador.getTelefonoUsuario())) {
-                bubble = new BubbleText(this.chat, texto, Color.white, autor, BubbleText.SENT, 14);
-            } else {
-                bubble = new BubbleText(this.chat, texto, Color.blue, contacto.getNombre(), BubbleText.RECEIVED, 14);
-            }
-            this.chat.add(bubble);
+            this.chat.add(burbuja);
         }
 
         // 4. Refrescar el panel

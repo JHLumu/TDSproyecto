@@ -39,17 +39,17 @@ public class Grupo extends Contacto {
     // Redefinición de equals y hashCode
     @Override
     public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (this.getClass() != o.getClass()) return false;
+        if (this == o) return true;              // misma referencia
+        if (!(o instanceof Grupo)) return false; // null o distinto tipo
 
-        Grupo grupo = (Grupo) o;
-        return this.getNombre().equals(grupo.getNombre());
+        Grupo otro = (Grupo) o;
+        return Objects.equals(this.getNombre(), otro.getNombre())
+            && Objects.equals(this.getAnfitrion(), otro.getAnfitrion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getNombre());
+        return Objects.hash(this.getNombre(), anfitrion);
     }
 
     // Funcionalidad para agregar un nuevo miembro
