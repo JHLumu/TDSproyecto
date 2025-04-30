@@ -376,38 +376,82 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
-	public boolean enviarMensaje(Contacto contacto, String texto) {
-		if(contacto instanceof ContactoIndividual) {
-			Mensaje mensaje = new Mensaje(sesionUsuario, ((ContactoIndividual) contacto).getUsuario(), texto, null);
-			this.mensajeDAO.registrarMensaje(mensaje);
-			this.sesionUsuario.enviarMensaje(mensaje);
-			this.usuarioDAO.modificarUsuario(sesionUsuario);
-			Usuario receptor = ((ContactoIndividual) contacto).getUsuario();
-			receptor.recibirMensaje(mensaje);
-			this.usuarioDAO.modificarUsuario(receptor);
-			return true;
-		} else if (contacto instanceof Grupo && soyAnfitrion(contacto)){
-			List<Contacto> miembros = ((Grupo) contacto).getMiembros();
-			Mensaje mensaje = new Mensaje(sesionUsuario, sesionUsuario, texto, (Grupo) contacto);
-			this.mensajeDAO.registrarMensaje(mensaje);
-			this.sesionUsuario.enviarMensaje(mensaje);
-			this.usuarioDAO.modificarUsuario(sesionUsuario);
-			for(Contacto miembro : miembros) {
-				Usuario receptor = ((ContactoIndividual) miembro).getUsuario();
-				receptor.recibirMensaje(mensaje);
-				this.usuarioDAO.modificarUsuario(receptor);
-			}
-			return true;
-		} else {
-			System.out.println("Error envio :)");
-			return false;
+	public boolean enviarMensaje(Contacto contacto, Object entrada) {
+		if (!(entrada instanceof String || entrada instanceof Integer)) {
+	        System.out.println("Tipo de mensaje no soportado");
+	        return false;
+	    }
 
-		}
+	    if (contacto instanceof ContactoIndividual) {
+	        Usuario receptor = ((ContactoIndividual) contacto).getUsuario();
+	        Mensaje mensaje;
+
+	        // Crear mensaje según el tipo de entrada
+	        if (entrada instanceof String) {
+	            mensaje = new Mensaje(sesionUsuario, receptor, (String) entrada, null);
+	        } else {
+	            mensaje = new Mensaje(sesionUsuario, receptor, (Integer) entrada, null);
+	        }
+
+	        mensajeDAO.registrarMensaje(mensaje);
+	        sesionUsuario.enviarMensaje(mensaje);
+	        usuarioDAO.modificarUsuario(sesionUsuario);
+
+	        receptor.recibirMensaje(mensaje);
+	        usuarioDAO.modificarUsuario(receptor);
+
+	        return true;
+
+	    } else if (contacto instanceof Grupo) {
+	        Grupo grupo = (Grupo) contacto;
+	        Mensaje mensaje;
+	        
+	        if(soyAnfitrion(contacto)) {
+	        	List<Contacto> miembros = grupo.getMiembros();
+	        	if (entrada instanceof String) {
+		            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (String) entrada, grupo);
+		        } else {
+		            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (Integer) entrada, grupo);
+		        }
+
+		        mensajeDAO.registrarMensaje(mensaje);
+		        sesionUsuario.enviarMensaje(mensaje);
+		        usuarioDAO.modificarUsuario(sesionUsuario);
+
+		        for (Contacto miembro : miembros) {
+		            if (miembro instanceof ContactoIndividual) {
+		                Usuario receptor = ((ContactoIndividual) miembro).getUsuario();
+		                receptor.recibirMensaje(mensaje);
+		                usuarioDAO.modificarUsuario(receptor);
+		            }
+		        }
+
+		        return true;
+	        } else {
+	        	Usuario anfitrion = catalogoUsuarios.getUsuario(grupo.getAnfitrion());
+	        	if (entrada instanceof String) {
+		            mensaje = new Mensaje(sesionUsuario, anfitrion,(String) entrada, grupo);
+		        } else {
+		            mensaje = new Mensaje(sesionUsuario, anfitrion, (Integer) entrada, grupo);
+		        }
+
+		        mensajeDAO.registrarMensaje(mensaje);
+		        sesionUsuario.enviarMensaje(mensaje);
+		        usuarioDAO.modificarUsuario(sesionUsuario);
+		        anfitrion.recibirMensaje(mensaje);
+		        usuarioDAO.modificarUsuario(anfitrion);
+
+		        return true;
+	        }
+	        
+	    }
+
+	    System.out.println("Error en el envío");
+	    return false;
 	}
 	
 	private boolean soyAnfitrion(Contacto contacto) {
-		
-		return ((Grupo) contacto).getAnfitrion() == getTelefonoUsuario();
+		return ((Grupo) contacto).getAnfitrion().equals(getTelefonoUsuario());
 	}
 
 	public Image getImagen(Object urlObj) {
@@ -485,12 +529,15 @@ public class AppChat extends TDSObservable{
 		
 	}
 
-	public String getUltimoMensajeContacto(Contacto contacto) {
+	public Object getUltimoMensajeContacto(Contacto contacto) {
 		// TODO Auto-generated method stub
 		
 		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
 		if (m != null)
-			return m.getTexto();
+			if (!m.getTexto().isEmpty())
+				return m.getTexto();
+			else 
+				return m.getEmoticono();
 		else
 			return null;
 	}
@@ -532,43 +579,52 @@ public class AppChat extends TDSObservable{
 	}
 
 	public List<BubbleText> pintarMensajesBurbuja(Contacto contacto, JPanel chat) {
-		List<Mensaje> mensajes = obtenerChatContacto(contacto);
+	    List<Mensaje> mensajes = obtenerChatContacto(contacto);
 	    List<BubbleText> burbujas = new ArrayList<>();
-	    
+
 	    if (mensajes == null || mensajes.isEmpty()) {
 	        return burbujas;
 	    }
-	    
+
 	    String telefonoUsuario = getTelefonoUsuario();
-	    
+
 	    for (Mensaje mensaje : mensajes) {
-	        String texto = mensaje.getTexto();
+	        Object contenido = (mensaje.getEmoticono() == -1) ? mensaje.getTexto() : mensaje.getEmoticono();
+
+	        boolean esUsuario = mensaje.getEmisorTelf().equals(telefonoUsuario);
 	        String autor;
 	        int tipoMensaje;
-	        
-	        if (mensaje.getEmisor().getTelefono().equals(telefonoUsuario)) {
+
+	        if (esUsuario) {
 	            autor = getNombreUsuario();
+	            if (mensaje.getIDGrupo() != -1 && !mensaje.getReceptorTelf().equals(telefonoUsuario)) {
+	                autor += " <G> * " + mensaje.getNombreGrupo() + " *";
+	            }
 	            tipoMensaje = BubbleText.SENT;
 	        } else {
 	            if (contacto instanceof ContactoIndividual) {
 	                autor = contacto.getNombre();
+	                if (mensaje.getIDGrupo() != -1) {
+	                    autor += " <G> * " + mensaje.getNombreGrupo() + " *";
+	                }
 	            } else {
-	            	String telefonoAnfitrion = ((Grupo) contacto).getAnfitrion();
-	                ContactoIndividual anfitrion = this.sesionUsuario.recuperarContactoIndividual(telefonoAnfitrion);
-	            	if(anfitrion == null)
-	            		autor = telefonoAnfitrion;
-	            	else
-	            		autor = anfitrion.getNombre();
+	                String telefonoAnfitrion = ((Grupo) contacto).getAnfitrion();
+	                ContactoIndividual anfitrion = (ContactoIndividual) this.sesionUsuario.getAnfitrionConMensajes(telefonoAnfitrion);
+	                autor = (anfitrion != null) ? anfitrion.getNombre() : telefonoAnfitrion;
 	            }
 	            tipoMensaje = BubbleText.RECEIVED;
 	        }
-	        
-	        BubbleText bubble = new BubbleText(chat, texto, Color.WHITE, autor, tipoMensaje, 14);
+
+	        BubbleText bubble = (contenido instanceof String)
+	            ? new BubbleText(chat, (String) contenido, Color.WHITE, autor, tipoMensaje, 14)
+	            : new BubbleText(chat, (Integer) contenido, Color.WHITE, autor, tipoMensaje, 14);
+
 	        burbujas.add(bubble);
 	    }
-	    
+
 	    return burbujas;
 	}
+
 	
 
 	

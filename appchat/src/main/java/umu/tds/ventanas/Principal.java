@@ -7,7 +7,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
+import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
 
 import tds.BubbleText;
@@ -147,13 +147,18 @@ public class Principal extends JFrame implements TDSObserver {
 		    if (comboBoxContactos.getSelectedIndex() != 0) {
 		    	seleccionado = comboBoxContactos.getSelectedItem();
 		        actualizarPanelChat((Contacto) seleccionado);
+		        SwingUtilities.invokeLater(() -> {
+		            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		        });
 		    } else {
 		        // Es el placeholder, por ejemplo: "Contacto o Teléfono"
 		        // Podés limpiar el panel o no hacer nada
 		    	chat.removeAll();
 		    	chat.revalidate();
 		    	chat.repaint();
+		    	
 		    }
+		    
 		});
 		panelNorte.add(comboBoxContactos);
 		
@@ -304,13 +309,35 @@ public class Principal extends JFrame implements TDSObserver {
 		
 		emoticonoBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				TDSEmojiPanel emojiPanel = new TDSEmojiPanel();
 				JDialog emojiDialog = new JDialog();
 			    emojiDialog.setTitle("Select Emoji");
-			    emojiDialog.add(new TDSEmojiPanel(chat));
+			    emojiDialog.add(emojiPanel);
 			    emojiDialog.pack();
 			    emojiDialog.setLocationRelativeTo(null);
 			    emojiDialog.setModal(true);
 			    emojiDialog.setVisible(true);
+			    
+			    int selectedEmoji = emojiPanel.getSelectedEmojiId();
+		        if (selectedEmoji != -1) {
+		        	Contacto contacto = null;
+					if(seleccionPanel && (comboBoxContactos.getSelectedIndex() != 0)) {
+						contacto = (Contacto) comboBoxContactos.getSelectedItem();	
+					}				
+					else {
+						contacto = listaPanelChat.getSelectedValue();
+					}
+					if(controlador.enviarMensaje(contacto, selectedEmoji));
+					actualizarListaContactosMensajes();
+					actualizarPanelChat(contacto);
+					
+		        }
+		        SwingUtilities.invokeLater(() -> {
+				    JScrollBar vertical = scrollPane.getVerticalScrollBar();
+				    vertical.setValue(vertical.getMaximum());
+				});
+				textArea.setText("");
+			    
 				
 			}
 		});
@@ -324,7 +351,7 @@ public class Principal extends JFrame implements TDSObserver {
 		barraIntro.add(emoticonoBtn, gbc_Emoticono);
 		
 		textArea = new JTextArea(1, 30);
-		textArea.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+		textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		textArea.setPreferredSize(new Dimension(300, 30));
@@ -356,8 +383,13 @@ public class Principal extends JFrame implements TDSObserver {
 					contacto = listaPanelChat.getSelectedValue();
 				}
 				if(controlador.enviarMensaje(contacto, textArea.getText()));
-				actualizarPanelChat(contacto);
 				actualizarListaContactosMensajes();
+				actualizarPanelChat(contacto);
+
+				SwingUtilities.invokeLater(() -> {
+				    JScrollBar vertical = scrollPane.getVerticalScrollBar();
+				    vertical.setValue(vertical.getMaximum());
+				});
 				textArea.setText("");
 			}
 		});
@@ -406,6 +438,9 @@ public class Principal extends JFrame implements TDSObserver {
 			        if(seleccionado instanceof Contacto && seleccionado != null){
 			        	Principal.this.seleccionPanel = false;
 			            actualizarPanelChat(seleccionado);
+			            SwingUtilities.invokeLater(() -> {
+			                scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+			            });
 			        }
 		        }
 		    	
@@ -487,6 +522,7 @@ public class Principal extends JFrame implements TDSObserver {
     }
     
     private void actualizarListaContactosMensajes() {
+        Contacto seleccionado = listaPanelChat.getSelectedValue(); // Guardar selección actual
         
     	DefaultListModel<Contacto> modelolista = listaContactosLista;
         modelolista.removeAllElements();
@@ -494,6 +530,17 @@ public class Principal extends JFrame implements TDSObserver {
         for (Contacto contacto : this.controlador.obtenerListaChatMensajes()) {
             modelolista.addElement(contacto);
         }
+        
+     // Restaurar la selección si el contacto sigue existiendo en la nueva lista
+        if (seleccionado != null) {
+            for (int i = 0; i < modelolista.getSize(); i++) {
+                if (modelolista.getElementAt(i).equals(seleccionado)) {
+                    listaPanelChat.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        
         
         this.revalidate();
         this.repaint();

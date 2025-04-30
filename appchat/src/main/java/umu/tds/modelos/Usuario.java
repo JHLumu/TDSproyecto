@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -287,6 +288,7 @@ public class Usuario {
 	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
 	                .flatMap(List::stream)
 	                .filter(msg -> msg.getIDGrupo() != -1)
+	                .filter(msg -> msg.getEmisor().equals(msg.getReceptor()))
 	                .filter(msg -> msg.getGrupo().equals(contacto))
 	                .sorted()
 	                .collect(Collectors.toList());
@@ -296,7 +298,6 @@ public class Usuario {
 	        Usuario otroUsuario = contacto.getUsuario();
 	        return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
 	                .flatMap(List::stream)
-	                .filter(msg -> msg.getIDGrupo() == -1)
 	                .filter(msg ->
 	                    (msg.getEmisor().equals(this) && msg.getReceptor().equals(otroUsuario)) ||
 	                    (msg.getReceptor().equals(this) && msg.getEmisor().equals(otroUsuario))
@@ -345,6 +346,14 @@ public class Usuario {
 		    todosLosContactos.addAll(nuevosContactos);
 		    todosLosContactos.addAll(gruposExistentes);
 		    todosLosContactos.addAll(nuevosGrupos);
+		    
+		 // Ordenar por fecha del último mensaje
+		    todosLosContactos.sort((c1, c2) -> {
+		        LocalDateTime fecha1 = getUltimoChatMensaje(c1).getFechaEnvio();
+		        LocalDateTime fecha2 = getUltimoChatMensaje(c2).getFechaEnvio();
+		        // Orden descendente (más reciente primero)
+		        return fecha2.compareTo(fecha1);
+		    });
 
 		    return todosLosContactos;
 		}
@@ -459,6 +468,19 @@ public class Usuario {
 	    public int hashCode() {
 	        return Objects.hash(telefono);
 	    }
+
+		public Contacto getAnfitrionConMensajes(String telefonoAnfitrion) {
+			List<Contacto> contactos = getListaContactosConMensajes();
+			
+			for (Contacto contacto : contactos) {
+				
+		        if (contacto instanceof ContactoIndividual && ((ContactoIndividual) contacto).getTelefono().equals(telefonoAnfitrion)) {
+		            return contacto;
+		        }
+		    }
+
+		    return null; // Retorna null si no se encuentra el contacto
+		}
 		
 		
 }

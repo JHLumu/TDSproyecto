@@ -18,10 +18,10 @@ public class TDSEmojiPanel extends JPanel{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel parentChat;
+    private int selectedEmojiId = -1;
+
     
-    public TDSEmojiPanel(JPanel chatPanel) {
-        this.parentChat = chatPanel;
+    public TDSEmojiPanel() {
         setLayout(new GridLayout(4, 6, 5, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
@@ -36,23 +36,19 @@ public class TDSEmojiPanel extends JPanel{
 
             // añadir el elejido al padre
             emojiButton.addActionListener(e -> {
-                BubbleText burbuja = new BubbleText(
-                    parentChat, 
-                    emojiId, 
-                    Color.WHITE, 
-                    AppChat.getInstancia().getNombreUsuario(), 
-                    BubbleText.SENT, 
-                    14
-                );
-                parentChat.add(burbuja);
-                parentChat.revalidate();
-                parentChat.repaint();
-                
+                selectedEmojiId = emojiId; // ← Guardamos el ID
+
                 Window window = SwingUtilities.getWindowAncestor(TDSEmojiPanel.this);
-                window.dispose();
+                if (window != null) {
+                    window.dispose(); // Cerramos el diálogo
+                }
             });
             
             add(emojiButton);
         }
+    }
+    
+    public int getSelectedEmojiId() {
+        return selectedEmojiId;
     }
 }

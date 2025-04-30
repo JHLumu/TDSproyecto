@@ -9,7 +9,7 @@ public class Mensaje implements Comparable<Mensaje>{
 	//Atributos de la clase
 	private int codigo;
 	private String texto; 
-	private ImageIcon emoticono;
+	private int emoticono;
 	private final Usuario emisor;
 	private final Usuario receptor;
 	private LocalDateTime fechaEnvio;
@@ -34,6 +34,7 @@ public class Mensaje implements Comparable<Mensaje>{
 		this.fechaEnvio = LocalDateTime.now();
 		this.codigo = 0;
 		this.grupo = grupo;
+		this.emoticono = -1;
 	}
 	
 	
@@ -45,7 +46,7 @@ public class Mensaje implements Comparable<Mensaje>{
 	 * @param contenido el contenido del mensaje
 	 *
 	 */
-	public Mensaje(Usuario emisor, Usuario receptor, ImageIcon emoticono, Grupo grupo) {
+	public Mensaje(Usuario emisor, Usuario receptor, int emoticono, Grupo grupo) {
 		this(emisor,receptor, "", grupo);
 		this.emoticono = emoticono;
 	}
@@ -56,7 +57,7 @@ public class Mensaje implements Comparable<Mensaje>{
 		return texto;
 	}
 
-	public ImageIcon getEmoticono() {
+	public int getEmoticono() {
 		return emoticono;
 	}
 
@@ -100,7 +101,7 @@ public class Mensaje implements Comparable<Mensaje>{
 	
 	@Override
 	public String toString() {
-		return emisor.getNombre() + " " + receptor.getNombre() + " " + texto + " Emoticono: " + (emoticono == null ? "false" : "true") + " " + fechaEnvio;
+		return emisor.getNombre() + " " + receptor.getNombre() + " " + texto + " Emoticono: " + emoticono + " " + fechaEnvio;
 	}
 
 	//Un mensaje A va despues de un mensaje B si A ha ocurrido despues de B.
@@ -120,6 +121,16 @@ public class Mensaje implements Comparable<Mensaje>{
 	
 	public Grupo getGrupo() {
 		return this.grupo;
+	}
+	 
+	public String getNombreGrupo() {
+		return this.grupo.getNombre();
+	}
+
+
+	public Object getReceptorTelf() {
+		// TODO Auto-generated method stub
+		return this.receptor.getTelefono();
 	}
 
 

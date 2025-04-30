@@ -49,7 +49,7 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		ArrayList<Propiedad> propiedades = new ArrayList<Propiedad>();
 		propiedades.addAll(Arrays.asList(
 				new Propiedad("texto", mensaje.getTexto()),
-				new Propiedad("emoticono", (mensaje.getEmoticono() != null) ? mensaje.getEmoticono().toString() : ""),
+				new Propiedad("emoticono", String.valueOf(mensaje.getEmoticono())),
 				new Propiedad("emisor", String.valueOf(mensaje.getEmisor().getCodigo())),
 				new Propiedad("receptor", String.valueOf(mensaje.getReceptor().getCodigo())),
 				new Propiedad("fecha", mensaje.getFechaEnvio().toString()),
@@ -82,7 +82,7 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		Usuario receptor = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idReceptor));
 		
 		String emoticonoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emoticono");
-		ImageIcon emoticono = null;
+		int emoticono = Integer.parseInt(emoticonoString);
 		
 		String grupoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "grupo");
 		Grupo grupo = (Grupo) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.parseInt(grupoString));
@@ -95,8 +95,6 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		Mensaje mensaje = null;
 		
 		if (texto.isEmpty()) {
-			
-			emoticono = new ImageIcon(emoticonoString);
 			
 			mensaje = new Mensaje(emisor, receptor, emoticono, grupo);
 			

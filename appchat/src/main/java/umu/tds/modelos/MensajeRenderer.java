@@ -13,6 +13,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import tds.BubbleText;
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto.TipoContacto;
 
@@ -41,13 +42,21 @@ public class MensajeRenderer extends JPanel implements ListCellRenderer<Contacto
     @Override
     public Component getListCellRendererComponent(JList<? extends Contacto> list, Contacto contacto, int index,
             boolean isSelected, boolean cellHasFocus) {
-    	
+    	mensaje.setText(""); // Limpia texto anterior
+    	mensaje.setIcon(null); // Limpia ícono anterior
     	AppChat controlador = AppChat.getInstancia();
         // Set the text fields
     	nombreLabel.setText(contacto.getNombre());
     	
-	    String mensaje = controlador.getUltimoMensajeContacto(contacto);
-	    this.mensaje.setText(mensaje);
+	    Object mensaje = controlador.getUltimoMensajeContacto(contacto);
+	    if(mensaje instanceof String) {
+	    	this.mensaje.setText((String) mensaje);
+	    }
+	    else {
+	    	this.mensaje.setIcon(BubbleText.getEmoji((Integer) mensaje));
+	    }
+	    	
+
 
     	try {
     		File fileImagenContacto = null;
