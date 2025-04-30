@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -623,6 +624,19 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return burbujas;
+	}
+
+	public String getTelefonoContacto(Contacto seleccionado) {
+		
+		return seleccionado instanceof ContactoIndividual ? 
+				((ContactoIndividual) seleccionado).getTelefono() :
+				((Grupo) seleccionado).getAnfitrion()											
+			;
+	}
+
+	public LocalDateTime getUltimoMensajeFecha(Contacto contacto) {
+		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
+		return m.getFechaEnvio();
 	}
 
 	

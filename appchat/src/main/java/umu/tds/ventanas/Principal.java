@@ -431,19 +431,27 @@ public class Principal extends JFrame implements TDSObserver {
 		listaPanelChat.addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseClicked(MouseEvent e) {
-		    	int index = listaPanelChat.locationToIndex(e.getPoint());
+		        int index = listaPanelChat.locationToIndex(e.getPoint());
 		        if (index != -1) {
-		        	Contacto seleccionado = listaPanelChat.getSelectedValue();
-			        
-			        if(seleccionado instanceof Contacto && seleccionado != null){
-			        	Principal.this.seleccionPanel = false;
-			            actualizarPanelChat(seleccionado);
-			            SwingUtilities.invokeLater(() -> {
-			                scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-			            });
-			        }
+		            Contacto seleccionado = listaPanelChat.getSelectedValue();
+		            
+		            if(seleccionado instanceof Contacto && seleccionado != null){
+		                if (e.getClickCount() == 1) {
+		                	Principal.this.seleccionPanel = false;
+		                    actualizarPanelChat(seleccionado);
+		                    SwingUtilities.invokeLater(() -> {
+		                        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		                    });
+		                } else if (e.getClickCount() == 2 && !controlador.esContacto(seleccionado) && seleccionado instanceof ContactoIndividual) {
+		                	
+		                	NuevoContacto frame = new NuevoContacto(seleccionado);
+		        			frame.setModal(true);
+		        			frame.setVisible(true);
+		        			frame.setLocationRelativeTo(null);
+		                    
+		                }
+		            }
 		        }
-		    	
 		    }
 		});
 		
@@ -554,7 +562,7 @@ public class Principal extends JFrame implements TDSObserver {
             this.chat.add(burbuja);
         }
 
-        // 4. Refrescar el panel
+
         this.chat.revalidate();
         this.chat.repaint();
     }

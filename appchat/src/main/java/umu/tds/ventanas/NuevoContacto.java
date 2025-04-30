@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.modelos.Contacto;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -111,6 +112,13 @@ public class NuevoContacto extends JDialog {
 	public NuevoContacto() {
 		super();
 		initialize();
+	}
+
+	public NuevoContacto(Contacto seleccionado) {
+		super();
+		initialize();
+		this.telefonoField.setText(AppChat.getInstancia().getTelefonoContacto(seleccionado));
+		this.telefonoField.setEditable(false);
 	}
 
 	/**
