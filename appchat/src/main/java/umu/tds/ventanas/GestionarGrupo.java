@@ -10,11 +10,9 @@ import java.awt.Image;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
-import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.ContactoRenderer;
 import umu.tds.modelos.Grupo;
 import umu.tds.utils.Estado;
@@ -23,30 +21,23 @@ import umu.tds.utils.TDSObserver;
 
 import java.awt.Font;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.awt.Dimension;
 
 
 public class GestionarGrupo extends JDialog implements TDSObserver {

@@ -1,15 +1,10 @@
 package umu.tds.lanzador;
 
-import java.awt.EventQueue;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 
-import javax.swing.UIManager;
-
 import umu.tds.appchat.AppChat;
-import umu.tds.modelos.CatalogoUsuarios;
-import umu.tds.ventanas.Login;
 
 public class Lanzador {
 	

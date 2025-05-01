@@ -16,9 +16,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import tds.BubbleText;
@@ -34,7 +31,6 @@ import umu.tds.persistencia.*;
 import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
-import umu.tds.ventanas.ListaContactos;
 
 //Clase Controlador entre modelos y ventanas
 public class AppChat extends TDSObservable{
@@ -535,10 +531,7 @@ public class AppChat extends TDSObservable{
 		
 		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
 		if (m != null)
-			if (!m.getTexto().isEmpty())
-				return m.getTexto();
-			else 
-				return m.getEmoticono();
+			return m.getContenido();
 		else
 			return null;
 	}
@@ -638,8 +631,4 @@ public class AppChat extends TDSObservable{
 		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
 		return m.getFechaEnvio();
 	}
-
-	
-
-	
 }

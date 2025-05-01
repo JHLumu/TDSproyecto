@@ -2,8 +2,6 @@ package umu.tds.modelos;
 
 import java.time.LocalDateTime;
 
-import javax.swing.ImageIcon;
-
 public class Mensaje implements Comparable<Mensaje>{
 	
 	//Atributos de la clase
@@ -128,9 +126,16 @@ public class Mensaje implements Comparable<Mensaje>{
 	}
 
 
-	public Object getReceptorTelf() {
+	public String getReceptorTelf() {
 		// TODO Auto-generated method stub
 		return this.receptor.getTelefono();
+	}
+	
+	public Object getContenido() {
+		if (!getTexto().isEmpty())
+			return getTexto();
+		else 
+			return getEmoticono();
 	}
 
 

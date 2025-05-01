@@ -1,6 +1,5 @@
 package umu.tds.ventanas;
 
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Window;
 
@@ -11,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import tds.BubbleText;
-import umu.tds.appchat.AppChat;
 
 public class TDSEmojiPanel extends JPanel{
 /**
