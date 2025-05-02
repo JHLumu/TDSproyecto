@@ -29,6 +29,7 @@ import javax.swing.JPasswordField;
 import com.toedter.calendar.JDateChooser;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.ImagenUtils;
 
 import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
@@ -120,7 +121,7 @@ public class Registro extends JFrame {
 	}
 	
 	private boolean validacionImagen() {
-		Image imagen = (AppChat.getInstancia().getImagen(this.URLField.getText()));
+		Image imagen = ImagenUtils.getImagenAPartirDeURL(this.URLField.getText());
 		boolean resultado = (imagen != null);
 		System.out.println("[DEBUG Registro validacionImagen]: " + "Imagen cumple formato: " + resultado);
 		return resultado;
@@ -372,7 +373,7 @@ public class Registro extends JFrame {
 			
 			if ( ! URLField.getText().isEmpty() ) {
 			
-			Image imagen = AppChat.getInstancia().getImagen(URLField.getText());
+			Image imagen = ImagenUtils.getImagenAPartirDeURL(URLField.getText());
 		     if(imagen != null) {
 		    	 lblImagen_1.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
 		     } else {

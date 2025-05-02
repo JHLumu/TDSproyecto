@@ -62,9 +62,12 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: Nombre de contacto: " + contacto);
+		String imagen = null;
+		URL URLContacto = contacto.getURLImagen();
+		if (URLContacto != null) imagen = URLContacto.toExternalForm(); 
 		propiedades.addAll(Arrays.asList(
 				new Propiedad("nombre", contacto.getNombre()),
-				new Propiedad("imagen", contacto.getURLImagen().toExternalForm())
+				new Propiedad("imagen", imagen)
 				));
 		
 		//Propiedades si es ContactoIndividual

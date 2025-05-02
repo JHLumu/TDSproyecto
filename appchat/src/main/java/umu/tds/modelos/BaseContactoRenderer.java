@@ -2,12 +2,11 @@ package umu.tds.modelos;
 
 import javax.swing.*;
 
-import umu.tds.appchat.AppChat;
+
+import umu.tds.utils.ImagenUtils;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+
 
 /**
  * Clase base abstracta para renderizadores de contactos.
@@ -95,40 +94,13 @@ public abstract class BaseContactoRenderer extends JPanel {
      * Configura la imagen del contacto
      */
     protected void configurarImagen(Contacto contacto) {
-        try {
-            File fileImagenContacto = getContactImageFile(contacto);
-            
-            if (fileImagenContacto != null && fileImagenContacto.exists()) {
-                Image localImage = ImageIO.read(fileImagenContacto);
-                imagenLabel.setIcon(new ImageIcon(localImage.getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH)));
-            } else {
-                cargarImagenPredeterminada(contacto);
-            }
-        } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
-            cargarImagenPredeterminada(contacto);
-        }
+        
+    	Image localImage = ImagenUtils.getImagen(contacto);    	
+    	if (localImage != null) imagenLabel.setIcon(new ImageIcon(localImage.getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH)));
+  
     }
     
-    /**
-     * Obtiene el archivo de imagen según el tipo de contacto
-     */
-    protected File getContactImageFile(Contacto contacto) {
-        AppChat controlador = AppChat.getInstancia();
-        
-        if (contacto instanceof ContactoIndividual) {
-            ContactoIndividual contactoIndividual = (ContactoIndividual) contacto;
-            if (controlador.esContacto(contacto)) {
-                return new File("imagenesUsuarios", contactoIndividual.getUsuario().getNombre() + "-" + 
-                               contactoIndividual.getTelefono() + ".png");
-            }
-        } else {
-            Grupo contactoGrupo = (Grupo) contacto;
-            return controlador.getGrupoFoto(contactoGrupo);
-        }
-        
-        return null;
-    }
+    
     
     /**
      * Carga la imagen predeterminada cuando no existe una personalizada
@@ -139,16 +111,13 @@ public abstract class BaseContactoRenderer extends JPanel {
         if (contacto instanceof ContactoIndividual) {
             defaultIcon = new ImageIcon(getClass().getResource("/resources/usuario_64.png"));
         } else {
-            defaultIcon = null;
+            defaultIcon = new ImageIcon(getClass().getResource("/resources/grupo_64.png"));
         }
         
-        if (defaultIcon != null) {
-            Image scaledDefaultImage = defaultIcon.getImage().getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH);
-            imagenLabel.setIcon(new ImageIcon(scaledDefaultImage));
-        } else {
-            System.err.println("No se encontró el icono predeterminado para: " + contacto.getNombre());
-            imagenLabel.setIcon(null);
-        }
+        
+       Image scaledDefaultImage = defaultIcon.getImage().getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH);
+       imagenLabel.setIcon(new ImageIcon(scaledDefaultImage));
+       
     }
     
     /**

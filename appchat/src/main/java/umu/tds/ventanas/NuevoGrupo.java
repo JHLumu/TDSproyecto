@@ -57,9 +57,9 @@ public class NuevoGrupo extends JDialog {
 		});
 	}
 
-	public void nuevoGrupo() {
+	public void crearGrupo() {
 
-		if ((nombreField.getText().isEmpty()) || (urlFoto.getText().isEmpty())) {
+		if ((nombreField.getText().isEmpty())) {
 			
 			 JOptionPane.showMessageDialog(this, 
 	                    "ERROR: No se han rellenado los campos.",
@@ -70,11 +70,10 @@ public class NuevoGrupo extends JDialog {
 
 		int resultado;
 		try {
-			resultado = AppChat.getInstancia().nuevoGrupo(nombreField.getText(), new URL(urlFoto.getText()));
-		
-			
-			if (resultado == -1) { 
-			
+			if (urlFoto.getText().isEmpty()) resultado = AppChat.getInstancia().nuevoGrupo(nombreField.getText(), null);
+			else {resultado = AppChat.getInstancia().nuevoGrupo(nombreField.getText(), new URL(urlFoto.getText()));}
+	
+			if (resultado == -1) { 		
 			JOptionPane.showMessageDialog(this, 
 		                    "No se ha podido leer la imagen.",
 		                    "AppChat",
@@ -101,7 +100,7 @@ public class NuevoGrupo extends JDialog {
 			}
 		} catch (MalformedURLException e) {
 			
-			e.printStackTrace();
+			System.err.println("[ERROR NuevoGrupo crearGrupo]: La URL introducida no es válida.");
 			JOptionPane.showMessageDialog(this, 
                     "URL mal formada",
                     "AppChat",
@@ -213,7 +212,7 @@ public class NuevoGrupo extends JDialog {
 		botonAceptar.setForeground(Color.WHITE);
 		botonAceptar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		botonAceptar.addActionListener(evento -> {
-			nuevoGrupo();
+			crearGrupo();
 		});
 		
 		JButton botonCancelar = new JButton("Cancelar");

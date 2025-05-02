@@ -30,34 +30,58 @@ import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.*;
 import umu.tds.utils.ColoresAppChat;
 import umu.tds.utils.Estado;
+import umu.tds.utils.ImagenUtils;
 import umu.tds.utils.TDSObservable;
 
-//Clase Controlador entre modelos y ventanas
+/**
+ * Clase que actúa de Controlador entre la capa de Modelo y la capa
+ * Ventana de AppChat.
+ * 
+ */
 public class AppChat extends TDSObservable{
 	
 	//Constantes
 	private static final double PRECIO_SUSCRIPCION = 9.99;
-	private static final String DIRECTORIO_IMAGENES_USUARIO = "imagenesUsuarios";
 	
-	//Servidor de persistencia elegido
+	
+	
+	/**
+	 * Servidor de Persistencia elegido.
+	 * 
+	 */
 	public static String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
 	
-	//Instancias de adaptadores
+	/*
+	 * Instancias de Adaptadores. 
+	 */
 	private ContactoDAO contactoDAO;
 	private MensajeDAO mensajeDAO;
 	private UsuarioDAO usuarioDAO;
 	private FactoriaDAO factoria;
 	
-	//Instancias de Catalogos
+	/*
+	 * Instancias de Catalogos. 
+	 */
 	private CatalogoUsuarios catalogoUsuarios;
 	
+	/*
+	 * Atributo que guarda la instancia de Usuario actual. 
+	 */
 	private Usuario sesionUsuario;
 	
-	//Uso de factoria abstracta para obtener los tipos DAO
-	
-	//Patron Singleton
+	/**
+	 * Instancia única de AppChat.  <p>
+	 * Patron Singleton: Se asegura que todas las clases usen la misma instancia AppChat
+	 */
 	private static AppChat instancia = new AppChat(SERVIDOR_PERSISTENCIA_ELEGIDO);
 	
+	
+	/**
+	 * Constructor de la clase AppChat. <p>
+	 * Patron Singleton: La visibilidad del constructor es privado para evitar que otras clases creen instancias AppChat.
+	 * 
+	 * @param factoria Tipo de Factoría Abstracta. Usado para la persistencia.
+	 */
 	private AppChat(String factoria) {	
 		this.catalogoUsuarios = CatalogoUsuarios.getInstancia();
 		this.factoria = FactoriaDAO.getInstancia(factoria);
@@ -66,6 +90,10 @@ public class AppChat extends TDSObservable{
 		this.usuarioDAO = this.factoria.getUsuarioDAO();
 	};
 	
+	/**
+	 * Método para obtener la instancia única de AppChat. <p>
+	 * Patron Singleton: Se proporciona al usuario un método estático para obtener la instancia de AppChat.
+	 */
 	public static AppChat getInstancia() {return instancia;}
 
 	
@@ -98,6 +126,13 @@ public class AppChat extends TDSObservable{
 		return PRECIO_SUSCRIPCION;
 	}
 	
+	
+	/**
+	 * Calcula el máximo descuento que se puede aplicar al usuario actual.
+	 *
+	 * @param descuentos Lista de decuentos que se encuentran activos en el sistema.
+	 * @return Máximo descuento aplicable para el usuario actual.
+	 */
 	public double getDescuentoAplicable(List<Descuento> descuentosActivos) {
 		
 		Optional<Double> res =  descuentosActivos.stream()
@@ -115,6 +150,19 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
+	/**
+	 * Procesa el formulario de registros, valida sus datos y registra al usuario
+	 * en el sistema de manera persistente.
+	 *  
+	 * @param nombre Nombre del usuario a registrar.
+	 * @param apellidos Apellidos del usuario a registrar.
+	 * @param telefono Teléfono del usuario a registrar.
+	 * @param fecha Fecha de Nacimiento del usuario a registrar.
+	 * @param email Correo electrónico del usuario a registrar.
+	 * @param password Contraseña del usuario a registrar.
+	 * @param saludo Saludo usuario a registrar.
+	 * @return false si teléfono ya está registrado en el sistema, true en caso contrario.
+	 */
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
@@ -132,35 +180,45 @@ public class AppChat extends TDSObservable{
 				.imagenDePerfil(imagen)
 				.build();
 		
+		boolean imagenGuardada = ImagenUtils.guardarImagen(usuario);
+		System.out.println("[DEBUG AppChat registrarUsuario]: resultado de guardarImagen: " + imagenGuardada);
+		if (imagenGuardada) {
 		usuarioDAO.registrarUsuario(usuario);
-		catalogoUsuarios.nuevoUsuario(usuario);
-		
-		//Se obtiene la carpeta con las imágenes de los contacto
-	    
-		File directorioBase = new File(DIRECTORIO_IMAGENES_USUARIO);
-		if (!directorioBase.exists()) directorioBase.mkdir();
-		File imagenUsuario = new File(directorioBase, nombre+"-"+telefono+".png");
-		try {
-			ImageIO.write((RenderedImage) getImagen(imagen), "png", imagenUsuario);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-
-		
+		catalogoUsuarios.nuevoUsuario(usuario);    	
 		return true;
+		}
+		else return false;
 	}
 	
-	//Necesidad de Patron Builder para construir el usuario?
 	
+	/**
+	 * Procesa el formulario de registros, valida sus datos y registra al usuario
+	 * en el sistema de manera persistente.
+	 *  
+	 * @param nombre Nombre del usuario a registrar.
+	 * @param apellidos Apellidos del usuario a registrar.
+	 * @param telefono Teléfono del usuario a registrar.
+	 * @param fecha Fecha de Nacimiento del usuario a registrar.
+	 * @param email Correo electrónico del usuario a registrar.
+	 * @param password Contraseña del usuario a registrar.
+	 * @return false si teléfono ya está registrado en el sistema, true en caso contrario.
+	 */
 	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, URL imagen) {
 		//Se tiene que verificar si el telefono no esta registrado ya
 		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
 		return this.registrarUsuario(nombre, apellidos, telefono, fechaNac, email, password, "", imagen);
 	}
 	
+	
+	/**
+	 * Procesa el formulario de inicio de sesión y autentica al usuario.
+	 * Para ello, valida si el teléfono se encuentra registrado en el sistema,
+	 * en ese caso valida si la contraseña pasada es la correcta.
+	 * 
+	 * @param telefono Teléfono del usuario a validar.
+	 * @param password Contraseña del usuario a validar.
+	 * @return false si el teléfono no se encuentra registrado o la contraseña es incorrecta, true en otro caso.
+	 */
 	public boolean iniciarSesionUsuario(String telefono, String contraseña) {
 		//Se tiene que verificar en el repositorio si los datos son correctos
 		
@@ -170,6 +228,11 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
+	/**
+	 * Cambia el estado Premium del usuario actual, persistiendo el cambio.
+	 * 
+	 * @param premium Nuevo estado premium del usuario.
+	 * */
 	public void setUsuarioPremium(boolean premium) {
 		this.sesionUsuario.setPremium(premium);
 		this.usuarioDAO.modificarUsuario(sesionUsuario);
@@ -179,6 +242,13 @@ public class AppChat extends TDSObservable{
 		return this.sesionUsuario.isPremium();
 	}
 
+	/**
+	 * Devuelve el color de los componentes de la aplicación según el estado Premium del
+	 * usuario actual.
+	 * 
+	 * @param id: Color primario (1) o secundario (2).
+	 * @return Color.
+	 * */
 	public Color getColorGUI(int id) {
 		boolean premium = this.isUsuarioPremium();
 		if (id == 1) {
@@ -195,10 +265,20 @@ public class AppChat extends TDSObservable{
 		else return null;
 	}
 	
+	/**
+	 * Devuelve la ruta de la imagen del icono de la aplicación,
+	 * según el estado Premium del Usuario.
+	 * 
+	 * @return Ruta de la imagen del icono de la aplicación. 
+	 * */
 	public String getURLIcon() {
 		if (this.isUsuarioPremium()) return "/Resources/chat_premium.png";
 		else return "/Resources/chat.png";
 	}
+	
+	
+	
+	
 	
 	public boolean crearGrupo(Usuario u, String nombre, URL imagen) {
 		//Se tiene que verificar que el nombre no este vacio (se hace en la capa de presentacion¿?)
@@ -218,7 +298,19 @@ public class AppChat extends TDSObservable{
 	}
 	
 	
+	/**
+	 *
+	 * Crea un nuevo contacto, lo registra de manera persistente
+	 * y notifica a la capa vista de la actualización de 
+	 * la lista de contactos.
+	 * 
+	 * @param nombre Nombre del contacto
+	 * @param telefono Teléfono del contacto. Debe estar registrado en el sistema.
+	 * @return -1 si el teléfono no se encuentra registrado, 0 si ya está registrado en la lista de contactos, 1 si el registro es un éxito.
+	 * 
+	 */
 	public int nuevoContacto(String nombre, String telefono) {
+		
 		if (!catalogoUsuarios.estaUsuarioRegistrado(telefono)) {
 			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono no se encuentra registrado.");
 			return -1;//-1 quiere decir que el telefono no está registrado
@@ -243,102 +335,59 @@ public class AppChat extends TDSObservable{
 
 	}
 	
-	
+	/**
+	 * 
+	 * Crea un nuevo grupo vacío, lo registra de manera persistente
+	 * y notifica a la capa vista de la actualización de la lista
+	 * de contactos.
+	 * 
+	 * @param nombre Nombre del grupo.
+	 * @param urlImagen URL de la imagen del grupo. Opcional.
+	 * @return -1 si la imagen no es válida, 0 si existe un grupo con ese mismo nombre, 1 en caso de que el registro haya sido un éxito.
+	 * */
 	public int nuevoGrupo(String nombre, URL urlImagen) {
+		
+		Image imagen = null;
+		
 	    // Primero comprobamos si ya existe un grupo con ese nombre
 	    if (this.sesionUsuario.recuperarGrupo(nombre) != null) {
 	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Ya existe un grupo con ese nombre.");
-	        return 0; // 0 significa que ya existe
+	        return 0;
 	    }
 
-	    // Si no existe, seguimos
-	    Image imagen = getImagen(urlImagen);
-	    if (imagen != null) {
-	        // Crear directorio si no existe
-	        File directorioBase = new File(DIRECTORIO_IMAGENES_USUARIO + "\\" + getTelefonoUsuario());
-	        if (!directorioBase.exists()) {
-	            directorioBase.mkdir();
-	        }
+	    this.sesionUsuario.crearGrupo(nombre, urlImagen);
+	    Grupo grupo = this.sesionUsuario.recuperarGrupo(nombre);
+	 
+	    if (urlImagen != null && !ImagenUtils.guardarImagen(grupo)) return -1;
+	       
+	    // Notificar cambios.
+	    setChanged(Estado.INFO_CONTACTO);
+	    contactoDAO.registrarContacto(grupo);
+	    usuarioDAO.modificarUsuario(sesionUsuario);
 
-	        // Guardar la imagen del grupo
-	        File imagenGrupo = new File(directorioBase, "Grupo-" + nombre + "-" + getTelefonoUsuario() + ".png");
-	        try {
-	            ImageIO.write((RenderedImage) imagen, "png", imagenGrupo);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-
-	        // Crear el grupo y registrarlo
+	    System.out.println("\n[DEBUG Controlador nuevoGrupo]: Se notifica a los observadores de añadir grupo.");
+	    notifyObservers(Estado.INFO_CONTACTO);
 	        
-	        this.sesionUsuario.crearGrupo(nombre, urlImagen);
-	        Grupo grupo = this.sesionUsuario.recuperarGrupo(nombre);
+	    return 1;
+	    
 
-	        // Notificar cambios
-	        setChanged(Estado.INFO_CONTACTO);
-	        contactoDAO.registrarContacto(grupo);
-	        usuarioDAO.modificarUsuario(sesionUsuario);
-
-	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Se notifica a los observadores de añadir grupo.");
-	        notifyObservers(Estado.INFO_CONTACTO);
-	        
-	        return 1; // 1 significa creado correctamente
-	    } else {
-	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Imagen no válida.");
-	        return -1; // Imagen inválida
-	    }
 	}
 	
-	public File getGrupoFoto(Grupo contacto) {
-		String nombre = contacto.getNombre();
-		URL urlImagen = contacto.getURLImagen();
-		
-		
-	    
-        // Crear directorio si no existe
-        File directorioBase = new File(DIRECTORIO_IMAGENES_USUARIO + "\\" + getTelefonoUsuario());
-        if (!directorioBase.exists()) {
-            directorioBase.mkdir();
-        }
-        
-	        // Guardar la imagen del grupo
- 
-        File imagenGrupo = new File(directorioBase, "Grupo-" + nombre + "-" + contacto.getAnfitrion() + ".png");
-        	
-        if(!imagenGrupo.exists()) {
-        	Image imagen = getImagen(urlImagen);
-        	if (imagen != null) {
-		        try {
-		            ImageIO.write((RenderedImage) imagen, "png", imagenGrupo);
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
-		        return imagenGrupo;
-        	}
-        	System.out.println("\n[DEBUG Controlador fotoGrupo]: Fallo al descargar foto válida.");
-	        System.err.println(urlImagen.toString());
-        	return null;
-	        
-	    } else {
-	    	return imagenGrupo;
-	    } 
-	}
-
 	
 	public List<Contacto> obtenerListaContactos(){
-		//REVISAR: Sorted falla
 		List<Contacto> contactos = this.sesionUsuario.getListaContacto();
 		return contactos;
 	}
 	
 	public List<Contacto> obtenerListaContactosIndividuales() {
 	    if (this.sesionUsuario == null) {
-	        return new LinkedList<>(); // Devuelve una lista vacía si no hay sesión iniciada
+	        return new LinkedList<>();
 	    }
 
 	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) // Filtrar sólo ContactoIndividual
-	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
-	            .collect(Collectors.toList()); // Convertir a lista
+	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL))
+	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
+	            .collect(Collectors.toList());
 	}
 	
 	public List<Contacto> obtenerListaContactosGrupo() {
@@ -347,20 +396,24 @@ public class AppChat extends TDSObservable{
 	    }
 
 	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.GRUPO)) // Filtrar sólo Grupos
-	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre())) // Ordenar alfabéticamente por nombre
-	            .collect(Collectors.toList()); // Convertir a lista
+	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.GRUPO))
+	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
+	            .collect(Collectors.toList()); 
 	}
 
 
 	public List<Contacto> obtenerListaChatMensajes(){
-		//REVISAR: Sorted falla
 		List<Contacto> contactos = this.sesionUsuario.getListaContactosConMensajes();
 		return contactos;
 	}
 	
 	
-	//Esto es mas cosa del patron dao que del controlador
+	/**
+	 * Recupera los mensajes enviados entre el usuario actual y un contacto.
+	 * 
+	 * @param contacto Contacto del usuario.
+	 * @return Lista de mensajes, tanto envíados como recibidos, entre estos dos usuarios.
+	 * */
 	public List <Mensaje> obtenerChatContacto(Contacto contacto){
 		
 			List<Mensaje> chat = this.sesionUsuario.getChatMensaje(contacto);
@@ -373,6 +426,16 @@ public class AppChat extends TDSObservable{
 		
 	}
 	
+	
+	//TODO: Revisar y explicar lógica.
+	/**
+	 * Registra el envío y la recepción del mensaje en el usuario
+	 * emisor y receptor.
+	 * 
+	 * @param contacto Puede ser tanto un contacto individual como un grupo.
+	 * @param entrada Puede ser tanto texto plano como un emoji.
+	 * @return true si el mensaje se ha enviado correctamente, false en caso contrario.
+	 * */
 	public boolean enviarMensaje(Contacto contacto, Object entrada) {
 		if (!(entrada instanceof String || entrada instanceof Integer)) {
 	        System.out.println("Tipo de mensaje no soportado");
@@ -383,7 +446,7 @@ public class AppChat extends TDSObservable{
 	        Usuario receptor = ((ContactoIndividual) contacto).getUsuario();
 	        Mensaje mensaje;
 
-	        // Crear mensaje según el tipo de entrada
+	        // Crear mensaje según el tipo de entrada: Si es tipo String, es un mensaje con texto, mientras que si es tipo Integer, es un emoji.
 	        if (entrada instanceof String) {
 	            mensaje = new Mensaje(sesionUsuario, receptor, (String) entrada, null);
 	        } else {
@@ -450,64 +513,34 @@ public class AppChat extends TDSObservable{
 	private boolean soyAnfitrion(Contacto contacto) {
 		return ((Grupo) contacto).getAnfitrion().equals(getTelefonoUsuario());
 	}
-
-	public Image getImagen(Object urlObj) {
-	    try {
-	        URL url;
-
-	        // Determinar si el objeto es String o URL
-	        if (urlObj instanceof String) {
-	            url = new URL((String) urlObj);
-	        } else if (urlObj instanceof URL) {
-	            url = (URL) urlObj;
-	        } else {
-	            throw new IllegalArgumentException("El parámetro debe ser una URL o una cadena válida.");
-	        }
-
-	        // Descargar la imagen desde la URL
-	        System.out.println("[DEBUG getImagen]: Obteniendo imagen desde URL: " + url);
-	        return ImageIO.read(url);
-
-	    } catch (IOException e) {
-	        System.err.println("[ERROR getImagen]: No se pudo descargar la imagen.");
-	        e.printStackTrace();
-	    } catch (IllegalArgumentException e) {
-	        System.err.println("[ERROR getImagen]: " + e.getMessage());
-	    }
-
-	    return null; // Retorna null en caso de error
-	}
-
 	
-	public Image getFotoPerfilSesion() {
-		return this.sesionUsuario.getFotoPerfilUsuario();
+	
+	
+	
+	/**
+	 * 
+	 * Devuelve la imagen del usuario actual.
+	 * 
+	 * @return Imagen del usuario.
+	 * 
+	 * */
+	public Image getImagenUsuarioActual() {
+		return ImagenUtils.getImagen(this.sesionUsuario);
 	}
 	
-	public void setImagenPerfil(Image imagen) {
-		// Directorio base del usuario de la sesión actual
-	    String directorioBase = "imagenPerfilContactos\\" + 
-	    						getNombreUsuario() +  "-" + 
-	    						getTelefonoUsuario();
-
-	    File directorio = new File(directorioBase);
-	    if (!directorio.exists()) {
-	        directorio.mkdirs(); // Crear directorio si no existe
-	    }
-	    
-	    File localFile = new File(directorio, this.getNombreUsuario() + "_" + this.getTelefonoUsuario() +".png");
-	    try {
-			ImageIO.write((java.awt.image.RenderedImage) imagen, "png", localFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    
-	}
-
-	public void cambiarFotoPerfil(URL nuevaFoto) {
-		this.sesionUsuario.setURLImagen(nuevaFoto);
-		Image nuevaImagen = this.getImagen(nuevaFoto);
-		File fileImagenContacto = new File("imagenesUsuarios", this.sesionUsuario.getNombre()+"-"+ this.sesionUsuario.getTelefono() + ".png");
+	/**
+	 * 
+	 * Actualiza la imagen de perfil de un usuario y registra
+	 * el cambio de manera persistente.
+	 * 
+	 * @param url URL de la imagen.
+	 * @param imagen Imagen descargada.
+	 * 
+	 * */
+	public void cambiarFotoPerfil(URL fotoURL, Image foto) {
+		this.sesionUsuario.setURLImagen(fotoURL);
+		Image nuevaImagen = foto;
+		File fileImagenContacto = ImagenUtils.getFile(this.sesionUsuario);
 		try {
 			ImageIO.write((RenderedImage) nuevaImagen, "png", fileImagenContacto);
 		} catch (IOException e) {
@@ -520,15 +553,26 @@ public class AppChat extends TDSObservable{
 		notifyObservers(Estado.NUEVA_FOTO_USUARIO);
 	}
 
+	
+	
 	public void cambiarSaludo(String saludo) {
 		this.sesionUsuario.setSaludo(saludo);
 		usuarioDAO.modificarUsuario(sesionUsuario);
 		
 	}
 
+
+	/**
+	 * 
+	 * Devuelve el último mensaje envíado o recibido entre el usuario actual 
+	 * y un contacto.
+	 * 
+	 * @param contacto Puede ser tanto un contacto individual como un grupo.
+	 * @return Mensaje (puede ser texto plano o un emoji).
+	 * 
+	 * */
 	public Object getUltimoMensajeContacto(Contacto contacto) {
-		// TODO Auto-generated method stub
-		
+
 		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
 		if (m != null)
 			return m.getContenido();
@@ -541,6 +585,18 @@ public class AppChat extends TDSObservable{
 		return grupo.getMiembros();
 	}
 
+	
+	//#TODO: Revisar si es necesario que seleccionado sea tipo Contacto y no ContactoIndividual.
+	/*
+	 *
+	 * Añade un nuevo contacto a un grupo, registra el cambio en el sistema
+	 * de manera persistente y notifica a la capa vista de la actualización
+	 * de la lista de contactos.
+	 * 
+	 * @param grupo: Grupo seleccionado en el que se añadirá un contacto.
+	 * @param seleccionado: Contacto a añadir.
+	 * 
+	 */
 	public void nuevoMiembroGrupo(Grupo grupo, Contacto seleccionado) {
 		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
 		System.out.println("\n[DEBUG Controlador nuevoMiembro]: Miembro -> " + seleccionado);
@@ -554,6 +610,17 @@ public class AppChat extends TDSObservable{
 		notifyObservers(Estado.INFO_CONTACTO);   
 	}
 
+	
+	/**
+	 *
+	 * Elimina un miembro existente de un grupo, registra el cambio en el sistema
+	 * de manera persistente y notifica a la capa vista de la actualización
+	 * de la lista de contactos.
+	 * 
+	 * @param grupo Grupo seleccionado en el que se eliminará un contacto.
+	 * @param seleccionado Contacto a eliminar.
+	 * 
+	 */
 	public void eliminarMiembroGrupo(Grupo grupo, Contacto seleccionado) {
 		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
 		System.out.println("\n[DEBUG Controlador eliminarMiembro]: Miembro -> " + seleccionado);
@@ -571,7 +638,9 @@ public class AppChat extends TDSObservable{
 		
 		return obtenerListaContactos().contains(contacto);
 	}
-
+	
+	
+	//TODO: Revisar y Explicar lógica.
 	public List<BubbleText> pintarMensajesBurbuja(Contacto contacto, JPanel chat) {
 	    List<Mensaje> mensajes = obtenerChatContacto(contacto);
 	    List<BubbleText> burbujas = new ArrayList<>();

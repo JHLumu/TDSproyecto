@@ -1,6 +1,6 @@
 package umu.tds.modelos;
 
-import java.awt.Image;
+
 import java.net.URL;
 
 //Clase que hereda de Contacto que representa 
@@ -16,6 +16,10 @@ public class ContactoIndividual extends Contacto {
         super(nombre, usuario.getURLImagen());  // Llamamos al constructor de la clase base (Contacto)
         this.usuario = usuario;
         
+    }
+    
+    public String getNombreUsuario() {
+    	return usuario.getNombre();
     }
 
     // Getter y setter para el usuario
@@ -49,9 +53,6 @@ public class ContactoIndividual extends Contacto {
     	return usuario.getSaludo();
     }
     
-    public Image getImagenContacto() {
-    	return usuario.getFotoPerfilUsuario();
-    }
     
     @Override
     public URL getURLImagen() {

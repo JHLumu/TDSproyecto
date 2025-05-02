@@ -263,7 +263,12 @@ public class Principal extends JFrame implements TDSObserver {
 		btnUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnUsuario.setForeground(new Color(255, 255, 255));
 		btnUsuario.setBackground(this.colorBotones);
-		btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+		
+		Image imagenUsuario = this.controlador.getImagenUsuarioActual();
+		if (imagenUsuario != null) btnUsuario.setIcon(new ImageIcon(imagenUsuario.getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+		
+		
+	
 		
 		btnUsuario.addActionListener(evento -> {
 				EditarUsuario frame = new EditarUsuario();
@@ -477,7 +482,7 @@ public class Principal extends JFrame implements TDSObserver {
                 this.actualizarListaContactosMensajes();
                 
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
-            	btnUsuario.setIcon(new ImageIcon(this.controlador.getFotoPerfilSesion().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+            	btnUsuario.setIcon(new ImageIcon(this.controlador.getImagenUsuarioActual().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
             }
          
         }

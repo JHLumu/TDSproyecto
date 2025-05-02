@@ -59,45 +59,58 @@ public class NuevoContacto extends JDialog {
 	public void nuevoContacto() {
 
 		if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
-			
-			 JOptionPane.showMessageDialog(NuevoContacto.this, 
-	                    "ERROR: No se han rellenado los campos.",
-	                    "AppChat",
-	                    JOptionPane.ERROR_MESSAGE);
+
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: No se ha introducido ningún nombre.");
+			 
+			JOptionPane.showMessageDialog(NuevoContacto.this, 
+					"Se debe escribir un nombre para el grupo..",
+	                "AppChat",
+	                JOptionPane.ERROR_MESSAGE);
 			 return;
+		}
+		
+		else if (telefonoField.getText().equals(AppChat.getInstancia().getTelefonoUsuario())) {
+			
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El telefono introducido es el mismo que el del usuario actual.");
+			JOptionPane.showMessageDialog(this, 
+                    "ERROR: No te puedes añadir a tí mismo.",
+                    "AppChat",
+                    JOptionPane.ERROR_MESSAGE);
+		 return;
+			
 		}
 		
 		int resultado = AppChat.getInstancia().nuevoContacto(nombreField.getText(),telefonoField.getText());
 			
 		//Si el resultado es -1 el teléfono no está registrado
 		if (resultado == -1) { 
-		
-		JOptionPane.showMessageDialog(NuevoContacto.this, 
-	                    "El teléfono no se encuentra registrado.",
-	                    "AppChat",
-	                    JOptionPane.ERROR_MESSAGE);
-			 this.dispose();
-		
-		
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El teléfono no se encuentra registrado.");
+			JOptionPane.showMessageDialog(NuevoContacto.this, 
+					"El teléfono no se encuentra registrado.",
+					"AppChat",
+					JOptionPane.ERROR_MESSAGE);
+			this.dispose();
 		}
 		
 		else if (resultado == 0) {
-			
-			JOptionPane.showMessageDialog(NuevoContacto.this, 
-                    "El teléfono ya se encuentra registrado en la lista de contactos.",
-                    "AppChat",
-                    JOptionPane.ERROR_MESSAGE);	
+
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El teléfono ya se encuentra registrado en la lista de contactos.");
+			JOptionPane.showMessageDialog(NuevoContacto.this,
+					"El teléfono ya se encuentra registrado en la lista de contactos.",
+					"AppChat",
+					JOptionPane.ERROR_MESSAGE);	
 			
 		}
 		
 		
 		else {
-			
+
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: Se ha registrado correctamente.");
 			JOptionPane.showMessageDialog(NuevoContacto.this, 
-                    "Se ha registrado el teléfono como " + nombreField.getText(),
-                    "AppChat",
-                    JOptionPane.PLAIN_MESSAGE);
-					this.dispose();
+					"Se ha registrado el teléfono como " + nombreField.getText(),
+					"AppChat",
+					JOptionPane.PLAIN_MESSAGE);
+			this.dispose();
 			
 		}
 			 
@@ -209,9 +222,9 @@ public class NuevoContacto extends JDialog {
 		botonAceptar.setBackground(this.colorPrimario);
 		botonAceptar.setForeground(Color.WHITE);
 		botonAceptar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		botonAceptar.addActionListener(evento -> {
-				nuevoContacto();
-			});
+
+		botonAceptar.addActionListener(evento -> nuevoContacto());
+
 		
 		JButton botonCancelar = new JButton("Cancelar");
 		botonCancelar.setBorderPainted(false);

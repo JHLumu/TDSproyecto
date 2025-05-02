@@ -16,6 +16,7 @@ import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoRenderer;
 import umu.tds.modelos.Grupo;
 import umu.tds.utils.Estado;
+import umu.tds.utils.ImagenUtils;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
@@ -26,7 +27,6 @@ import java.awt.Insets;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,8 +35,6 @@ import javax.swing.JDialog;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 
@@ -186,15 +184,9 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		gbc_imagenPerfil.gridx = 1;
 		gbc_imagenPerfil.gridy = 2;
 		
-		File fileImagenContacto = new File("imagenesUsuarios\\"+ this.controlador.getTelefonoUsuario(), "Grupo-" + seleccionado.getNombre()+"-"+ seleccionado.getAnfitrion() + ".png");
-		Image localImage = null;
-		try {
-			localImage = ImageIO.read(fileImagenContacto);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		imagenPerfil.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+		
+		Image localImage = ImagenUtils.getImagen(seleccionado);
+		if (localImage != null) imagenPerfil.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
 			
 		contenidoSuperior.add(imagenPerfil, gbc_imagenPerfil);
 		

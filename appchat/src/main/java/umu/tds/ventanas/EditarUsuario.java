@@ -14,6 +14,7 @@ import java.awt.Image;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import umu.tds.appchat.AppChat;
+import umu.tds.utils.ImagenUtils;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -27,8 +28,11 @@ import javax.swing.JDialog;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class EditarUsuario extends JDialog {
@@ -39,7 +43,8 @@ public class EditarUsuario extends JDialog {
     private JPanel contentPane;
     private JTextField URLField;
     private URL fotoPerfil;
-    private boolean fotoCorrecta;
+    private Image foto;
+    private int fotoCorrecta;
     private JTextArea saludoArea;
     private String saludoUsuario;
     private JLabel lblImagen;
@@ -279,17 +284,18 @@ public class EditarUsuario extends JDialog {
          
          btnAceptarImagen.addActionListener(evento -> {
         	 if (! URLField.getText().isEmpty()) {
-             Image imagen = AppChat.getInstancia().getImagen(URLField.getText());
+             Image imagen = ImagenUtils.getImagen(URLField.getText());
              if (imagen != null) {
                  try {
-                     this.fotoPerfil = new URL(URLField.getText());
-                     this.fotoCorrecta = true;
+                     URL aux = new URL(URLField.getText());
+                     this.fotoPerfil = aux;
+                     this.foto = imagen;
+                     this.fotoCorrecta++;
                  } catch (MalformedURLException e) {
                      e.printStackTrace();
                  }
                  lblImagen.setIcon(new ImageIcon(imagen.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
              } else {
-                 this.fotoCorrecta = false;
                  JOptionPane.showMessageDialog(this,
                          "No se pudo descargar la imagen desde la URL proporcionada.",
                          "AppChat",
@@ -308,7 +314,17 @@ public class EditarUsuario extends JDialog {
           gbc_lblImagen.gridy = 1;
           gbc_lblImagen.gridwidth = 2;
           lblImagen = new JLabel();
-          lblImagen.setIcon(new ImageIcon(AppChat.getInstancia().getFotoPerfilSesion().getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
+          Image aux = AppChat.getInstancia().getImagenUsuarioActual();
+          if (aux!=null) this.foto = aux;
+		else
+			try {
+				this.foto = ImageIO.read(Registro.class.getResource("/resources/usuario_64.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+          lblImagen.setIcon(new ImageIcon(this.foto.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
           lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
           lblImagen.setBorder(new LineBorder(new Color(25, 25, 112), 2, true));
           panelDerecho.add(lblImagen, gbc_lblImagen);
@@ -329,8 +345,8 @@ public class EditarUsuario extends JDialog {
     	   this.addWindowListener(new WindowAdapter() {
                @Override
                public void windowClosing(WindowEvent e) {
-                   if (fotoCorrecta) {
-                       AppChat.getInstancia().cambiarFotoPerfil(fotoPerfil);
+                   if (fotoCorrecta > 0) {
+                       AppChat.getInstancia().cambiarFotoPerfil(fotoPerfil, foto);
                    };
                    
                    if(saludoUsuario ==null || !saludoUsuario.equals(saludoArea.getText())) {
@@ -342,6 +358,8 @@ public class EditarUsuario extends JDialog {
     }
     
     public EditarUsuario() {
+    	
+    	this.fotoCorrecta = 0;
     	
     	//Se definen propiedades de la ventana
     	setResizable(true);
