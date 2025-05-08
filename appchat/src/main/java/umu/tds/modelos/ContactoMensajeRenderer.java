@@ -1,13 +1,8 @@
 package umu.tds.modelos;
 
 import javax.swing.*;
-
-import tds.BubbleText;
 import umu.tds.appchat.AppChat;
-
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Implementación específica del renderizador para la lista de contactos con mensajes.
@@ -15,25 +10,25 @@ import java.time.format.DateTimeFormatter;
 public class ContactoMensajeRenderer extends BaseContactoRenderer implements ListCellRenderer<Object> {
 
     private static final long serialVersionUID = 1L;
-    private static final int MAX_MESSAGE_LENGTH = 16;
     
     // Componentes específicos de este renderizador
     private JLabel mensajeLabel;
     private JLabel fechaLabel;
-    
-    /**
-     * Constructor
-     */
-    public ContactoMensajeRenderer() {
-        super();
-    }
-    
+ // Añadir a la clase ContactoMensajeRenderer
+    private JLabel indicadorLabel;
+
+    // Modificar el método inicializarContenidoPanel
     @Override
     protected void inicializarContenidoPanel() {
         contenidoPanel = new JPanel(new GridBagLayout());
         contenidoPanel.setOpaque(false);
         
         GridBagConstraints gbc = new GridBagConstraints();
+        
+        
+        // Resto del contenido en columna a la derecha
+        gbc.gridx = 1;
+        gbc.gridheight = 1;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -42,12 +37,14 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
         // Nombre en la parte superior con fuente más grande
         nombreLabel = new JLabel();
         nombreLabel.setFont(new Font(nombreLabel.getFont().getName(), Font.BOLD, 14));
+        gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 2, 0);
         contenidoPanel.add(nombreLabel, gbc);
         
         // Separador entre nombre y mensaje
         separador = new JSeparator();
         separador.setForeground(SEPARATOR_COLOR);
+        gbc.gridy = 1;
         gbc.insets = new Insets(1, 0, 3, 0);
         contenidoPanel.add(separador, gbc);
         
@@ -58,126 +55,91 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
         mensajeLabel.setFont(new Font(mensajeLabel.getFont().getName(), Font.PLAIN, 12));
         mensajeLabel.setVerticalAlignment(JLabel.CENTER);
         mensajePanel.add(mensajeLabel, BorderLayout.CENTER);
+        gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 2, 0);
         gbc.weighty = 1.0; // Esto hace que el panel de mensaje tome el espacio vertical disponible
         gbc.fill = GridBagConstraints.BOTH;
+        
+     // Indicador E/R a la izquierda
+        indicadorLabel = new JLabel();
+        indicadorLabel.setFont(new Font(indicadorLabel.getFont().getName(), Font.BOLD, 12));
+        indicadorLabel.setHorizontalAlignment(JLabel.CENTER);
+        indicadorLabel.setPreferredSize(new Dimension(20, 20));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.weightx = 0.0;
+        gbc.insets = new Insets(0, 0, 0, 5);
+        mensajePanel.add(indicadorLabel, BorderLayout.WEST);
         contenidoPanel.add(mensajePanel, gbc);
         
         // Fecha en la parte inferior
         fechaLabel = new JLabel();
         fechaLabel.setFont(new Font(fechaLabel.getFont().getName(), Font.ITALIC, 10));
         fechaLabel.setForeground(PHONE_TEXT_COLOR);
+        gbc.gridy = 3;
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(1, 0, 0, 0);
         contenidoPanel.add(fechaLabel, gbc);
     }
 
+    // Modificar el método getListCellRendererComponent
     @Override
     public Component getListCellRendererComponent(JList<? extends Object> list, 
                                                   Object contacto, 
                                                   int index,
                                                   boolean isSelected, 
                                                   boolean cellHasFocus) {
-        if(contacto instanceof Contacto) {
-        	Contacto c = (Contacto) contacto;
-	        // Limpiar componentes
-	        mensajeLabel.setText("");
-	        mensajeLabel.setIcon(null);
-	        
-	        // Configurar nombre y mensaje
-	        nombreLabel.setText(c.getNombre());
-	        configurarMensaje(c);
-	        configurarFecha(c);
-	        
-	        // Configurar la imagen
-	        configurarImagen(c);
-	        
-	        // Aplicar estilos según selección y posición
-	        aplicarEstilos(list, index, isSelected);
-	        
-        } else if (contacto instanceof MensajeCoincidencia) {
-        	MensajeCoincidencia c = (MensajeCoincidencia) contacto;
-	        // Limpiar componentes
-	        mensajeLabel.setText("");
-	        mensajeLabel.setIcon(null);
-	        
-	        // Configurar nombre y mensaje
-	        nombreLabel.setText(c.getNombre());
-	        configurarMensaje(c);
-	        configurarFecha(c);
-	        
-	        // Configurar la imagen
-	        configurarImagen(c.getContacto());
-	        
-	        // Aplicar estilos según selección y posición
-	        aplicarEstilos(list, index, isSelected);
-        }
-		return this;
-    }
-    
-    /**
-     * Configura el contenido del último mensaje
-     */
-    private void configurarMensaje(Object contacto) {
-        AppChat controlador = AppChat.getInstancia();
-        Object mensaje;
-        ImageIcon emojiIcon;
-        
-        // Procesar y establecer el último mensaje
-        if (contacto instanceof Contacto) {
-        	Contacto c = (Contacto) contacto;
-        	mensaje = controlador.getUltimoMensajeContacto(c);
-            
-        } else {
-        	MensajeCoincidencia c = (MensajeCoincidencia) contacto;
-        	mensaje = c.getContenido();
-        }
-        
-        if (mensaje instanceof String) {
-            String mensajeTexto = (String) mensaje;
-            // Truncar mensaje si es demasiado largo (añadir "...")
-            if (mensajeTexto.length() > MAX_MESSAGE_LENGTH) {
-                mensajeTexto = mensajeTexto.substring(0, MAX_MESSAGE_LENGTH - 1) + "...";
-            }
-            mensajeLabel.setText(mensajeTexto);
-        } else if (mensaje instanceof Integer) {
-            // Aquí es donde se establece el emoji
+        if(contacto instanceof Contacto || contacto instanceof MensajeCoincidencia) {
+            // Limpiar componentes
             mensajeLabel.setText("");
+            mensajeLabel.setIcon(null);
             
-            // Obtener el emoji original
-            emojiIcon = BubbleText.getEmoji((Integer) mensaje);
-            if (emojiIcon != null) {
-                Image img = emojiIcon.getImage();
-                // Redimensionar a un tamaño más pequeño
-                Image newImg = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-                mensajeLabel.setIcon(new ImageIcon(newImg));
+            // Obtener nombre según el tipo de objeto
+            String nombre = (contacto instanceof Contacto) ? 
+                ((Contacto)contacto).getNombre() : 
+                ((MensajeCoincidencia)contacto).getNombre();
+            
+            nombreLabel.setText(nombre);
+            
+            // Obtener la información procesada del controlador
+            AppChat controlador = AppChat.getInstancia();
+            AppChat.InfoMensajeVista infoMensaje = controlador.prepararInfoParaVista(contacto);
+            
+            // Configurar el indicador E/R según si el mensaje es enviado o recibido
+            if (infoMensaje.esMensajeEnviado()) {
+                indicadorLabel.setText("E");
+                indicadorLabel.setForeground(new Color(0, 100, 0)); // Verde oscuro para enviados
+            } else {
+                indicadorLabel.setText("R");
+                indicadorLabel.setForeground(new Color(0, 0, 150)); // Azul oscuro para recibidos
             }
+            
+            // Configurar el mensaje con los datos ya procesados
+            if (infoMensaje.esEmoji()) {
+                mensajeLabel.setIcon(infoMensaje.getEmojiRedimensionado());
+            } else {
+                mensajeLabel.setText(infoMensaje.getTextoFormateado());
+            }
+            
+            // Configurar la fecha ya formateada
+            fechaLabel.setText(infoMensaje.getHoraFormateada());
+            
+            // Configurar la imagen
+            if (contacto instanceof Contacto) {
+                configurarImagen((Contacto)contacto);
+            } else {
+                configurarImagen(((MensajeCoincidencia)contacto).getContacto());
+            }
+            
+            // Aplicar estilos según selección y posición
+            aplicarEstilos(list, index, isSelected);
         }
-        
+        return this;
     }
     
-    /**
-     * Configura la fecha del último mensaje
-     */
-    private void configurarFecha(Object contacto) {
-        AppChat controlador = AppChat.getInstancia();
-        LocalDateTime fecha;
-        if (contacto instanceof Contacto) {
-        	Contacto c = (Contacto) contacto;
-        	fecha = controlador.getUltimoMensajeFecha(c);
-            
-        } else {
-        	MensajeCoincidencia c = (MensajeCoincidencia) contacto;
-        	fecha = c.getFechaEnvio();
-        }
-        if (fecha != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            fechaLabel.setText(fecha.format(formatter));
-        } else {
-            fechaLabel.setText("");
-        }
-    }
     
     @Override
     protected void aplicarEstilosSeleccionado() {

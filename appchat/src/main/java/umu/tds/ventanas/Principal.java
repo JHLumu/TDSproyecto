@@ -16,12 +16,15 @@ import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.ContactoMensajeRenderer;
+import umu.tds.modelos.Mensaje;
+import umu.tds.utils.BuscarFiltroListener;
 import umu.tds.utils.Estado;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
@@ -32,6 +35,7 @@ import javax.swing.DefaultListModel;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -49,14 +53,16 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 
-public class Principal extends JFrame implements TDSObserver {
+public class Principal extends JFrame implements TDSObserver, BuscarFiltroListener{
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -183,9 +189,8 @@ public class Principal extends JFrame implements TDSObserver {
 		btnBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BuscarConFiltro frame = new BuscarConFiltro();
-				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
+				abrirBuscador();
+
 				
 			}
 		});
@@ -569,6 +574,41 @@ public class Principal extends JFrame implements TDSObserver {
         this.chat.revalidate();
         this.chat.repaint();
     }
+    
+	@Override
+	public void onAccionRealizada(Contacto c, Mensaje mObjetivo) {
+		int targetIndex = controlador.ubicarMensaje(c, mObjetivo);
+		actualizarPanelChat(c);
+		if (targetIndex >= 0) {
+	        SwingUtilities.invokeLater(() -> {
+	            Component comp = chat.getComponent(targetIndex);
+	            chat.scrollRectToVisible(comp.getBounds());
+
+	            if (comp instanceof JComponent) {
+	                JComponent jc = (JComponent) comp;
+	                // Guarda el borde original para restaurarlo después
+	                Border originalBorder = jc.getBorder();
+
+	                // Aplica un borde grueso de color brillante
+	                jc.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+
+	                // Crea un Timer que en 1 000 ms restaure el borde original
+	                new javax.swing.Timer(1000, e -> {
+	                    jc.setBorder(originalBorder);
+	                    ((javax.swing.Timer)e.getSource()).stop();
+	                }).start();
+	            }
+	        });
+	    }
+		
+	}
+	
+	private void abrirBuscador() {
+        BuscarConFiltro buscador = new BuscarConFiltro(this);
+
+        buscador.setVisible(true);
+		buscador.setLocationRelativeTo(null);
+    }
 
 	/**
 	 * Create the frame.
@@ -596,6 +636,7 @@ public class Principal extends JFrame implements TDSObserver {
 		inicializacionPanelCentro();
 		
 	}
+
    
 
 }

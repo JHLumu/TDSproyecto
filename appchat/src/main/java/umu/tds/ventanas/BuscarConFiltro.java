@@ -1,17 +1,15 @@
 package umu.tds.ventanas;
 
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoMensajeRenderer;
-import umu.tds.modelos.ContactoRenderer;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.MensajeCoincidencia;
+import umu.tds.utils.BuscarFiltroListener;
 
 import java.awt.BorderLayout;
 
@@ -32,8 +30,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -46,28 +44,12 @@ public class BuscarConFiltro extends JFrame {
 	private JTextField txtTexto;
 	private JTextField txtTelfono;
 	private JTextField txtContacto;
-	private JList list;
-	private DefaultListModel<Object> modeloLista;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-					BuscarConFiltro window = new BuscarConFiltro();
-					window.setVisible(true);
-					window.setLocationRelativeTo(null);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private JList<MensajeCoincidencia> list;
+	private DefaultListModel<MensajeCoincidencia> modeloLista;
+	private BuscarFiltroListener buscarFiltroListener;
 	
-	public BuscarConFiltro() {
+	public BuscarConFiltro(BuscarFiltroListener listener) {
+		this.buscarFiltroListener = listener;
 		setSize(350, 500);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
 		setTitle("Buscar");
@@ -152,8 +134,8 @@ public class BuscarConFiltro extends JFrame {
 		panelCentro.setLayout(gbl_panelCentro);
 		
 		// Inicializar modelo y lista
-		modeloLista = new DefaultListModel<>();
-		list = new JList(modeloLista);
+		modeloLista = new DefaultListModel<MensajeCoincidencia>();
+		list = new JList<MensajeCoincidencia>(modeloLista);
 		
 		JScrollPane scrollPane = new JScrollPane(list);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -176,30 +158,16 @@ public class BuscarConFiltro extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					Object seleccionado = list.getSelectedValue();
+					MensajeCoincidencia seleccionado = list.getSelectedValue();
 					if (seleccionado != null) {
 						abrirSeleccionado(seleccionado);
 					}
 				}
 			}
 		});
-		
-		// Cargar contactos inicialmente
-		cargarTodosLosContactos();
 	}
 	
-	/**
-	 * Carga todos los contactos en la lista
-	 */
-	private void cargarTodosLosContactos() {
-		modeloLista.clear();
-		list.setCellRenderer(new ContactoRenderer ());
-		
-		List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactos();
-		for (Contacto contacto : contactos) {
-			modeloLista.addElement(contacto);
-		}
-	}
+
 	
 	/**
 	 * Realiza la búsqueda según los filtros ingresados
@@ -215,11 +183,12 @@ public class BuscarConFiltro extends JFrame {
 		boolean buscarPorNombre = !nombreContactoFiltro.isEmpty();
 		
 		if (!buscarPorTexto && !buscarPorTelefono && !buscarPorNombre) {
-			// Sin filtros, mostrar todos los contactos
-			cargarTodosLosContactos();
+			// Sin filtros, mostrar todos los mensajes ordenados por contacto y luego por fecha
+			mostrarTodosMensajes();
 			return;
 		}
-		
+		buscarMensajes(textoFiltro, buscarPorNombre ? nombreContactoFiltro : null, buscarPorTelefono ? telefonoFiltro : null);
+		/*
 		if (buscarPorTexto) {
 			// Búsqueda de mensajes que contienen el texto
 			buscarMensajes(textoFiltro, buscarPorNombre ? nombreContactoFiltro : null, buscarPorTelefono ? telefonoFiltro : null);
@@ -227,44 +196,50 @@ public class BuscarConFiltro extends JFrame {
 			// Búsqueda de contactos por nombre y/o teléfono
 			buscarContactos(nombreContactoFiltro, telefonoFiltro);
 		}
+		*/
 	}
-	
 	/**
-	 * Busca contactos por nombre y/o teléfono
-	 * 
-	 * @param nombreFiltro Filtro de nombre (puede ser null o vacío)
-	 * @param telefonoFiltro Filtro de teléfono (puede ser null o vacío)
+	 * Muestra todos los mensajes ordenados primero por contacto y luego por fecha
 	 */
-	private void buscarContactos(String nombreFiltro, String telefonoFiltro) {
-		modeloLista.clear();
-		list.setCellRenderer(new ContactoRenderer());
-		
-		List<Contacto> todosLosContactos = AppChat.getInstancia().obtenerListaContactos();
-		List<Contacto> resultados = todosLosContactos.stream()
-				.filter(contacto -> {
-					boolean coincideNombre = nombreFiltro.isEmpty() || 
-							contacto.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase());
-					
-					boolean coincideTelefono = telefonoFiltro.isEmpty() || 
-							AppChat.getInstancia().getTelefonoContacto(contacto).contains(telefonoFiltro);
-					
-					return coincideNombre && coincideTelefono;
-				})
-				.collect(Collectors.toList());
-		
-		if (resultados.isEmpty()) {
-			JOptionPane.showMessageDialog(this, 
-					"No se encontraron contactos que coincidan con los criterios de búsqueda", 
-					"Sin resultados", 
-					JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			for (Contacto contacto : resultados) {
-				modeloLista.addElement(contacto);
-			}
-		}
+	private void mostrarTodosMensajes() {
+	    modeloLista.clear();
+	    list.setCellRenderer(new ContactoMensajeRenderer());
+	    
+	    List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactos();
+	    List<MensajeCoincidencia> todosMensajes = new ArrayList<>();
+	    
+	    // Recopilar todos los mensajes de todos los contactos
+	    for (Contacto contacto : contactos) {
+	        List<Mensaje> mensajesContacto = AppChat.getInstancia().obtenerChatContacto(contacto);
+	        if (mensajesContacto != null && !mensajesContacto.isEmpty()) {
+	            for (Mensaje mensaje : mensajesContacto) {
+	                todosMensajes.add(new MensajeCoincidencia(mensaje, contacto));
+	            }
+	        }
+	    }
+	    
+	    if (todosMensajes.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, 
+	                "No hay mensajes disponibles", 
+	                "Sin mensajes", 
+	                JOptionPane.INFORMATION_MESSAGE);
+	    } else {
+	        // Ordenar los mensajes por contacto y luego por fecha
+	        todosMensajes.sort(Comparator
+	                .comparing((MensajeCoincidencia mc) -> mc.getContacto().getNombre())
+	                .thenComparing(mc -> mc.getMensaje().getFechaEnvio()));
+	        
+	        // Agregar todos los mensajes ordenados a la lista
+	        for (MensajeCoincidencia mensaje : todosMensajes) {
+	            modeloLista.addElement(mensaje);
+	        }
+	        
+	        JOptionPane.showMessageDialog(this, 
+	                "Mostrando todos los mensajes ordenados por contacto y fecha", 
+	                "Resultado de búsqueda", 
+	                JOptionPane.INFORMATION_MESSAGE);
+	    }
 	}
-	
-	
 	
 	/**
 	 * Busca mensajes que contienen un texto específico, opcionalmente filtrando por contacto y/o teléfono
@@ -276,41 +251,8 @@ public class BuscarConFiltro extends JFrame {
 	private void buscarMensajes(String textoFiltro, String nombreFiltro, String telefonoFiltro) {
 	    modeloLista.clear();
 	    list.setCellRenderer(new ContactoMensajeRenderer());
-	    
-	    List<Contacto> contactos = AppChat.getInstancia().obtenerListaContactos();
-	    List<MensajeCoincidencia> mensajesCoincidentes = new ArrayList<>();
-	    
-	    // Primero filtramos los contactos si es necesario
-	    if (nombreFiltro != null && !nombreFiltro.isEmpty() || telefonoFiltro != null && !telefonoFiltro.isEmpty()) {
-	        contactos = contactos.stream()
-	                .filter(contacto -> {
-	                    boolean coincideNombre = nombreFiltro == null || nombreFiltro.isEmpty() || 
-	                            contacto.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase());
-	                    
-	                    boolean coincideTelefono = telefonoFiltro == null || telefonoFiltro.isEmpty() || 
-	                            AppChat.getInstancia().getTelefonoContacto(contacto).contains(telefonoFiltro);
-	                    
-	                    return coincideNombre && coincideTelefono;
-	                })
-	                .collect(Collectors.toList());
-	    }
-	    
-	    // Ahora buscamos en los mensajes de los contactos filtrados
-	    for (Contacto contacto : contactos) {
-	        List<Mensaje> mensajes = AppChat.getInstancia().obtenerChatContacto(contacto);
-	        if (mensajes != null) {
-	            for (Mensaje mensaje : mensajes) {
-	                String textoMensaje = mensaje.getTexto();
-	                if (textoMensaje != null && !textoMensaje.isEmpty()) {
-	                    double puntuacion = calcularPuntuacionCoincidencia(textoMensaje, textoFiltro);
-	                    if (puntuacion > 0) {
-	                        mensajesCoincidentes.add(new MensajeCoincidencia(mensaje, contacto));
-	                    }
-	                }
-	            }
-	        }
-	    }
-	    
+	    List<MensajeCoincidencia> mensajesCoincidentes = AppChat.getInstancia().buscarMensajes(textoFiltro, nombreFiltro, telefonoFiltro);
+
 	    // Agregar los mensajes ordenados a la lista
 	    if (mensajesCoincidentes.isEmpty()) {
 	        JOptionPane.showMessageDialog(this, 
@@ -325,54 +267,19 @@ public class BuscarConFiltro extends JFrame {
 	}
 	
 	/**
-	 * Calcula la puntuación de coincidencia entre un texto de mensaje y un filtro
-	 * Busca la cadena completa, no palabras individuales
-	 * 
-	 * @param textoMensaje Texto del mensaje
-	 * @param filtro Filtro de búsqueda
-	 * @return Puntuación de coincidencia (0-1), donde 1 es coincidencia exacta
-	 */
-	private double calcularPuntuacionCoincidencia(String textoMensaje, String filtro) {
-	    if (textoMensaje == null || textoMensaje.isEmpty() || filtro == null || filtro.isEmpty()) {
-	        return 0;
-	    }
-	    
-	    String textoLower = textoMensaje.toLowerCase();
-	    String filtroLower = filtro.toLowerCase();
-	    
-	    // Buscar la frase completa como una unidad
-	    if (textoLower.contains(filtroLower)) {
-	        // Coincidencia exacta de la frase completa
-	        double relacionLongitud = (double) filtroLower.length() / textoLower.length();
-	        // Dar más peso a coincidencias exactas
-	        return 0.5 + (relacionLongitud * 0.5);
-	    }
-	    
-	    // Si no contiene la frase exacta, no hay coincidencia
-	    return 0;
-	}
-	
-	/**
 	 * Abre el elemento seleccionado (contacto o mensaje)
 	 * 
 	 * @param seleccionado El objeto seleccionado
 	 */
-	private void abrirSeleccionado(Object seleccionado) {
-		if (seleccionado instanceof Contacto) {
-			Contacto contacto = (Contacto) seleccionado;
-			// Aquí abrirías la conversación con este contacto
-			JOptionPane.showMessageDialog(this, 
-					"Abriendo conversación con: " + contacto.getNombre(), 
-					"Abrir conversación", 
-					JOptionPane.INFORMATION_MESSAGE);
-		} else if (seleccionado instanceof Mensaje) {
-			Mensaje mensaje = (Mensaje) seleccionado;
+	private void abrirSeleccionado(MensajeCoincidencia seleccionado) {
+			Mensaje mensaje = seleccionado.getMensaje();
+			Contacto contacto = seleccionado.getContacto();
+			buscarFiltroListener.onAccionRealizada(contacto, mensaje);
 			// Aquí podrías abrir la conversación en el punto de este mensaje
 			JOptionPane.showMessageDialog(this, 
 					"Mensaje seleccionado: " + mensaje.getTexto(), 
 					"Ver mensaje", 
 					JOptionPane.INFORMATION_MESSAGE);
-		}
 	}
 	
 }

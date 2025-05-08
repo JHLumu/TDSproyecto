@@ -75,7 +75,7 @@ public class Mensaje implements Comparable<Mensaje>{
 		this.fechaEnvio = fecha;
 	}
 	
-	public Integer getCodigo() {
+	public int getCodigo() {
 		return codigo;
 	}
 
@@ -136,6 +136,14 @@ public class Mensaje implements Comparable<Mensaje>{
 			return getTexto();
 		else 
 			return getEmoticono();
+	}
+	
+	public boolean igualEmisorReceptor() {
+		return this.emisor.equals(receptor);
+	}
+	
+	public boolean esEmisor(String telf) {
+		return this.emisor.getTelefono().equals(telf);
 	}
 
 

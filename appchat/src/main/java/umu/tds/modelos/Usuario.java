@@ -314,21 +314,21 @@ public class Usuario {
 		    List<Contacto> nuevosContactos = crearContactosIndividualesNuevos(usuariosConMensajes, contactosIndividuales);
 
 		    List<Contacto> gruposExistentes = obtenerGruposExistentesConMensajes(gruposConMensajes);
-		    List<Contacto> nuevosGrupos = crearGruposNuevos(gruposConMensajes, gruposExistentes);
+		    //List<Contacto> nuevosGrupos = crearGruposNuevos(gruposConMensajes, gruposExistentes);
 
 		    List<Contacto> todosLosContactos = new ArrayList<>();
 		    todosLosContactos.addAll(contactosIndividuales);
 		    todosLosContactos.addAll(nuevosContactos);
 		    todosLosContactos.addAll(gruposExistentes);
-		    todosLosContactos.addAll(nuevosGrupos);
-		    
-		 // Ordenar por fecha del último mensaje
+
+		    // Ordenar por fecha del último mensaje
 		    todosLosContactos.sort((c1, c2) -> {
 		        LocalDateTime fecha1 = getUltimoChatMensaje(c1).getFechaEnvio();
 		        LocalDateTime fecha2 = getUltimoChatMensaje(c2).getFechaEnvio();
 		        // Orden descendente (más reciente primero)
 		        return fecha2.compareTo(fecha1);
 		    });
+		    
 
 		    return todosLosContactos;
 		}
@@ -336,7 +336,8 @@ public class Usuario {
 		private Set<Usuario> obtenerUsuariosConMensajesIndividuales() {
 			return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
 		            .flatMap(List::stream)
-		            .filter(msg -> msg.getIDGrupo() == -1)
+		            //.filter(msg -> msg.getIDGrupo() == -1)
+		            .filter(msg -> !msg.igualEmisorReceptor())
 		            .flatMap(msg -> {
 		                Usuario emisor = msg.getEmisor();
 		                Usuario receptor = msg.getReceptor();
@@ -379,17 +380,6 @@ public class Usuario {
 		            .filter(c -> gruposConMensajes.contains((Grupo) c))
 		            .collect(Collectors.toList());
 		}
-
-		private List<Contacto> crearGruposNuevos(Set<Grupo> gruposConMensajes, List<Contacto> existentes) {
-		    Set<Grupo> gruposExistentes = existentes.stream()
-		            .map(c -> (Grupo) c)
-		            .collect(Collectors.toSet());
-
-		    return gruposConMensajes.stream()
-		            .filter(g -> !gruposExistentes.contains(g))
-		            .collect(Collectors.toList());
-		}
-		
 		
 
 
@@ -444,18 +434,15 @@ public class Usuario {
 	        return Objects.hash(telefono);
 	    }
 
-		public Contacto getAnfitrionConMensajes(String telefonoAnfitrion) {
-			List<Contacto> contactos = getListaContactosConMensajes();
+		public List<Mensaje> getMensajes() {
 			
-			for (Contacto contacto : contactos) {
-				
-		        if (contacto instanceof ContactoIndividual && ((ContactoIndividual) contacto).getTelefono().equals(telefonoAnfitrion)) {
-		            return contacto;
-		        }
-		    }
-
-		    return null; // Retorna null si no se encuentra el contacto
+			return Stream.of(this.mensajesEnviados, this.mensajesRecibidos)
+					.flatMap(List::stream)
+	                .sorted()
+	                .collect(Collectors.toList());
+			
 		}
+
 		
 		
 }

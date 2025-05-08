@@ -46,7 +46,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 	private JPanel contentPane;
 	private DefaultListModel<Contacto> listaContactos;
 	private DefaultListModel<Contacto> listaMiembros;
-	private Color colorPrimario;
 	private Grupo grupo;
 
 	public static void main(String[] args) {
@@ -250,7 +249,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(this.controlador.getURLIcon())));
 		setForeground(new Color(0, 0, 0));
 		setTitle("AppChat");
-		this.colorPrimario = this.controlador.getColorGUI(1);
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 

@@ -33,5 +33,10 @@ public class MensajeCoincidencia{
 	public String getNombre() {
 		return contacto.getNombre();
 	}
+
+	public boolean esEmisor(String telf) {
+		// TODO Auto-generated method stub
+		return mensaje.esEmisor(telf);
+	}
 	
 }

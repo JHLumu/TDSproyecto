@@ -1,6 +1,9 @@
 package umu.tds.modelos;
 
 import javax.swing.*;
+
+import umu.tds.appchat.AppChat;
+
 import java.awt.*;
 
 /**
@@ -9,7 +12,6 @@ import java.awt.*;
 public class ContactoRenderer extends BaseContactoRenderer implements ListCellRenderer<Contacto> {
 
     private static final long serialVersionUID = 1L;
-    private static final int MAX_GREETING_LENGTH = 40;
     
     // Componentes específicos de este renderizador
     private JLabel saludoLabel;
@@ -97,25 +99,9 @@ public class ContactoRenderer extends BaseContactoRenderer implements ListCellRe
     /**
      * Configura el texto o ícono del saludo según el tipo de contacto
      */
-    private void configurarSaludo(Contacto contacto) {
-        if (contacto instanceof ContactoIndividual) {
-            String saludo = ((ContactoIndividual) contacto).getSaludo();
-            if (saludo != null && !saludo.isEmpty()) {
-                // Truncar texto si es demasiado largo
-                if (saludo.length() > MAX_GREETING_LENGTH) {
-                    saludo = saludo.substring(0, MAX_GREETING_LENGTH) + "...";
-                }
-                saludoLabel.setText(saludo);
-                saludoLabel.setIcon(null);
-            } else {
-                saludoLabel.setText("<Sin saludo>");
-                saludoLabel.setIcon(null);
-            }
-        } else {
-            // Para grupos
-            saludoLabel.setText("Grupo de chat");
-            saludoLabel.setIcon(null);
-        }
+    private void configurarSaludo(Contacto contacto) {        
+        saludoLabel.setText(AppChat.getInstancia().formatearSaludoVista(contacto));
+        saludoLabel.setIcon(null);
     }
     
     /**

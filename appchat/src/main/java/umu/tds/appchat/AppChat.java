@@ -8,14 +8,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import tds.BubbleText;
@@ -26,6 +30,7 @@ import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Descuento;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Mensaje;
+import umu.tds.modelos.MensajeCoincidencia;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.*;
 import umu.tds.utils.ColoresAppChat;
@@ -34,670 +39,987 @@ import umu.tds.utils.ImagenUtils;
 import umu.tds.utils.TDSObservable;
 
 /**
- * Clase que actúa de Controlador entre la capa de Modelo y la capa
- * Ventana de AppChat.
- * 
+ * Controlador principal que gestiona la comunicación entre la capa de Modelo y la capa
+ * de Vista de la aplicación AppChat.
+ * Implementa el patrón Singleton para garantizar una única instancia en toda la aplicación.
  */
-public class AppChat extends TDSObservable{
-	
-	//Constantes
-	private static final double PRECIO_SUSCRIPCION = 9.99;
-	
-	
-	
+public class AppChat extends TDSObservable {
+    
+    // Constantes
+    private static final double PRECIO_SUSCRIPCION = 9.99;
+    private static final String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
+    private static final int MAX_MESSAGE_PREVIEW_LENGTH = 16;
+    
+    // Singleton
+    private static final AppChat instancia = new AppChat(SERVIDOR_PERSISTENCIA_ELEGIDO);
+    
+    // DAOs para acceso a datos
+    private final ContactoDAO contactoDAO;
+    private final MensajeDAO mensajeDAO;
+    private final UsuarioDAO usuarioDAO;
+    private final FactoriaDAO factoria;
+    
+    // Catálogos
+    private final CatalogoUsuarios catalogoUsuarios;
+    
+    // Usuario en sesión actual
+    private Usuario sesionUsuario;
+    
+    /**
+     * Constructor privado (patrón Singleton)
+     * 
+     * @param factoriaPath Ruta de la factoría de persistencia
+     */
+    private AppChat(String factoriaPath) {    
+        this.catalogoUsuarios = CatalogoUsuarios.getInstancia();
+        this.factoria = FactoriaDAO.getInstancia(factoriaPath);
+        this.contactoDAO = this.factoria.getContactoDAO();
+        this.mensajeDAO = this.factoria.getMensajeDAO();
+        this.usuarioDAO = this.factoria.getUsuarioDAO();
+    }
+    
+    /**
+     * Obtiene la instancia única de AppChat
+     * 
+     * @return La instancia de AppChat
+     */
+    public static AppChat getInstancia() {
+        return instancia;
+    }
+    
+    /**
+     * Obtiene el precio de la suscripción premium
+     * 
+     * @return Precio de la suscripción
+     */
+    public static double getPrecioSuscripcion() {
+        return PRECIO_SUSCRIPCION;
+    }
+    
+    // ---------- MÉTODOS DE GESTIÓN DE USUARIOS ----------
+    
+    /**
+     * Inicia sesión de un usuario en el sistema
+     * 
+     * @param telefono Teléfono del usuario
+     * @param contraseña Contraseña del usuario
+     * @return true si las credenciales son correctas, false en caso contrario
+     */
+    public boolean iniciarSesionUsuario(String telefono, String contraseña) {
+        if (!catalogoUsuarios.sonCredencialesCorrectas(telefono, contraseña)) {
+            return false;
+        }
+        this.sesionUsuario = catalogoUsuarios.getUsuario(telefono);
+        return true;
+    }
+    
+    /**
+     * Registra un nuevo usuario en el sistema
+     * 
+     * @param nombre Nombre del usuario
+     * @param apellidos Apellidos del usuario
+     * @param telefono Teléfono del usuario (identificador único)
+     * @param fechaNac Fecha de nacimiento
+     * @param email Correo electrónico
+     * @param password Contraseña
+     * @param saludo Saludo personalizado (opcional)
+     * @param imagen URL de la imagen de perfil
+     * @return true si el registro fue exitoso, false si el teléfono ya está registrado o hubo un error
+     */
+    public boolean registrarUsuario(String nombre, String apellidos, String telefono, 
+                                  LocalDate fechaNac, String email, String password, 
+                                  String saludo, URL imagen) {
+        // Verificar si el teléfono ya está registrado
+        if (this.catalogoUsuarios.estaUsuarioRegistrado(telefono)) {
+            return false;
+        }
+        
+        // Crear el usuario con el patrón Builder
+        Usuario usuario = new Usuario.BuilderUsuario()
+                .nombre(nombre)
+                .telefono(telefono)
+                .apellidos(apellidos)
+                .email(email)
+                .password(password)
+                .saludo(saludo)
+                .fechaNac(fechaNac)
+                .imagenDePerfil(imagen)
+                .build();
+        
+        // Guardar la imagen y persistir el usuario
+        if (ImagenUtils.guardarImagen(usuario)) {
+            usuarioDAO.registrarUsuario(usuario);
+            catalogoUsuarios.nuevoUsuario(usuario);        
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Sobrecarga del método registrarUsuario sin saludo personalizado
+     */
+    public boolean registrarUsuario(String nombre, String apellidos, String telefono, 
+                                  LocalDate fechaNac, String email, String password, 
+                                  URL imagen) {
+        return this.registrarUsuario(nombre, apellidos, telefono, fechaNac, email, password, "", imagen);
+    }
+    
+    /**
+     * Actualiza el estado premium del usuario actual
+     * 
+     * @param premium Nuevo estado premium
+     */
+    public void setUsuarioPremium(boolean premium) {
+        this.sesionUsuario.setPremium(premium);
+        this.usuarioDAO.modificarUsuario(sesionUsuario);
+    }
+    
+    /**
+     * Verifica si el usuario actual es premium
+     * 
+     * @return true si el usuario es premium, false en caso contrario
+     */
+    public boolean isUsuarioPremium() {
+        return this.sesionUsuario.isPremium();
+    }
+    
+    /**
+     * Calcula el máximo descuento aplicable al usuario actual
+     * 
+     * @param descuentosActivos Lista de descuentos activos en el sistema
+     * @return Valor del descuento máximo aplicable
+     */
+    public double getDescuentoAplicable(List<Descuento> descuentosActivos) {
+        Optional<Double> res = descuentosActivos.stream()
+                .map(d -> d.calcularDescuento(sesionUsuario, PRECIO_SUSCRIPCION))
+                .max(Double::compare);
+        
+        return res.orElse(0.0);
+    }
+    
+    /**
+     * Actualiza el saludo del usuario actual
+     * 
+     * @param saludo Nuevo saludo
+     */
+    public void cambiarSaludo(String saludo) {
+        this.sesionUsuario.setSaludo(saludo);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+    }
+    
+    /**
+     * Actualiza la imagen de perfil del usuario actual
+     * 
+     * @param fotoURL URL de la nueva imagen
+     * @param foto Objeto Image de la nueva foto
+     */
+    public void cambiarFotoPerfil(URL fotoURL, Image foto) {
+        this.sesionUsuario.setURLImagen(fotoURL);
+        
+        File fileImagenContacto = ImagenUtils.getFile(this.sesionUsuario);
+        try {
+            ImageIO.write((RenderedImage) foto, "png", fileImagenContacto);
+            
+            setChanged(Estado.NUEVA_FOTO_USUARIO);
+            usuarioDAO.modificarUsuario(sesionUsuario);
+            notifyObservers(Estado.NUEVA_FOTO_USUARIO);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // ---------- GETTERS DE INFORMACIÓN DEL USUARIO ----------
+    
+    /**
+     * Obtiene el nombre del usuario en sesión
+     */
+    public String getNombreUsuario() {
+        return this.sesionUsuario.getNombre();
+    }
+    
+    /**
+     * Obtiene el teléfono del usuario en sesión
+     */
+    public String getTelefonoUsuario() {
+        return this.sesionUsuario.getTelefono();
+    }
+    
+    /**
+     * Obtiene los apellidos del usuario en sesión
+     */
+    public String getApellidosUsuario() {
+        return this.sesionUsuario.getApellidos();
+    }
+    
+    /**
+     * Obtiene la fecha de nacimiento del usuario en sesión
+     */
+    public String getFechaNacimientoUsuario() {
+        return this.sesionUsuario.getFechaNacimiento().toString();
+    }
+    
+    /**
+     * Obtiene el correo del usuario en sesión
+     */
+    public String getCorreoUsuario() {
+        return this.sesionUsuario.getEmail();
+    }
+    
+    /**
+     * Obtiene el saludo del usuario en sesión
+     */
+    public String getSaludoUsuario() {
+        return this.sesionUsuario.getSaludo(); 
+    }
+    
+    /**
+     * Obtiene la imagen del usuario en sesión
+     */
+    public Image getImagenUsuarioActual() {
+        return ImagenUtils.getImagen(this.sesionUsuario);
+    }
+    
+    // ---------- MÉTODOS DE INTERFAZ GRÁFICA ----------
+    
+    /**
+     * Obtiene el color para la interfaz según el estado premium
+     * 
+     * @param id 1 para color primario, 2 para color secundario
+     * @return Color correspondiente
+     */
+    public Color getColorGUI(int id) {
+        boolean premium = this.isUsuarioPremium();
+        
+        if (id == 1) {
+            return premium ? ColoresAppChat.COLOR_PREMIUM : ColoresAppChat.COLOR_NOPREMIUM;
+        } else if (id == 2) {
+            return premium ? ColoresAppChat.COLOR_PREMIUM_2 : ColoresAppChat.COLOR_NOPREMIUM_2;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Obtiene la URL del icono según el estado premium
+     */
+    public String getURLIcon() {
+        return this.isUsuarioPremium() ? "/Resources/chat_premium.png" : "/Resources/chat.png";
+    }
+    
+    // ---------- GESTIÓN DE CONTACTOS ----------
+    
+    /**
+     * Crea un nuevo contacto individual para el usuario actual
+     * 
+     * @param nombre Nombre del contacto
+     * @param telefono Teléfono del contacto
+     * @return -1 si el teléfono no está registrado, 0 si ya es contacto, 1 si se añadió correctamente
+     */
+    public int nuevoContacto(String nombre, String telefono) {
+        // Verificar si el teléfono está registrado en el sistema
+        if (!catalogoUsuarios.estaUsuarioRegistrado(telefono)) {
+            return -1; // Teléfono no registrado en el sistema
+        }
+        
+        // Obtener el usuario asociado al teléfono
+        Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
+        
+        // Intentar crear el contacto
+        if (!this.sesionUsuario.crearContacto(nombre, usuarioAsociado)) {
+            return 0; // El contacto ya existe en la lista
+        }
+        
+        // Obtener el contacto creado y persistir los cambios
+        ContactoIndividual contacto = this.sesionUsuario.recuperarContactoIndividual(telefono);
+        
+        setChanged(Estado.INFO_CONTACTO);
+        contactoDAO.registrarContacto(contacto);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        notifyObservers(Estado.INFO_CONTACTO);
+        
+        return 1; // Contacto añadido con éxito
+    }
+    
+    /**
+     * Obtiene la lista completa de contactos del usuario
+     */
+    public List<Contacto> obtenerListaContactos() {
+        return this.sesionUsuario.getListaContacto();
+    }
+    
+    /**
+     * Obtiene sólo los contactos individuales, ordenados por nombre
+     */
+    public List<Contacto> obtenerListaContactosIndividuales() {
+        if (this.sesionUsuario == null) {
+            return new LinkedList<>();
+        }
+
+        return this.sesionUsuario.getListaContacto().stream()
+                .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL))
+                .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Obtiene sólo los grupos, ordenados por nombre
+     */
+    public List<Contacto> obtenerListaContactosGrupo() {
+        if (this.sesionUsuario == null) {
+            return new LinkedList<>();
+        }
+
+        return this.sesionUsuario.getListaContacto().stream()
+                .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.GRUPO))
+                .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Obtiene la lista de contactos con los que se ha intercambiado mensajes
+     */
+    public List<Contacto> obtenerListaChatMensajes() {
+        return this.sesionUsuario.getListaContactosConMensajes();
+    }
+    
+    /**
+     * Verifica si un contacto pertenece a la lista de contactos del usuario
+     */
+    public boolean esContacto(Contacto contacto) {
+        return obtenerListaContactos().contains(contacto);
+    }
+    
+    /**
+     * Obtiene el teléfono de un contacto o del anfitrión si es un grupo
+     */
+    public String getTelefonoContacto(Contacto contacto) {
+        return contacto instanceof ContactoIndividual ? 
+                ((ContactoIndividual) contacto).getTelefono() :
+                ((Grupo) contacto).getAnfitrion();
+    }
+    
+    // ---------- GESTIÓN DE GRUPOS ----------
+    
+    /**
+     * Crea un nuevo grupo vacío
+     * 
+     * @param nombre Nombre del grupo
+     * @param urlImagen URL de la imagen del grupo (opcional)
+     * @return -1 si hay error con la imagen, 0 si ya existe un grupo con ese nombre, 1 si se creó correctamente
+     */
+    public int nuevoGrupo(String nombre, URL urlImagen) {
+        // Verificar si ya existe un grupo con ese nombre
+        if (this.sesionUsuario.recuperarGrupo(nombre) != null) {
+            return 0; // Ya existe un grupo con ese nombre
+        }
+
+        // Crear el grupo
+        this.sesionUsuario.crearGrupo(nombre, urlImagen);
+        Grupo grupo = this.sesionUsuario.recuperarGrupo(nombre);
+     
+        // Guardar la imagen si se proporcionó
+        if (urlImagen != null && !ImagenUtils.guardarImagen(grupo)) {
+            return -1; // Error al guardar la imagen
+        }
+           
+        // Persistir los cambios y notificar
+        setChanged(Estado.INFO_CONTACTO);
+        contactoDAO.registrarContacto(grupo);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        notifyObservers(Estado.INFO_CONTACTO);
+            
+        return 1; // Grupo creado con éxito
+    }
+    
+    /**
+     * Añade un miembro a un grupo
+     * 
+     * @param grupo Grupo al que añadir el miembro
+     * @param contacto Contacto individual que se añadirá como miembro
+     */
+    public void nuevoMiembroGrupo(Grupo grupo, Contacto contacto) {
+        if (!(contacto instanceof ContactoIndividual)) {
+            return;
+        }
+        
+        Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
+        ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(
+                ((ContactoIndividual) contacto).getTelefono());
+        
+        recuperado.nuevoMiembro(miembro);
+        
+        setChanged(Estado.INFO_CONTACTO);
+        contactoDAO.modificarContacto(recuperado);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        notifyObservers(Estado.INFO_CONTACTO);
+    }
+    
+    /**
+     * Elimina un miembro de un grupo
+     * 
+     * @param grupo Grupo del que eliminar el miembro
+     * @param contacto Contacto individual que se eliminará como miembro
+     */
+    public void eliminarMiembroGrupo(Grupo grupo, Contacto contacto) {
+        if (!(contacto instanceof ContactoIndividual)) {
+            return;
+        }
+        
+        Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
+        ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(
+                ((ContactoIndividual) contacto).getTelefono());
+        
+        recuperado.eliminarMiembro(miembro);
+        
+        setChanged(Estado.INFO_CONTACTO);
+        contactoDAO.modificarContacto(recuperado);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        notifyObservers(Estado.INFO_CONTACTO);
+    }
+    
+    /**
+     * Obtiene la lista de miembros de un grupo
+     */
+    public List<Contacto> obtenerListaMiembrosGrupo(Grupo grupo) {
+        return grupo.getMiembros();
+    }
+    
+    // ---------- GESTIÓN DE MENSAJES ----------
+      
+    /**
+     * Obtiene todos los mensajes intercambiados con un contacto
+     * 
+     * @param contacto Contacto o grupo
+     * @return Lista de mensajes ordenados cronológicamente
+     */
+    public List<Mensaje> obtenerChatContacto(Contacto contacto) {
+        return this.sesionUsuario.getChatMensaje(contacto);
+    }
+    
+    /**
+     * Envía un mensaje a un contacto o grupo
+     * 
+     * @param contacto Destinatario (individual o grupo)
+     * @param entrada Contenido del mensaje (String para texto, Integer para emoji)
+     * @return true si se envió correctamente, false en caso contrario
+     */
+    public boolean enviarMensaje(Contacto contacto, Object entrada) {
+        // Validar tipo de entrada
+        if (!(entrada instanceof String || entrada instanceof Integer)) {
+            return false;
+        }
+
+        // Caso: mensaje a contacto individual
+        if (contacto instanceof ContactoIndividual) {
+            return enviarMensajeIndividual((ContactoIndividual) contacto, entrada);
+        } 
+        // Caso: mensaje a grupo
+        else if (contacto instanceof Grupo) {
+            return enviarMensajeGrupo((Grupo) contacto, entrada);
+        }
+
+        return false;
+    }
+    
+    /**
+     * Método auxiliar para enviar mensaje a un contacto individual
+     */
+    private boolean enviarMensajeIndividual(ContactoIndividual contacto, Object entrada) {
+        Usuario receptor = contacto.getUsuario();
+        Mensaje mensaje;
+
+        // Crear mensaje según tipo de entrada
+        if (entrada instanceof String) {
+            mensaje = new Mensaje(sesionUsuario, receptor, (String) entrada, null);
+        } else {
+            mensaje = new Mensaje(sesionUsuario, receptor, (Integer) entrada, null);
+        }
+
+        // Persistir y actualizar en ambos usuarios
+        mensajeDAO.registrarMensaje(mensaje);
+        sesionUsuario.enviarMensaje(mensaje);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        receptor.recibirMensaje(mensaje);
+        usuarioDAO.modificarUsuario(receptor);
+
+        return true;
+    }
+    
+    /**
+     * Método auxiliar para enviar mensaje a un grupo
+     */
+    private boolean enviarMensajeGrupo(Grupo grupo, Object entrada) {
+        Mensaje mensaje;
+
+        List<Contacto> miembros = grupo.getMiembros();
+        
+        
+        // Enviar a todos los miembros
+        for (Contacto miembro : miembros) {
+        	Usuario receptor = ((ContactoIndividual) miembro).getUsuario();
+            // Crear mensaje
+            if (entrada instanceof String) {
+                mensaje = new Mensaje(sesionUsuario, receptor, (String) entrada, grupo);
+            } else {
+                mensaje = new Mensaje(sesionUsuario, receptor, (Integer) entrada, grupo);
+            }
+            
+            // Persistir mensaje
+            mensajeDAO.registrarMensaje(mensaje);
+            sesionUsuario.enviarMensaje(mensaje);
+            receptor.recibirMensaje(mensaje);
+            usuarioDAO.modificarUsuario(receptor);
+            
+        }
+        // Crear mensaje para grupo
+        if (entrada instanceof String) {
+            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (String) entrada, grupo);
+        } else {
+            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (Integer) entrada, grupo);
+        }
+        mensajeDAO.registrarMensaje(mensaje);
+        sesionUsuario.enviarMensaje(mensaje);
+        usuarioDAO.modificarUsuario(sesionUsuario);
+        
+        return true;
+
+    }
+
 	/**
-	 * Servidor de Persistencia elegido.
-	 * 
-	 */
-	public static String SERVIDOR_PERSISTENCIA_ELEGIDO = "umu.tds.persistencia.FactoriaDAOTDS";
-	
-	/*
-	 * Instancias de Adaptadores. 
-	 */
-	private ContactoDAO contactoDAO;
-	private MensajeDAO mensajeDAO;
-	private UsuarioDAO usuarioDAO;
-	private FactoriaDAO factoria;
-	
-	/*
-	 * Instancias de Catalogos. 
-	 */
-	private CatalogoUsuarios catalogoUsuarios;
-	
-	/*
-	 * Atributo que guarda la instancia de Usuario actual. 
-	 */
-	private Usuario sesionUsuario;
-	
-	/**
-	 * Instancia única de AppChat.  <p>
-	 * Patron Singleton: Se asegura que todas las clases usen la misma instancia AppChat
-	 */
-	private static AppChat instancia = new AppChat(SERVIDOR_PERSISTENCIA_ELEGIDO);
-	
-	
-	/**
-	 * Constructor de la clase AppChat. <p>
-	 * Patron Singleton: La visibilidad del constructor es privado para evitar que otras clases creen instancias AppChat.
-	 * 
-	 * @param factoria Tipo de Factoría Abstracta. Usado para la persistencia.
-	 */
-	private AppChat(String factoria) {	
-		this.catalogoUsuarios = CatalogoUsuarios.getInstancia();
-		this.factoria = FactoriaDAO.getInstancia(factoria);
-		this.contactoDAO = this.factoria.getContactoDAO();
-		this.mensajeDAO = this.factoria.getMensajeDAO();
-		this.usuarioDAO = this.factoria.getUsuarioDAO();
-	};
-	
-	/**
-	 * Método para obtener la instancia única de AppChat. <p>
-	 * Patron Singleton: Se proporciona al usuario un método estático para obtener la instancia de AppChat.
-	 */
-	public static AppChat getInstancia() {return instancia;}
+     * Obtiene el contenido del último mensaje con un contacto
+     */
+    public Object getUltimoMensajeContacto(Contacto contacto) {
+        Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
+        return m != null ? m.getContenido() : null;
+    }
+    
+    /**
+     * Obtiene la fecha del último mensaje con un contacto
+     */
+    public LocalDateTime getUltimoMensajeFecha(Contacto contacto) {
+        Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
+        return m != null ? m.getFechaEnvio() : null;
+    }
+    
+    public List<Mensaje> getTodoMensajes(){
+    	return this.sesionUsuario.getMensajes();
+    }
+    
+    /**
+    * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
+    * Si no se proporciona texto de búsqueda, devuelve todos los mensajes que cumplan con los filtros de emisor/receptor
+    * 
+    * Soporta búsqueda de emojis con el formato "Emoji:<número de 0 a 23>"
+    * 
+    * Los resultados se ordenan por:
+    * - Si hay textoFiltro: ordenados por precisión de coincidencia
+    * - Si no hay textoFiltro: ordenados por coincidencia de contacto y luego por fecha de envío
+    *
+    * **@param** textoFiltro Texto a buscar en los mensajes (puede ser null o vacío)
+    * **@param** nombreFiltro Filtro de nombre de contacto (puede ser null)
+    * **@param** telefonoFiltro Filtro de teléfono de contacto (puede ser null)
+    * **@return** Lista de mensajes coincidentes ordenados según los criterios establecidos
+    */
+    public List<MensajeCoincidencia> buscarMensajes(String textoFiltro, String nombreFiltro, String telefonoFiltro) {
+        List<Contacto> contactos = AppChat.getInstancia().obtenerListaChatMensajes();
+        List<MensajeCoincidencia> mensajesCoincidentes = new ArrayList<>();
+        
+        // Estructura para almacenar información de puntuación para ordenar posteriormente
+        Map<MensajeCoincidencia, Double> puntuacionesTexto = new HashMap<>();
+        Map<MensajeCoincidencia, Double> puntuacionesContacto = new HashMap<>();
+        
+        // Determinar si estamos buscando un emoji específico
+        boolean busquedaEmoji = false;
+        int emojiNumero = -1;
+        
+        if (textoFiltro.matches("(?i)Emoji:\\s*([0-9]|1[0-9]|2[0-3])")) {
+            busquedaEmoji = true;
+            // Extraer el número de emoji (0-24)
+            emojiNumero = Integer.parseInt(textoFiltro.replaceAll("(?i)Emoji:\\s*", ""));
+        }
+        
+        boolean busquedaPorTexto = (textoFiltro != null && !textoFiltro.isEmpty());
+        boolean busquedaPorContacto = (nombreFiltro != null && !nombreFiltro.isEmpty()) || 
+                                     (telefonoFiltro != null && !telefonoFiltro.isEmpty());
 
-	
-	public String getNombreUsuario() {
-		return this.sesionUsuario.getNombre();
-	}
-	
-	public String getTelefonoUsuario() {
-		return this.sesionUsuario.getTelefono();
-	}
-	
-	public String getApellidosUsuario() {
-		return this.sesionUsuario.getApellidos();
-	}
-	
-	public String getFechaNacimientoUsuario() {
-		System.out.println("[DEBUG AppChat getFechaNacimientoUsuario]: Fecha nacimiento usuario: " + this.sesionUsuario.getFechaNacimiento());
-		return this.sesionUsuario.getFechaNacimiento().toString();
-	}
-	
-	public String getCorreoUsuario() {
-		return this.sesionUsuario.getEmail();
-	}
-	
-	public String getSaludoUsuario() {
-		return this.sesionUsuario.getSaludo(); 
-	}
-	
-	public static double getPrecioSuscripcion() {
-		return PRECIO_SUSCRIPCION;
-	}
-	
-	
-	/**
-	 * Calcula el máximo descuento que se puede aplicar al usuario actual.
-	 *
-	 * @param descuentos Lista de decuentos que se encuentran activos en el sistema.
-	 * @return Máximo descuento aplicable para el usuario actual.
-	 */
-	public double getDescuentoAplicable(List<Descuento> descuentosActivos) {
-		
-		Optional<Double> res =  descuentosActivos.stream()
-				.map(d -> d.calcularDescuento(sesionUsuario, PRECIO_SUSCRIPCION))
-				.max(new Comparator<Double>() {
-			
-					@Override
-					public int compare(Double o1, Double o2) {
-						return Double.compare(o1, o2);
-					}
-			
-				});
-		
-		return res.orElse(0.0);
-		
-	}
-	
-	/**
-	 * Procesa el formulario de registros, valida sus datos y registra al usuario
-	 * en el sistema de manera persistente.
-	 *  
-	 * @param nombre Nombre del usuario a registrar.
-	 * @param apellidos Apellidos del usuario a registrar.
-	 * @param telefono Teléfono del usuario a registrar.
-	 * @param fecha Fecha de Nacimiento del usuario a registrar.
-	 * @param email Correo electrónico del usuario a registrar.
-	 * @param password Contraseña del usuario a registrar.
-	 * @param saludo Saludo usuario a registrar.
-	 * @return false si teléfono ya está registrado en el sistema, true en caso contrario.
-	 */
-	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, String saludo, URL imagen) {
-		//Se tiene que verificar si el telefono no esta registrado ya
-		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
-	
-		if (this.catalogoUsuarios.estaUsuarioRegistrado(telefono)) return false;
-		
-		Usuario usuario = new Usuario.BuilderUsuario()
-				.nombre(nombre)
-				.telefono(telefono)
-				.apellidos(apellidos)
-				.email(email)
-				.password(password)
-				.saludo(saludo)
-				.fechaNac(fechaNac)
-				.imagenDePerfil(imagen)
-				.build();
-		
-		boolean imagenGuardada = ImagenUtils.guardarImagen(usuario);
-		System.out.println("[DEBUG AppChat registrarUsuario]: resultado de guardarImagen: " + imagenGuardada);
-		if (imagenGuardada) {
-		usuarioDAO.registrarUsuario(usuario);
-		catalogoUsuarios.nuevoUsuario(usuario);    	
-		return true;
-		}
-		else return false;
-	}
-	
-	
-	/**
-	 * Procesa el formulario de registros, valida sus datos y registra al usuario
-	 * en el sistema de manera persistente.
-	 *  
-	 * @param nombre Nombre del usuario a registrar.
-	 * @param apellidos Apellidos del usuario a registrar.
-	 * @param telefono Teléfono del usuario a registrar.
-	 * @param fecha Fecha de Nacimiento del usuario a registrar.
-	 * @param email Correo electrónico del usuario a registrar.
-	 * @param password Contraseña del usuario a registrar.
-	 * @return false si teléfono ya está registrado en el sistema, true en caso contrario.
-	 */
-	public boolean registrarUsuario(String nombre, String apellidos ,String telefono, LocalDate fechaNac, String email, String password, URL imagen) {
-		//Se tiene que verificar si el telefono no esta registrado ya
-		//Se tiene que verificar si los datos son correctos (se hace en la capa de presentacion¿?)
-		return this.registrarUsuario(nombre, apellidos, telefono, fechaNac, email, password, "", imagen);
-	}
-	
-	
-	/**
-	 * Procesa el formulario de inicio de sesión y autentica al usuario.
-	 * Para ello, valida si el teléfono se encuentra registrado en el sistema,
-	 * en ese caso valida si la contraseña pasada es la correcta.
-	 * 
-	 * @param telefono Teléfono del usuario a validar.
-	 * @param password Contraseña del usuario a validar.
-	 * @return false si el teléfono no se encuentra registrado o la contraseña es incorrecta, true en otro caso.
-	 */
-	public boolean iniciarSesionUsuario(String telefono, String contraseña) {
-		//Se tiene que verificar en el repositorio si los datos son correctos
-		
-		if(!catalogoUsuarios.sonCredencialesCorrectas(telefono, contraseña)) return false;
-		this.sesionUsuario = catalogoUsuarios.getUsuario(telefono);
-		return true;
-		
-	}
-	
-	/**
-	 * Cambia el estado Premium del usuario actual, persistiendo el cambio.
-	 * 
-	 * @param premium Nuevo estado premium del usuario.
-	 * */
-	public void setUsuarioPremium(boolean premium) {
-		this.sesionUsuario.setPremium(premium);
-		this.usuarioDAO.modificarUsuario(sesionUsuario);
-	}
-	
-	public boolean isUsuarioPremium() {
-		return this.sesionUsuario.isPremium();
-	}
+        // Primero filtramos los contactos si es necesario
+        if (busquedaPorContacto) {
+            contactos = contactos.stream()
+                .filter(contacto -> {
+                    boolean coincideNombre = nombreFiltro == null || nombreFiltro.isEmpty() ||
+                        contacto.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase());
+                    
+                    boolean coincideTelefono = telefonoFiltro == null || telefonoFiltro.isEmpty() ||
+                        AppChat.getInstancia().getTelefonoContacto(contacto).contains(telefonoFiltro);
+                    
+                    return coincideNombre && coincideTelefono;
+                })
+                .collect(Collectors.toList());
+        }
 
-	/**
-	 * Devuelve el color de los componentes de la aplicación según el estado Premium del
-	 * usuario actual.
-	 * 
-	 * @param id: Color primario (1) o secundario (2).
-	 * @return Color.
-	 * */
-	public Color getColorGUI(int id) {
-		boolean premium = this.isUsuarioPremium();
-		if (id == 1) {
-			
-			if (premium) return ColoresAppChat.COLOR_PREMIUM;
-			else return ColoresAppChat.COLOR_NOPREMIUM;
-		}
-		
-		else if (id == 2) {
-			if (premium) return ColoresAppChat.COLOR_PREMIUM_2;
-			else return ColoresAppChat.COLOR_NOPREMIUM_2;
-		}
-		
-		else return null;
+        // Ahora buscamos en los mensajes de los contactos filtrados
+        for (Contacto contacto : contactos) {
+            // Calculamos la puntuación de coincidencia del contacto
+            double puntuacionContacto = calcularPuntuacionCoincidenciaContacto(
+                contacto, nombreFiltro, telefonoFiltro);
+                
+            List<Mensaje> mensajes = AppChat.getInstancia().obtenerChatContacto(contacto);
+            if (mensajes != null) {
+                for (Mensaje mensaje : mensajes) {
+                    // Verificar si estamos buscando emojis
+                    if (busquedaEmoji) {
+                        // Crear un MensajeCoincidencia para poder acceder a getContenido()
+                        MensajeCoincidencia coincidencia = new MensajeCoincidencia(mensaje, contacto);
+                        Object contenido = coincidencia.getContenido();
+                        
+                        // Verificar si el contenido es un entero (emoji)
+                        if (contenido instanceof Integer) {
+                            int emojiValue = (Integer) contenido;
+                            
+                            // Si coincide con el emoji buscado o si no se especificó un emoji específico
+                            if (emojiNumero == -1 || emojiValue == emojiNumero) {
+                                mensajesCoincidentes.add(coincidencia);
+                                
+                                // Asignamos puntuación máxima para emojis que coinciden exactamente
+                                double puntuacionTexto = (emojiNumero == -1 || emojiValue == emojiNumero) ? 1.0 : 0.0;
+                                puntuacionesTexto.put(coincidencia, puntuacionTexto);
+                                puntuacionesContacto.put(coincidencia, puntuacionContacto);
+                            }
+                        }
+                    } else {
+                    	// Procesamiento normal para mensajes de texto **y emojis** cuando no hay filtro de texto
+                        String textoMensaje = mensaje.getTexto();
+                        Object contenido = new MensajeCoincidencia(mensaje, contacto).getContenido();
+
+                        // Calculamos la puntuación de texto (si hay filtro) o la dejamos a 1.0
+                        double puntuacionTexto = busquedaPorTexto
+                            ? calcularPuntuacionCoincidencia(textoMensaje, textoFiltro)
+                            : 1.0;
+
+                        // Si coincide el texto O es un emoji (Integer) o no filtramos por texto
+                        if (!busquedaPorTexto || puntuacionTexto > 0 || contenido instanceof Integer) {
+                            MensajeCoincidencia coincidencia = new MensajeCoincidencia(mensaje, contacto);
+                            mensajesCoincidentes.add(coincidencia);
+
+                            // Para emojis sin filtro de texto, asignamos puntuación máxima
+                            if (contenido instanceof Integer) {
+                                puntuacionesTexto.put(coincidencia, 1.0);
+                            } else {
+                                puntuacionesTexto.put(coincidencia, puntuacionTexto);
+                            }
+                            puntuacionesContacto.put(coincidencia, puntuacionContacto);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ordenamos los resultados según el criterio correspondiente
+        if (busquedaPorTexto) {
+            // Si hay búsqueda por texto, ordenamos primero por puntuación de texto
+            Collections.sort(mensajesCoincidentes, (m1, m2) -> {
+                int comparacion = Double.compare(puntuacionesTexto.get(m2), puntuacionesTexto.get(m1));
+                if (comparacion == 0) {
+                    // Si empatan en puntuación de texto, ordenamos por fecha de envío (más reciente primero)
+                    return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
+                }
+                return comparacion;
+            });
+        } else {
+            // Si no hay búsqueda por texto, ordenamos por puntuación de contacto y luego por fecha
+            Collections.sort(mensajesCoincidentes, (m1, m2) -> {
+                int comparacion = Double.compare(puntuacionesContacto.get(m2), puntuacionesContacto.get(m1));
+                if (comparacion == 0) {
+                    // Si empatan en puntuación de contacto, ordenamos por fecha de envío (más reciente primero)
+                    return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
+                }
+                return comparacion;
+            });
+        }
+
+        return mensajesCoincidentes;
+    }
+
+    /**
+     * Calcula la puntuación de coincidencia entre un texto de mensaje y un filtro de búsqueda
+     * 
+     * @param textoMensaje El texto del mensaje a evaluar
+     * @param textoFiltro El texto de búsqueda
+     * @return Puntuación de coincidencia (0 si no hay coincidencia)
+     */
+    private double calcularPuntuacionCoincidencia(String textoMensaje, String textoFiltro) {
+        if (textoFiltro == null || textoFiltro.isEmpty()) {
+            return 1.0; // Coincidencia máxima si no hay filtro
+        }
+        
+        String mensajeLower = textoMensaje.toLowerCase();
+        String filtroLower = textoFiltro.toLowerCase();
+        
+        if (mensajeLower.contains(filtroLower)) {
+            // Mayor puntuación si el texto es más corto o si la coincidencia está al principio
+            double puntuacionLongitud = 1.0 - ((double) textoMensaje.length() / 1000);
+            if (puntuacionLongitud < 0.1) puntuacionLongitud = 0.1;
+            
+            int posicion = mensajeLower.indexOf(filtroLower);
+            double puntuacionPosicion = 1.0 - ((double) posicion / textoMensaje.length());
+            
+            return 0.7 + (0.15 * puntuacionLongitud) + (0.15 * puntuacionPosicion);
+        }
+        
+        return 0.0;
+    }
+
+    /**
+     * Calcula la puntuación de coincidencia de un contacto con los filtros de nombre y teléfono
+     * 
+     * @param contacto El contacto a evaluar
+     * @param nombreFiltro Filtro de nombre
+     * @param telefonoFiltro Filtro de teléfono
+     * @return Puntuación de coincidencia del contacto
+     */
+    private double calcularPuntuacionCoincidenciaContacto(Contacto contacto, String nombreFiltro, String telefonoFiltro) {
+        double puntuacion = 1.0;
+        
+        if (nombreFiltro != null && !nombreFiltro.isEmpty()) {
+            String nombreContacto = contacto.getNombre().toLowerCase();
+            String filtroNombre = nombreFiltro.toLowerCase();
+            
+            if (nombreContacto.equals(filtroNombre)) {
+                puntuacion *= 1.0; // Coincidencia exacta
+            } else if (nombreContacto.contains(filtroNombre)) {
+                // Mayor puntuación si el filtro está al principio del nombre
+                int posicion = nombreContacto.indexOf(filtroNombre);
+                double factorPosicion = 1.0 - ((double) posicion / nombreContacto.length());
+                puntuacion *= 0.7 + (0.3 * factorPosicion);
+            } else {
+                puntuacion *= 0.0; // No hay coincidencia
+                return 0.0;
+            }
+        }
+        
+        if (telefonoFiltro != null && !telefonoFiltro.isEmpty()) {
+            String telefonoContacto = AppChat.getInstancia().getTelefonoContacto(contacto);
+            
+            if (telefonoContacto.equals(telefonoFiltro)) {
+                puntuacion *= 1.0; // Coincidencia exacta
+            } else if (telefonoContacto.contains(telefonoFiltro)) {
+                puntuacion *= 0.8; // Coincidencia parcial
+            } else {
+                puntuacion *= 0.0; // No hay coincidencia
+                return 0.0;
+            }
+        }
+        
+        return puntuacion;
+    }
+    
+    // ---------- MÉTODOS DE PRESENTACIÓN ----------
+    
+    /**
+     * Clase para encapsular la información procesada de un mensaje para la vista
+     */
+    public class InfoMensajeVista {
+        private String textoFormateado;
+        private ImageIcon emojiRedimensionado;
+        private String horaFormateada;
+        private boolean esEmoji;
+
+        private boolean esMensajeEnviado;
+
+        public boolean esMensajeEnviado() { return esMensajeEnviado; }
+        public void setEsMensajeEnviado(boolean enviado) { this.esMensajeEnviado = enviado; }
+        
+        public String getTextoFormateado() { return textoFormateado; }
+        public void setTextoFormateado(String texto) { this.textoFormateado = texto; }
+        
+        public ImageIcon getEmojiRedimensionado() { return emojiRedimensionado; }
+        public void setEmojiRedimensionado(ImageIcon emoji) { 
+            this.emojiRedimensionado = emoji;
+            this.esEmoji = (emoji != null);
+        }
+        
+        public String getHoraFormateada() { return horaFormateada; }
+        public void setHoraFormateada(String hora) { this.horaFormateada = hora; }
+        
+        public boolean esEmoji() { return esEmoji; }
+    }
+    
+    /**
+     * Prepara la información de un mensaje para mostrar en la vista
+     */
+    public InfoMensajeVista prepararInfoParaVista(Object item) {
+        InfoMensajeVista info = new InfoMensajeVista();
+        
+        Object contenido = null;
+        LocalDateTime fecha = null;
+        boolean esEnviado = false;
+
+        // Extraer contenido y fecha según el tipo de objeto
+        if (item instanceof Contacto) {
+            Contacto contacto = (Contacto) item;
+            esEnviado = esUltimoMensajeEnviado(contacto);
+            contenido = getUltimoMensajeContacto(contacto);
+            fecha = getUltimoMensajeFecha(contacto);
+        } else if (item instanceof MensajeCoincidencia) {
+            MensajeCoincidencia coincidencia = (MensajeCoincidencia) item;
+            esEnviado = coincidencia.esEmisor(getTelefonoUsuario());
+            contenido = coincidencia.getContenido();
+            fecha = coincidencia.getFechaEnvio();
+        } else {
+            return info;
+        }
+        info.setEsMensajeEnviado(esEnviado);
+        // Procesar el contenido según su tipo
+        if (contenido instanceof String) {
+            info.setTextoFormateado(formatearMensajeParaVista((String) contenido));
+        } else if (contenido instanceof Integer) {
+            info.setEmojiRedimensionado(obtenerEmojiRedimensionado((Integer) contenido));
+        }
+        
+        // Formatear la fecha
+        info.setHoraFormateada(formatearFechaMensaje(fecha));
+        
+        return info;
+    }
+    
+    private boolean esUltimoMensajeEnviado(Contacto item) {
+    	Mensaje m = this.sesionUsuario.getUltimoChatMensaje(item);
+		return m.esEmisor(getTelefonoUsuario());
 	}
-	
-	/**
-	 * Devuelve la ruta de la imagen del icono de la aplicación,
-	 * según el estado Premium del Usuario.
-	 * 
-	 * @return Ruta de la imagen del icono de la aplicación. 
-	 * */
-	public String getURLIcon() {
-		if (this.isUsuarioPremium()) return "/Resources/chat_premium.png";
-		else return "/Resources/chat.png";
-	}
-	
-	
-	
-	
-	
-	public boolean crearGrupo(Usuario u, String nombre, URL imagen) {
-		//Se tiene que verificar que el nombre no este vacio (se hace en la capa de presentacion¿?)
-		//Se tiene que registrar la entidad
-		return (u.crearGrupo(nombre, imagen));
-	}
-	
-	public boolean crearGrupo(Usuario u, String nombre) {
-		//Se tiene que verificar que el nombre no este vacio (se hace en la capa de presentacion¿?)
-		//Se tiene que registrar la entidad
-		return (u.crearGrupo(nombre));
-	}
-	
-	
-	public boolean introducirMiembroAGrupo(Usuario u, ContactoIndividual c, Grupo g) {
-		return u.introducirMiembroaGrupo(c, g);
-	}
-	
-	
-	/**
-	 *
-	 * Crea un nuevo contacto, lo registra de manera persistente
-	 * y notifica a la capa vista de la actualización de 
-	 * la lista de contactos.
-	 * 
-	 * @param nombre Nombre del contacto
-	 * @param telefono Teléfono del contacto. Debe estar registrado en el sistema.
-	 * @return -1 si el teléfono no se encuentra registrado, 0 si ya está registrado en la lista de contactos, 1 si el registro es un éxito.
-	 * 
-	 */
-	public int nuevoContacto(String nombre, String telefono) {
-		
-		if (!catalogoUsuarios.estaUsuarioRegistrado(telefono)) {
-			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono no se encuentra registrado.");
-			return -1;//-1 quiere decir que el telefono no está registrado
-		}
-		Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
-		if (!this.sesionUsuario.crearContacto(nombre,usuarioAsociado)) {
-			System.out.println("\n[DEBUG Controlador nuevoContacto]: Teléfono ya está registrado en la lista de contactos del usuario.");
-			return 0; //0 quiere decir que el teléfono ya está en la lista de contactos
-		}
-		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Se registra el contacto y se modifica el usuario.");
-		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto registrado. Usuario asociado: " + usuarioAsociado);
-		ContactoIndividual contacto = this.sesionUsuario.recuperarContactoIndividual(telefono);
-		System.out.println("\n[DEBUG Controlador nuevoContacto]: Contacto:" + contacto);
-		
-		setChanged(Estado.INFO_CONTACTO);
-		contactoDAO.registrarContacto(contacto);
-		usuarioDAO.modificarUsuario(sesionUsuario);
-		// Notificar a los observadores sobre el nuevo contacto
-		System.out.println("\n[DEBUG Controlador nuevoContacto]: Se notifica a los observadores de añadir contacto.");
-		notifyObservers(Estado.INFO_CONTACTO);    
-	    return 1;
-
-	}
-	
-	/**
-	 * 
-	 * Crea un nuevo grupo vacío, lo registra de manera persistente
-	 * y notifica a la capa vista de la actualización de la lista
-	 * de contactos.
-	 * 
-	 * @param nombre Nombre del grupo.
-	 * @param urlImagen URL de la imagen del grupo. Opcional.
-	 * @return -1 si la imagen no es válida, 0 si existe un grupo con ese mismo nombre, 1 en caso de que el registro haya sido un éxito.
-	 * */
-	public int nuevoGrupo(String nombre, URL urlImagen) {
-		
-		Image imagen = null;
-		
-	    // Primero comprobamos si ya existe un grupo con ese nombre
-	    if (this.sesionUsuario.recuperarGrupo(nombre) != null) {
-	        System.out.println("\n[DEBUG Controlador nuevoGrupo]: Ya existe un grupo con ese nombre.");
-	        return 0;
-	    }
-
-	    this.sesionUsuario.crearGrupo(nombre, urlImagen);
-	    Grupo grupo = this.sesionUsuario.recuperarGrupo(nombre);
-	 
-	    if (urlImagen != null && !ImagenUtils.guardarImagen(grupo)) return -1;
-	       
-	    // Notificar cambios.
-	    setChanged(Estado.INFO_CONTACTO);
-	    contactoDAO.registrarContacto(grupo);
-	    usuarioDAO.modificarUsuario(sesionUsuario);
-
-	    System.out.println("\n[DEBUG Controlador nuevoGrupo]: Se notifica a los observadores de añadir grupo.");
-	    notifyObservers(Estado.INFO_CONTACTO);
-	        
-	    return 1;
-	    
-
-	}
-	
-	
-	public List<Contacto> obtenerListaContactos(){
-		List<Contacto> contactos = this.sesionUsuario.getListaContacto();
-		return contactos;
-	}
-	
-	public List<Contacto> obtenerListaContactosIndividuales() {
-	    if (this.sesionUsuario == null) {
-	        return new LinkedList<>();
-	    }
-
-	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL))
-	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
-	            .collect(Collectors.toList());
-	}
-	
-	public List<Contacto> obtenerListaContactosGrupo() {
-	    if (this.sesionUsuario == null) {
-	        return new LinkedList<>(); // Devuelve una lista vacía si no hay sesión iniciada
-	    }
-
-	    return this.sesionUsuario.getListaContacto().stream()
-	            .filter(contacto -> contacto.getTipoContacto().equals(TipoContacto.GRUPO))
-	            .sorted((c1, c2) -> c1.getNombre().compareToIgnoreCase(c2.getNombre()))
-	            .collect(Collectors.toList()); 
-	}
-
-
-	public List<Contacto> obtenerListaChatMensajes(){
-		List<Contacto> contactos = this.sesionUsuario.getListaContactosConMensajes();
-		return contactos;
-	}
-	
-	
-	/**
-	 * Recupera los mensajes enviados entre el usuario actual y un contacto.
-	 * 
-	 * @param contacto Contacto del usuario.
-	 * @return Lista de mensajes, tanto envíados como recibidos, entre estos dos usuarios.
-	 * */
-	public List <Mensaje> obtenerChatContacto(Contacto contacto){
-		
-			List<Mensaje> chat = this.sesionUsuario.getChatMensaje(contacto);
-			int i = 0;
-			for(Mensaje m : chat) {
-				System.out.println("Lista Mensajes " + i + " : " + m);
-				i++;
-			}
-			return chat;
-		
-	}
-	
-	
-	//TODO: Revisar y explicar lógica.
-	/**
-	 * Registra el envío y la recepción del mensaje en el usuario
-	 * emisor y receptor.
-	 * 
-	 * @param contacto Puede ser tanto un contacto individual como un grupo.
-	 * @param entrada Puede ser tanto texto plano como un emoji.
-	 * @return true si el mensaje se ha enviado correctamente, false en caso contrario.
-	 * */
-	public boolean enviarMensaje(Contacto contacto, Object entrada) {
-		if (!(entrada instanceof String || entrada instanceof Integer)) {
-	        System.out.println("Tipo de mensaje no soportado");
-	        return false;
-	    }
-
-	    if (contacto instanceof ContactoIndividual) {
-	        Usuario receptor = ((ContactoIndividual) contacto).getUsuario();
-	        Mensaje mensaje;
-
-	        // Crear mensaje según el tipo de entrada: Si es tipo String, es un mensaje con texto, mientras que si es tipo Integer, es un emoji.
-	        if (entrada instanceof String) {
-	            mensaje = new Mensaje(sesionUsuario, receptor, (String) entrada, null);
-	        } else {
-	            mensaje = new Mensaje(sesionUsuario, receptor, (Integer) entrada, null);
-	        }
-
-	        mensajeDAO.registrarMensaje(mensaje);
-	        sesionUsuario.enviarMensaje(mensaje);
-	        usuarioDAO.modificarUsuario(sesionUsuario);
-
-	        receptor.recibirMensaje(mensaje);
-	        usuarioDAO.modificarUsuario(receptor);
-
-	        return true;
-
-	    } else if (contacto instanceof Grupo) {
-	        Grupo grupo = (Grupo) contacto;
-	        Mensaje mensaje;
-	        
-	        if(soyAnfitrion(contacto)) {
-	        	List<Contacto> miembros = grupo.getMiembros();
-	        	if (entrada instanceof String) {
-		            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (String) entrada, grupo);
-		        } else {
-		            mensaje = new Mensaje(sesionUsuario, sesionUsuario, (Integer) entrada, grupo);
-		        }
-
-		        mensajeDAO.registrarMensaje(mensaje);
-		        sesionUsuario.enviarMensaje(mensaje);
-		        usuarioDAO.modificarUsuario(sesionUsuario);
-
-		        for (Contacto miembro : miembros) {
-		            if (miembro instanceof ContactoIndividual) {
-		                Usuario receptor = ((ContactoIndividual) miembro).getUsuario();
-		                receptor.recibirMensaje(mensaje);
-		                usuarioDAO.modificarUsuario(receptor);
-		            }
-		        }
-
-		        return true;
-	        } else {
-	        	Usuario anfitrion = catalogoUsuarios.getUsuario(grupo.getAnfitrion());
-	        	if (entrada instanceof String) {
-		            mensaje = new Mensaje(sesionUsuario, anfitrion,(String) entrada, grupo);
-		        } else {
-		            mensaje = new Mensaje(sesionUsuario, anfitrion, (Integer) entrada, grupo);
-		        }
-
-		        mensajeDAO.registrarMensaje(mensaje);
-		        sesionUsuario.enviarMensaje(mensaje);
-		        usuarioDAO.modificarUsuario(sesionUsuario);
-		        anfitrion.recibirMensaje(mensaje);
-		        usuarioDAO.modificarUsuario(anfitrion);
-
-		        return true;
-	        }
-	        
-	    }
-
-	    System.out.println("Error en el envío");
-	    return false;
-	}
-	
-	private boolean soyAnfitrion(Contacto contacto) {
-		return ((Grupo) contacto).getAnfitrion().equals(getTelefonoUsuario());
-	}
-	
-	
-	
-	
-	/**
-	 * 
-	 * Devuelve la imagen del usuario actual.
-	 * 
-	 * @return Imagen del usuario.
-	 * 
-	 * */
-	public Image getImagenUsuarioActual() {
-		return ImagenUtils.getImagen(this.sesionUsuario);
-	}
-	
-	/**
-	 * 
-	 * Actualiza la imagen de perfil de un usuario y registra
-	 * el cambio de manera persistente.
-	 * 
-	 * @param url URL de la imagen.
-	 * @param imagen Imagen descargada.
-	 * 
-	 * */
-	public void cambiarFotoPerfil(URL fotoURL, Image foto) {
-		this.sesionUsuario.setURLImagen(fotoURL);
-		Image nuevaImagen = foto;
-		File fileImagenContacto = ImagenUtils.getFile(this.sesionUsuario);
-		try {
-			ImageIO.write((RenderedImage) nuevaImagen, "png", fileImagenContacto);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		setChanged(Estado.NUEVA_FOTO_USUARIO);
-		usuarioDAO.modificarUsuario(sesionUsuario);
-		
-		notifyObservers(Estado.NUEVA_FOTO_USUARIO);
-	}
-
-	
-	
-	public void cambiarSaludo(String saludo) {
-		this.sesionUsuario.setSaludo(saludo);
-		usuarioDAO.modificarUsuario(sesionUsuario);
-		
-	}
-
 
 	/**
-	 * 
-	 * Devuelve el último mensaje envíado o recibido entre el usuario actual 
-	 * y un contacto.
-	 * 
-	 * @param contacto Puede ser tanto un contacto individual como un grupo.
-	 * @return Mensaje (puede ser texto plano o un emoji).
-	 * 
-	 * */
-	public Object getUltimoMensajeContacto(Contacto contacto) {
+     * Formatea un mensaje de texto para la vista (trunca si es muy largo)
+     */
+    public String formatearMensajeParaVista(String mensajeTexto) {
+        if (mensajeTexto == null) {
+            return "";
+        }
+        
+        if (mensajeTexto.length() > MAX_MESSAGE_PREVIEW_LENGTH) {
+            return mensajeTexto.substring(0, MAX_MESSAGE_PREVIEW_LENGTH - 1) + "...";
+        }
+        return mensajeTexto;
+    }
+    
+    /**
+     * Formatea la fecha de un mensaje para mostrar solo la hora
+     */
+    public String formatearFechaMensaje(LocalDateTime fecha) {
+        if (fecha != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd-HH:mm");
+            return fecha.format(formatter);
+        }
+        return "";
+    }
+    
+    /**
+     * Redimensiona un emoji para la vista
+     */
+    public ImageIcon obtenerEmojiRedimensionado(Integer emojiCode) {
+        if (emojiCode == null) {
+            return null;
+        }
+        
+        ImageIcon emojiIcon = BubbleText.getEmoji(emojiCode);
+        if (emojiIcon != null) {
+            Image img = emojiIcon.getImage();
+            Image newImg = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            return new ImageIcon(newImg);
+        }
+        return null;
+    }
+    
+    /**
+     * Formatea el saludo de un contacto para la vista
+     */
+    public String formatearSaludoVista(Contacto contacto) {
+        final int MAX_SALUDO_LENGTH = 40;
+        
+        if (contacto.getTipoContacto() == TipoContacto.INDIVIDUAL) {
+            String saludo = ((ContactoIndividual) contacto).getSaludo();
+            if (saludo != null && !saludo.isEmpty()) {
+                // Truncar si es muy largo
+                if (saludo.length() > MAX_SALUDO_LENGTH) {
+                    saludo = saludo.substring(0, MAX_SALUDO_LENGTH) + "...";
+                }
+                return saludo;
+            }
+        }
+        return "";
+    }
+    
+    /**
+     * Genera las burbujas de chat para mostrar en la interfaz
+     * 
+     * @param contacto Contacto del chat
+     * @param chat Panel donde se mostrarán las burbujas
+     * @return Lista de burbujas de texto
+     */
+    public List<BubbleText> pintarMensajesBurbuja(Contacto contacto, JPanel chat) {
+        List<Mensaje> mensajes = obtenerChatContacto(contacto);
+        List<BubbleText> burbujas = new ArrayList<>();
 
-		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
-		if (m != null)
-			return m.getContenido();
-		else
-			return null;
-	}
+        if (mensajes == null || mensajes.isEmpty()) {
+            return burbujas;
+        }
 
-	public List<Contacto> obtenerListaMiembrosGrupo(Grupo grupo) {
-		
-		return grupo.getMiembros();
-	}
+        String telefonoUsuario = getTelefonoUsuario();
 
-	
-	//#TODO: Revisar si es necesario que seleccionado sea tipo Contacto y no ContactoIndividual.
-	/*
-	 *
-	 * Añade un nuevo contacto a un grupo, registra el cambio en el sistema
-	 * de manera persistente y notifica a la capa vista de la actualización
-	 * de la lista de contactos.
-	 * 
-	 * @param grupo: Grupo seleccionado en el que se añadirá un contacto.
-	 * @param seleccionado: Contacto a añadir.
-	 * 
-	 */
-	public void nuevoMiembroGrupo(Grupo grupo, Contacto seleccionado) {
-		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
-		System.out.println("\n[DEBUG Controlador nuevoMiembro]: Miembro -> " + seleccionado);
-		ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(((ContactoIndividual) seleccionado).getTelefono());
-		recuperado.nuevoMiembro(miembro);
-		setChanged(Estado.INFO_CONTACTO);
-		contactoDAO.modificarContacto(recuperado);
-		usuarioDAO.modificarUsuario(sesionUsuario);
-		// Notificar a los observadores sobre el nuevo contacto
-		System.out.println("\n[DEBUG Controlador nuevoMiembro]: Se notifica a los observadores de añadir miembro.");
-		notifyObservers(Estado.INFO_CONTACTO);   
-	}
+        for (Mensaje mensaje : mensajes) {
+            Object contenido = (mensaje.getEmoticono() == -1) ? 
+                    mensaje.getTexto() : mensaje.getEmoticono();
 
-	
-	/**
-	 *
-	 * Elimina un miembro existente de un grupo, registra el cambio en el sistema
-	 * de manera persistente y notifica a la capa vista de la actualización
-	 * de la lista de contactos.
-	 * 
-	 * @param grupo Grupo seleccionado en el que se eliminará un contacto.
-	 * @param seleccionado Contacto a eliminar.
-	 * 
-	 */
-	public void eliminarMiembroGrupo(Grupo grupo, Contacto seleccionado) {
-		Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
-		System.out.println("\n[DEBUG Controlador eliminarMiembro]: Miembro -> " + seleccionado);
-		ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(((ContactoIndividual) seleccionado).getTelefono());
-		recuperado.eliminarMiembro(miembro);
-		setChanged(Estado.INFO_CONTACTO);
-		contactoDAO.modificarContacto(recuperado);
-		usuarioDAO.modificarUsuario(sesionUsuario);
-		// Notificar a los observadores sobre el nuevo contacto
-		System.out.println("\n[DEBUG Controlador eliminarMiembro]: Se notifica a los observadores de eliminar miembro.");
-		notifyObservers(Estado.INFO_CONTACTO);   
-	}
+            boolean esUsuario = mensaje.esEmisor(telefonoUsuario);
+            String autor = determinarAutorMensaje(contacto, mensaje, esUsuario);
+            int tipoMensaje = esUsuario ? BubbleText.SENT : BubbleText.RECEIVED;
 
-	public boolean esContacto(Contacto contacto) {
-		
-		return obtenerListaContactos().contains(contacto);
-	}
-	
-	
-	//TODO: Revisar y Explicar lógica.
-	public List<BubbleText> pintarMensajesBurbuja(Contacto contacto, JPanel chat) {
-	    List<Mensaje> mensajes = obtenerChatContacto(contacto);
-	    List<BubbleText> burbujas = new ArrayList<>();
+            BubbleText bubble = (contenido instanceof String)
+                ? new BubbleText(chat, (String) contenido, Color.WHITE, autor, tipoMensaje, 14)
+                : new BubbleText(chat, (Integer) contenido, Color.WHITE, autor, tipoMensaje, 14);
 
-	    if (mensajes == null || mensajes.isEmpty()) {
-	        return burbujas;
-	    }
+            burbujas.add(bubble);
+        }
 
-	    String telefonoUsuario = getTelefonoUsuario();
+        return burbujas;
+    }
 
-	    for (Mensaje mensaje : mensajes) {
-	        Object contenido = (mensaje.getEmoticono() == -1) ? mensaje.getTexto() : mensaje.getEmoticono();
+    
+    /**
+     * Método auxiliar para determinar el autor a mostrar en la burbuja
+     */
+    private String determinarAutorMensaje(Contacto contacto, Mensaje mensaje, boolean esUsuario) {
+        String autor;
+        
+        if (esUsuario) {
+            autor = getNombreUsuario();
+            if (mensaje.getIDGrupo() != -1 && !mensaje.getReceptorTelf().equals(getTelefonoUsuario())) {
+                autor += " <G> *" + mensaje.getNombreGrupo() + "*";
+            }
+        } else {
+        	autor = contacto.getNombre();
+    
+        }
+        
+        return autor += " <> " + formatearFechaMensaje(mensaje.getFechaEnvio());
+        
+    }
 
-	        boolean esUsuario = mensaje.getEmisorTelf().equals(telefonoUsuario);
-	        String autor;
-	        int tipoMensaje;
+    public int ubicarMensaje(Contacto c, Mensaje mObjetivo) {
+        List<Mensaje> mensajes = obtenerChatContacto(c);
 
-	        if (esUsuario) {
-	            autor = getNombreUsuario();
-	            if (mensaje.getIDGrupo() != -1 && !mensaje.getReceptorTelf().equals(telefonoUsuario)) {
-	                autor += " <G> * " + mensaje.getNombreGrupo() + " *";
-	            }
-	            tipoMensaje = BubbleText.SENT;
-	        } else {
-	            if (contacto instanceof ContactoIndividual) {
-	                autor = contacto.getNombre();
-	                if (mensaje.getIDGrupo() != -1) {
-	                    autor += " <G> * " + mensaje.getNombreGrupo() + " *";
-	                }
-	            } else {
-	                String telefonoAnfitrion = ((Grupo) contacto).getAnfitrion();
-	                ContactoIndividual anfitrion = (ContactoIndividual) this.sesionUsuario.getAnfitrionConMensajes(telefonoAnfitrion);
-	                autor = (anfitrion != null) ? anfitrion.getNombre() : telefonoAnfitrion;
-	            }
-	            tipoMensaje = BubbleText.RECEIVED;
-	        }
+        int i = 0;
+        // Recorremos mientras queden elementos
+        while (i < mensajes.size()) {
+            Mensaje m = mensajes.get(i);
+            // Comparamos valores de código (primitivos) y salimos en cuanto coincidamos
+            if (m.getCodigo() == mObjetivo.getCodigo()) {
+                return i;
+            }
+            i++;
+        }
 
-	        BubbleText bubble = (contenido instanceof String)
-	            ? new BubbleText(chat, (String) contenido, Color.WHITE, autor, tipoMensaje, 14)
-	            : new BubbleText(chat, (Integer) contenido, Color.WHITE, autor, tipoMensaje, 14);
+        // Si acabamos el bucle sin retorno, no lo encontramos
+        return -1;
+    }
 
-	        burbujas.add(bubble);
-	    }
-
-	    return burbujas;
-	}
-
-	public String getTelefonoContacto(Contacto seleccionado) {
-		
-		return seleccionado instanceof ContactoIndividual ? 
-				((ContactoIndividual) seleccionado).getTelefono() :
-				((Grupo) seleccionado).getAnfitrion()											
-			;
-	}
-
-	public LocalDateTime getUltimoMensajeFecha(Contacto contacto) {
-		Mensaje m = this.sesionUsuario.getUltimoChatMensaje(contacto);
-		return m.getFechaEnvio();
-	}
 }
