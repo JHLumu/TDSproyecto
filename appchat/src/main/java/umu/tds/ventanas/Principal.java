@@ -320,6 +320,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 				TDSEmojiPanel emojiPanel = new TDSEmojiPanel();
 				JDialog emojiDialog = new JDialog();
 			    emojiDialog.setTitle("Select Emoji");
+			    emojiDialog.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 			    emojiDialog.add(emojiPanel);
 			    emojiDialog.pack();
 			    emojiDialog.setLocationRelativeTo(null);

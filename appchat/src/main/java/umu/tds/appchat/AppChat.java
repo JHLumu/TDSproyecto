@@ -596,212 +596,210 @@ public class AppChat extends TDSObservable {
     }
     
     /**
-    * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
-    * Si no se proporciona texto de búsqueda, devuelve todos los mensajes que cumplan con los filtros de emisor/receptor
-    * 
-    * Soporta búsqueda de emojis con el formato "Emoji:<número de 0 a 23>"
-    * 
-    * Los resultados se ordenan por:
-    * - Si hay textoFiltro: ordenados por precisión de coincidencia
-    * - Si no hay textoFiltro: ordenados por coincidencia de contacto y luego por fecha de envío
-    *
-    * **@param** textoFiltro Texto a buscar en los mensajes (puede ser null o vacío)
-    * **@param** nombreFiltro Filtro de nombre de contacto (puede ser null)
-    * **@param** telefonoFiltro Filtro de teléfono de contacto (puede ser null)
-    * **@return** Lista de mensajes coincidentes ordenados según los criterios establecidos
-    */
-    public List<MensajeCoincidencia> buscarMensajes(String textoFiltro, String nombreFiltro, String telefonoFiltro) {
-        List<Contacto> contactos = AppChat.getInstancia().obtenerListaChatMensajes();
-        List<MensajeCoincidencia> mensajesCoincidentes = new ArrayList<>();
-        
-        // Estructura para almacenar información de puntuación para ordenar posteriormente
-        Map<MensajeCoincidencia, Double> puntuacionesTexto = new HashMap<>();
-        Map<MensajeCoincidencia, Double> puntuacionesContacto = new HashMap<>();
-        
-        // Determinar si estamos buscando un emoji específico
-        boolean busquedaEmoji = false;
-        int emojiNumero = -1;
-        
-        if (textoFiltro.matches("(?i)Emoji:\\s*([0-9]|1[0-9]|2[0-3])")) {
-            busquedaEmoji = true;
-            // Extraer el número de emoji (0-24)
-            emojiNumero = Integer.parseInt(textoFiltro.replaceAll("(?i)Emoji:\\s*", ""));
-        }
-        
-        boolean busquedaPorTexto = (textoFiltro != null && !textoFiltro.isEmpty());
-        boolean busquedaPorContacto = (nombreFiltro != null && !nombreFiltro.isEmpty()) || 
-                                     (telefonoFiltro != null && !telefonoFiltro.isEmpty());
-
-        // Primero filtramos los contactos si es necesario
-        if (busquedaPorContacto) {
-            contactos = contactos.stream()
-                .filter(contacto -> {
-                    boolean coincideNombre = nombreFiltro == null || nombreFiltro.isEmpty() ||
-                        contacto.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase());
-                    
-                    boolean coincideTelefono = telefonoFiltro == null || telefonoFiltro.isEmpty() ||
-                        AppChat.getInstancia().getTelefonoContacto(contacto).contains(telefonoFiltro);
-                    
-                    return coincideNombre && coincideTelefono;
-                })
-                .collect(Collectors.toList());
-        }
-
-        // Ahora buscamos en los mensajes de los contactos filtrados
-        for (Contacto contacto : contactos) {
-            // Calculamos la puntuación de coincidencia del contacto
-            double puntuacionContacto = calcularPuntuacionCoincidenciaContacto(
-                contacto, nombreFiltro, telefonoFiltro);
-                
-            List<Mensaje> mensajes = AppChat.getInstancia().obtenerChatContacto(contacto);
-            if (mensajes != null) {
-                for (Mensaje mensaje : mensajes) {
-                    // Verificar si estamos buscando emojis
-                    if (busquedaEmoji) {
-                        // Crear un MensajeCoincidencia para poder acceder a getContenido()
-                        MensajeCoincidencia coincidencia = new MensajeCoincidencia(mensaje, contacto);
-                        Object contenido = coincidencia.getContenido();
-                        
-                        // Verificar si el contenido es un entero (emoji)
-                        if (contenido instanceof Integer) {
-                            int emojiValue = (Integer) contenido;
-                            
-                            // Si coincide con el emoji buscado o si no se especificó un emoji específico
-                            if (emojiNumero == -1 || emojiValue == emojiNumero) {
-                                mensajesCoincidentes.add(coincidencia);
-                                
-                                // Asignamos puntuación máxima para emojis que coinciden exactamente
-                                double puntuacionTexto = (emojiNumero == -1 || emojiValue == emojiNumero) ? 1.0 : 0.0;
-                                puntuacionesTexto.put(coincidencia, puntuacionTexto);
-                                puntuacionesContacto.put(coincidencia, puntuacionContacto);
-                            }
-                        }
-                    } else {
-                    	// Procesamiento normal para mensajes de texto **y emojis** cuando no hay filtro de texto
-                        String textoMensaje = mensaje.getTexto();
-                        Object contenido = new MensajeCoincidencia(mensaje, contacto).getContenido();
-
-                        // Calculamos la puntuación de texto (si hay filtro) o la dejamos a 1.0
-                        double puntuacionTexto = busquedaPorTexto
-                            ? calcularPuntuacionCoincidencia(textoMensaje, textoFiltro)
-                            : 1.0;
-
-                        // Si coincide el texto O es un emoji (Integer) o no filtramos por texto
-                        if (!busquedaPorTexto || puntuacionTexto > 0 || contenido instanceof Integer) {
-                            MensajeCoincidencia coincidencia = new MensajeCoincidencia(mensaje, contacto);
-                            mensajesCoincidentes.add(coincidencia);
-
-                            // Para emojis sin filtro de texto, asignamos puntuación máxima
-                            if (contenido instanceof Integer) {
-                                puntuacionesTexto.put(coincidencia, 1.0);
-                            } else {
-                                puntuacionesTexto.put(coincidencia, puntuacionTexto);
-                            }
-                            puntuacionesContacto.put(coincidencia, puntuacionContacto);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Ordenamos los resultados según el criterio correspondiente
-        if (busquedaPorTexto) {
-            // Si hay búsqueda por texto, ordenamos primero por puntuación de texto
-            Collections.sort(mensajesCoincidentes, (m1, m2) -> {
-                int comparacion = Double.compare(puntuacionesTexto.get(m2), puntuacionesTexto.get(m1));
-                if (comparacion == 0) {
-                    // Si empatan en puntuación de texto, ordenamos por fecha de envío (más reciente primero)
-                    return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
-                }
-                return comparacion;
-            });
-        } else {
-            // Si no hay búsqueda por texto, ordenamos por puntuación de contacto y luego por fecha
-            Collections.sort(mensajesCoincidentes, (m1, m2) -> {
-                int comparacion = Double.compare(puntuacionesContacto.get(m2), puntuacionesContacto.get(m1));
-                if (comparacion == 0) {
-                    // Si empatan en puntuación de contacto, ordenamos por fecha de envío (más reciente primero)
-                    return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
-                }
-                return comparacion;
-            });
-        }
-
-        return mensajesCoincidentes;
-    }
-
-    /**
-     * Calcula la puntuación de coincidencia entre un texto de mensaje y un filtro de búsqueda
+     * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
+     * Si no se proporciona texto de búsqueda, devuelve todos los mensajes que cumplan con los filtros de emisor/receptor
      * 
-     * @param textoMensaje El texto del mensaje a evaluar
-     * @param textoFiltro El texto de búsqueda
-     * @return Puntuación de coincidencia (0 si no hay coincidencia)
-     */
-    private double calcularPuntuacionCoincidencia(String textoMensaje, String textoFiltro) {
-        if (textoFiltro == null || textoFiltro.isEmpty()) {
-            return 1.0; // Coincidencia máxima si no hay filtro
-        }
-        
-        String mensajeLower = textoMensaje.toLowerCase();
-        String filtroLower = textoFiltro.toLowerCase();
-        
-        if (mensajeLower.contains(filtroLower)) {
-            // Mayor puntuación si el texto es más corto o si la coincidencia está al principio
-            double puntuacionLongitud = 1.0 - ((double) textoMensaje.length() / 1000);
-            if (puntuacionLongitud < 0.1) puntuacionLongitud = 0.1;
-            
-            int posicion = mensajeLower.indexOf(filtroLower);
-            double puntuacionPosicion = 1.0 - ((double) posicion / textoMensaje.length());
-            
-            return 0.7 + (0.15 * puntuacionLongitud) + (0.15 * puntuacionPosicion);
-        }
-        
-        return 0.0;
-    }
-
-    /**
-     * Calcula la puntuación de coincidencia de un contacto con los filtros de nombre y teléfono
+     * Soporta búsqueda de emojis con el formato "Emoji:<número de 0 a 23>"
      * 
-     * @param contacto El contacto a evaluar
-     * @param nombreFiltro Filtro de nombre
-     * @param telefonoFiltro Filtro de teléfono
-     * @return Puntuación de coincidencia del contacto
+     * Los resultados se ordenan por:
+     * - Si hay textoFiltro: ordenados por precisión de coincidencia
+     * - Si no hay textoFiltro: ordenados por coincidencia de contacto y luego por fecha de envío
+     *
+     * **@param** textoFiltro Texto a buscar en los mensajes (puede ser null o vacío)
+     * **@param** nombreFiltro Filtro de nombre de contacto (puede ser null)
+     * **@param** telefonoFiltro Filtro de teléfono de contacto (puede ser null)
+     * **@return** Lista de mensajes coincidentes ordenados según los criterios establecidos
      */
-    private double calcularPuntuacionCoincidenciaContacto(Contacto contacto, String nombreFiltro, String telefonoFiltro) {
-        double puntuacion = 1.0;
-        
-        if (nombreFiltro != null && !nombreFiltro.isEmpty()) {
-            String nombreContacto = contacto.getNombre().toLowerCase();
-            String filtroNombre = nombreFiltro.toLowerCase();
-            
-            if (nombreContacto.equals(filtroNombre)) {
-                puntuacion *= 1.0; // Coincidencia exacta
-            } else if (nombreContacto.contains(filtroNombre)) {
-                // Mayor puntuación si el filtro está al principio del nombre
-                int posicion = nombreContacto.indexOf(filtroNombre);
-                double factorPosicion = 1.0 - ((double) posicion / nombreContacto.length());
-                puntuacion *= 0.7 + (0.3 * factorPosicion);
-            } else {
-                puntuacion *= 0.0; // No hay coincidencia
-                return 0.0;
-            }
-        }
-        
-        if (telefonoFiltro != null && !telefonoFiltro.isEmpty()) {
-            String telefonoContacto = AppChat.getInstancia().getTelefonoContacto(contacto);
-            
-            if (telefonoContacto.equals(telefonoFiltro)) {
-                puntuacion *= 1.0; // Coincidencia exacta
-            } else if (telefonoContacto.contains(telefonoFiltro)) {
-                puntuacion *= 0.8; // Coincidencia parcial
-            } else {
-                puntuacion *= 0.0; // No hay coincidencia
-                return 0.0;
-            }
-        }
-        
-        return puntuacion;
-    }
+     public List<MensajeCoincidencia> buscarMensajes(String textoFiltro, String nombreFiltro, String telefonoFiltro) {
+         List<Contacto> contactos = AppChat.getInstancia().obtenerListaChatMensajes();
+         List<MensajeCoincidencia> mensajesCoincidentes = new ArrayList<>();
+         
+         // Estructura para almacenar información de puntuación para ordenar posteriormente
+         Map<MensajeCoincidencia, Double> puntuacionesTexto = new HashMap<>();
+         Map<MensajeCoincidencia, Double> puntuacionesContacto = new HashMap<>();
+         
+         // Determinar si estamos buscando un emoji específico
+         boolean busquedaEmoji = false;
+         int emojiNumero = -1;
+         
+         if (textoFiltro != null && textoFiltro.matches("(?i)Emoji:\\s*([0-9]|1[0-9]|2[0-3])")) {
+             busquedaEmoji = true;
+             // Extraer el número de emoji (0-24)
+             emojiNumero = Integer.parseInt(textoFiltro.replaceAll("(?i)Emoji:\\s*", ""));
+         }
+         
+         boolean busquedaPorTexto = (textoFiltro != null && !textoFiltro.isEmpty());
+         boolean busquedaPorContacto = (nombreFiltro != null && !nombreFiltro.isEmpty()) || 
+                                      (telefonoFiltro != null && !telefonoFiltro.isEmpty());
+
+         // Primero filtramos los contactos si es necesario
+         if (busquedaPorContacto) {
+             contactos = contactos.stream()
+                 .filter(contacto -> {
+                     boolean coincideNombre = nombreFiltro == null || nombreFiltro.isEmpty() ||
+                         contacto.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase());
+                     
+                     boolean coincideTelefono = telefonoFiltro == null || telefonoFiltro.isEmpty() ||
+                         AppChat.getInstancia().getTelefonoContacto(contacto).contains(telefonoFiltro);
+                     
+                     return coincideNombre && coincideTelefono;
+                 })
+                 .collect(Collectors.toList());
+         }
+
+         // Ahora buscamos en los mensajes de los contactos filtrados
+         for (Contacto contacto : contactos) {
+             // Calculamos la puntuación de coincidencia del contacto
+             double puntuacionContacto = calcularPuntuacionCoincidenciaContacto(
+                 contacto, nombreFiltro, telefonoFiltro);
+                 
+             List<Mensaje> mensajes = AppChat.getInstancia().obtenerChatContacto(contacto);
+             if (mensajes != null) {
+                 for (Mensaje mensaje : mensajes) {
+                     // Crear un MensajeCoincidencia para poder acceder a getContenido()
+                     MensajeCoincidencia coincidencia = new MensajeCoincidencia(mensaje, contacto);
+                     Object contenido = coincidencia.getContenido();
+                     
+                     // Verificar si estamos buscando emojis
+                     if (busquedaEmoji) {
+                         // Verificar si el contenido es un entero (emoji)
+                         if (contenido instanceof Integer) {
+                             int emojiValue = (Integer) contenido;
+                             
+                             // Si coincide con el emoji buscado o si no se especificó un emoji específico
+                             if (emojiNumero == -1 || emojiValue == emojiNumero) {
+                                 mensajesCoincidentes.add(coincidencia);
+                                 
+                                 // Asignamos puntuación máxima para emojis que coinciden exactamente
+                                 double puntuacionTexto = (emojiNumero == -1 || emojiValue == emojiNumero) ? 1.0 : 0.0;
+                                 puntuacionesTexto.put(coincidencia, puntuacionTexto);
+                                 puntuacionesContacto.put(coincidencia, puntuacionContacto);
+                             }
+                         }
+                     } else {
+                         // Procesamiento normal para mensajes de texto (NO incluimos emojis cuando hay búsqueda por texto)
+                         
+                         // Si es un emoji y estamos filtrando por texto, lo ignoramos
+                         if (contenido instanceof Integer && busquedaPorTexto) {
+                             continue; // Saltamos este mensaje, no incluimos emojis en búsqueda por texto
+                         }
+                         
+                         String textoMensaje = mensaje.getTexto();
+                         
+                         // Calculamos la puntuación de texto (si hay filtro) o la dejamos a 1.0
+                         double puntuacionTexto = busquedaPorTexto
+                             ? calcularPuntuacionCoincidencia(textoMensaje, textoFiltro)
+                             : 1.0;
+
+                         // Incluimos el mensaje si hay coincidencia de texto o si no estamos filtrando por texto
+                         if (!busquedaPorTexto || puntuacionTexto > 0) {
+                             mensajesCoincidentes.add(coincidencia);
+                             puntuacionesTexto.put(coincidencia, puntuacionTexto);
+                             puntuacionesContacto.put(coincidencia, puntuacionContacto);
+                         }
+                     }
+                 }
+             }
+         }
+
+         // Ordenamos los resultados según el criterio correspondiente
+         if (busquedaPorTexto) {
+             // Si hay búsqueda por texto, ordenamos primero por puntuación de texto
+             Collections.sort(mensajesCoincidentes, (m1, m2) -> {
+                 int comparacion = Double.compare(puntuacionesTexto.get(m2), puntuacionesTexto.get(m1));
+                 if (comparacion == 0) {
+                     // Si empatan en puntuación de texto, ordenamos por fecha de envío (más reciente primero)
+                     return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
+                 }
+                 return comparacion;
+             });
+         } else {
+             // Si no hay búsqueda por texto, ordenamos por puntuación de contacto y luego por fecha
+             Collections.sort(mensajesCoincidentes, (m1, m2) -> {
+                 int comparacion = Double.compare(puntuacionesContacto.get(m2), puntuacionesContacto.get(m1));
+                 if (comparacion == 0) {
+                     // Si empatan en puntuación de contacto, ordenamos por fecha de envío (más reciente primero)
+                     return m2.getFechaEnvio().compareTo(m1.getFechaEnvio());
+                 }
+                 return comparacion;
+             });
+         }
+
+         return mensajesCoincidentes;
+     }
+
+     /**
+      * Calcula la puntuación de coincidencia entre un texto de mensaje y un filtro de búsqueda
+      * 
+      * @param textoMensaje El texto del mensaje a evaluar
+      * @param textoFiltro El texto de búsqueda
+      * @return Puntuación de coincidencia (0 si no hay coincidencia)
+      */
+     private double calcularPuntuacionCoincidencia(String textoMensaje, String textoFiltro) {
+         if (textoFiltro == null || textoFiltro.isEmpty()) {
+             return 1.0; // Coincidencia máxima si no hay filtro
+         }
+         
+         String mensajeLower = textoMensaje.toLowerCase();
+         String filtroLower = textoFiltro.toLowerCase();
+         
+         if (mensajeLower.contains(filtroLower)) {
+             // Mayor puntuación si el texto es más corto o si la coincidencia está al principio
+             double puntuacionLongitud = 1.0 - ((double) textoMensaje.length() / 1000);
+             if (puntuacionLongitud < 0.1) puntuacionLongitud = 0.1;
+             
+             int posicion = mensajeLower.indexOf(filtroLower);
+             double puntuacionPosicion = 1.0 - ((double) posicion / textoMensaje.length());
+             
+             return 0.7 + (0.15 * puntuacionLongitud) + (0.15 * puntuacionPosicion);
+         }
+         
+         return 0.0;
+     }
+
+     /**
+      * Calcula la puntuación de coincidencia de un contacto con los filtros de nombre y teléfono
+      * 
+      * @param contacto El contacto a evaluar
+      * @param nombreFiltro Filtro de nombre
+      * @param telefonoFiltro Filtro de teléfono
+      * @return Puntuación de coincidencia del contacto
+      */
+     private double calcularPuntuacionCoincidenciaContacto(Contacto contacto, String nombreFiltro, String telefonoFiltro) {
+         double puntuacion = 1.0;
+         
+         if (nombreFiltro != null && !nombreFiltro.isEmpty()) {
+             String nombreContacto = contacto.getNombre().toLowerCase();
+             String filtroNombre = nombreFiltro.toLowerCase();
+             
+             if (nombreContacto.equals(filtroNombre)) {
+                 puntuacion *= 1.0; // Coincidencia exacta
+             } else if (nombreContacto.contains(filtroNombre)) {
+                 // Mayor puntuación si el filtro está al principio del nombre
+                 int posicion = nombreContacto.indexOf(filtroNombre);
+                 double factorPosicion = 1.0 - ((double) posicion / nombreContacto.length());
+                 puntuacion *= 0.7 + (0.3 * factorPosicion);
+             } else {
+                 puntuacion *= 0.0; // No hay coincidencia
+                 return 0.0;
+             }
+         }
+         
+         if (telefonoFiltro != null && !telefonoFiltro.isEmpty()) {
+             String telefonoContacto = AppChat.getInstancia().getTelefonoContacto(contacto);
+             
+             if (telefonoContacto.equals(telefonoFiltro)) {
+                 puntuacion *= 1.0; // Coincidencia exacta
+             } else if (telefonoContacto.contains(telefonoFiltro)) {
+                 puntuacion *= 0.8; // Coincidencia parcial
+             } else {
+                 puntuacion *= 0.0; // No hay coincidencia
+                 return 0.0;
+             }
+         }
+         
+         return puntuacion;
+     }
     
     // ---------- MÉTODOS DE PRESENTACIÓN ----------
     
