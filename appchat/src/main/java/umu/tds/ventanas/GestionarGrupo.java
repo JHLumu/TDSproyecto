@@ -36,6 +36,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.SwingConstants;
 
 
 public class GestionarGrupo extends JDialog implements TDSObserver {
@@ -66,27 +67,29 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		JPanel panelCentral = new JPanel();
 		contentPane.add(panelCentral, BorderLayout.CENTER);
 		GridBagLayout gbl_panelCentral = new GridBagLayout();
-		gbl_panelCentral.columnWidths = new int[]{183, 0, 0, 0};
+		gbl_panelCentral.columnWidths = new int[]{0, 0, 0};
 		gbl_panelCentral.rowHeights = new int[]{0, 246, 0};
-		gbl_panelCentral.columnWeights = new double[]{1.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panelCentral.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_panelCentral.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_panelCentral.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		panelCentral.setLayout(gbl_panelCentral);
-
-		JLabel lblLista = new JLabel("Lista de Contactos");
-		lblLista.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		GridBagConstraints gbc_lblLista = new GridBagConstraints();
-		gbc_lblLista.insets = new Insets(0, 0, 5, 5);
-		gbc_lblLista.gridx = 0;
-		gbc_lblLista.gridy = 0;
-		panelCentral.add(lblLista, gbc_lblLista);
-
-		JLabel lblGrupo = new JLabel("Miembros");
-		lblGrupo.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		GridBagConstraints gbc_lblGrupo = new GridBagConstraints();
-		gbc_lblGrupo.insets = new Insets(0, 0, 5, 5);
-		gbc_lblGrupo.gridx = 1;
-		gbc_lblGrupo.gridy = 0;
-		panelCentral.add(lblGrupo, gbc_lblGrupo);
+		
+				JLabel lblLista = new JLabel("Lista de Contactos");
+				lblLista.setHorizontalAlignment(SwingConstants.CENTER);
+				GridBagConstraints gbc_lblLista = new GridBagConstraints();
+				gbc_lblLista.insets = new Insets(0, 0, 5, 5);
+				gbc_lblLista.gridx = 0;
+				gbc_lblLista.gridy = 0;
+				panelCentral.add(lblLista, gbc_lblLista);
+				lblLista.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		
+				JLabel lblGrupo = new JLabel("Miembros");
+				lblGrupo.setHorizontalAlignment(SwingConstants.CENTER);
+				GridBagConstraints gbc_lblGrupo = new GridBagConstraints();
+				gbc_lblGrupo.insets = new Insets(0, 0, 5, 0);
+				gbc_lblGrupo.gridx = 1;
+				gbc_lblGrupo.gridy = 0;
+				panelCentral.add(lblGrupo, gbc_lblGrupo);
+				lblGrupo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
 		JList<Contacto> list = inicializacionListaContactos();
 		GridBagConstraints gbc_list = new GridBagConstraints();
@@ -100,7 +103,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		list_1.setBackground(Color.WHITE);
 		list_1.setBorder(new LineBorder(Color.BLACK));
 		GridBagConstraints gbc_list_1 = new GridBagConstraints();
-		gbc_list_1.gridwidth = 2;
 		gbc_list_1.fill = GridBagConstraints.BOTH;
 		gbc_list_1.gridx = 1;
 		gbc_list_1.gridy = 1;
@@ -168,9 +170,9 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		panelSuperior.add(contenidoSuperior, BorderLayout.NORTH);
 		GridBagLayout gbl_contenidoSuperior = new GridBagLayout();
 		gbl_contenidoSuperior.columnWidths = new int[]{20, 0, 20, 0};
-		gbl_contenidoSuperior.rowHeights = new int[]{20, 0, 0, 0, 20, 0};
+		gbl_contenidoSuperior.rowHeights = new int[]{20, 0, 0, 20, 0};
 		gbl_contenidoSuperior.columnWeights = new double[]{1.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_contenidoSuperior.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contenidoSuperior.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contenidoSuperior.setLayout(gbl_contenidoSuperior);
 		
 		JLabel nombreGrupo = new JLabel(seleccionado.getNombre());
@@ -194,13 +196,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		if (localImage != null) imagenPerfil.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
 			
 		contenidoSuperior.add(imagenPerfil, gbc_imagenPerfil);
-		
-		JButton btnNewButton = new JButton("Editar");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
-		gbc_btnNewButton.gridx = 1;
-		gbc_btnNewButton.gridy = 3;
-		contenidoSuperior.add(btnNewButton, gbc_btnNewButton);
 	}
 
 	private void inicializacionPanelInferior() {

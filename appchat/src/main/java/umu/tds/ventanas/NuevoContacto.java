@@ -193,7 +193,7 @@ public class NuevoContacto extends JDialog {
 		panelCentro.add(this.nombreField, gbc_nombreField);
 		this.nombreField.setColumns(10);
 		
-		JLabel lblTelefono = new JLabel("Telefono");
+		JLabel lblTelefono = new JLabel("Teléfono");
 		lblTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		GridBagConstraints gbc_lblTelefono = new GridBagConstraints();
 		gbc_lblTelefono.anchor = GridBagConstraints.WEST;
