@@ -443,6 +443,34 @@ public class Usuario {
 			
 		}
 
+		public Grupo nuevoMiembroGrupo(Grupo grupo, Contacto contacto) {
+			if (!(contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL))) {
+	            return null;
+	        }
+	        
+	        Grupo recuperado = recuperarGrupo(grupo.getNombre());
+	        ContactoIndividual miembro = recuperarContactoIndividual(
+	                ((ContactoIndividual) contacto).getTelefono());
+	        
+	        recuperado.nuevoMiembro(miembro);
+	        
+	        return recuperado;
+		}
+
+		public Grupo eliminarMiembroGrupo(Grupo grupo, Contacto contacto) {
+			if (!(contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL))) {
+	            return null;
+	        }
+	        
+	        Grupo recuperado = recuperarGrupo(grupo.getNombre());
+	        ContactoIndividual miembro = recuperarContactoIndividual(
+	                ((ContactoIndividual) contacto).getTelefono());
+	        
+	        recuperado.eliminarMiembro(miembro);
+	        
+	        return recuperado;
+		}
+
 		
 		
 }

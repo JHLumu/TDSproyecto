@@ -120,9 +120,12 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		    public void mouseClicked(MouseEvent e) {
 		        int index = list.locationToIndex(e.getPoint());
 		        if (index != -1) {
-		            Contacto seleccionado = list.getModel().getElementAt(index);
-		            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
-		            controlador.nuevoMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
+		        	if(e.getClickCount() == 2) {
+		        		Contacto seleccionado = list.getModel().getElementAt(index);
+			            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
+			            controlador.nuevoMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
+		        	}
+		            
 		        }
 		    }
 		});

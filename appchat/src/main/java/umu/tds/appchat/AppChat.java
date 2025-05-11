@@ -438,20 +438,16 @@ public class AppChat extends TDSObservable {
      * @param contacto Contacto individual que se añadirá como miembro
      */
     public void nuevoMiembroGrupo(Grupo grupo, Contacto contacto) {
-        if (!(contacto instanceof ContactoIndividual)) {
-            return;
+       
+        Grupo recuperado = this.sesionUsuario.nuevoMiembroGrupo(grupo, contacto);
+        
+        if(recuperado != null) {
+        	setChanged(Estado.INFO_CONTACTO);
+            contactoDAO.modificarContacto(recuperado);
+            usuarioDAO.modificarUsuario(sesionUsuario);
+            notifyObservers(Estado.INFO_CONTACTO);
         }
         
-        Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
-        ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(
-                ((ContactoIndividual) contacto).getTelefono());
-        
-        recuperado.nuevoMiembro(miembro);
-        
-        setChanged(Estado.INFO_CONTACTO);
-        contactoDAO.modificarContacto(recuperado);
-        usuarioDAO.modificarUsuario(sesionUsuario);
-        notifyObservers(Estado.INFO_CONTACTO);
     }
     
     /**
@@ -461,20 +457,14 @@ public class AppChat extends TDSObservable {
      * @param contacto Contacto individual que se eliminará como miembro
      */
     public void eliminarMiembroGrupo(Grupo grupo, Contacto contacto) {
-        if (!(contacto instanceof ContactoIndividual)) {
-            return;
+        Grupo recuperado = this.sesionUsuario.eliminarMiembroGrupo(grupo, contacto);
+        
+        if(recuperado != null) {
+        	setChanged(Estado.INFO_CONTACTO);
+            contactoDAO.modificarContacto(recuperado);
+            usuarioDAO.modificarUsuario(sesionUsuario);
+            notifyObservers(Estado.INFO_CONTACTO);
         }
-        
-        Grupo recuperado = this.sesionUsuario.recuperarGrupo(grupo.getNombre());
-        ContactoIndividual miembro = this.sesionUsuario.recuperarContactoIndividual(
-                ((ContactoIndividual) contacto).getTelefono());
-        
-        recuperado.eliminarMiembro(miembro);
-        
-        setChanged(Estado.INFO_CONTACTO);
-        contactoDAO.modificarContacto(recuperado);
-        usuarioDAO.modificarUsuario(sesionUsuario);
-        notifyObservers(Estado.INFO_CONTACTO);
     }
     
     /**

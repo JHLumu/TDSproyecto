@@ -129,7 +129,7 @@ public class ListaContactos extends JDialog implements TDSObserver {
 		        if (index != -1) {
 			    	Contacto seleccionado = listaGrupos.getSelectedValue();
 			        
-			        if(seleccionado instanceof Grupo && seleccionado != null){
+			        if(e.getClickCount() == 2 && seleccionado instanceof Grupo && seleccionado != null){
 			        	GestionarGrupo frame = new GestionarGrupo(seleccionado);
 						frame.setModal(true);
 						frame.setVisible(true);

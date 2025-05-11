@@ -592,8 +592,8 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	                // Aplica un borde grueso de color brillante
 	                jc.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
 
-	                // Crea un Timer que en 1 000 ms restaure el borde original
-	                new javax.swing.Timer(1000, e -> {
+	                // Crea un Timer que en 2000 ms restaure el borde original
+	                new javax.swing.Timer(2000, e -> {
 	                    jc.setBorder(originalBorder);
 	                    ((javax.swing.Timer)e.getSource()).stop();
 	                }).start();
