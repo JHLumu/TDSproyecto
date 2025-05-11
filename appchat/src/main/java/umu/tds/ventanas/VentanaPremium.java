@@ -148,7 +148,7 @@ public class VentanaPremium extends JDialog {
         gbcDescValor.anchor = GridBagConstraints.EAST;
         gbcDescValor.insets = new Insets( 5, 5, 5, 10);
         JLabel lblPrecioDescuento = new JLabel(
-            String.format("-%.0f€", 0.0)
+            String.format("-%.0f€", AppChat.getInstancia().getDescuentoAplicable())
         );
         lblPrecioDescuento.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         panelDerecho.add(lblPrecioDescuento, gbcDescValor);
@@ -168,7 +168,7 @@ public class VentanaPremium extends JDialog {
         gbcTotalValor.gridy     = 3;
         gbcTotalValor.anchor    = GridBagConstraints.EAST;
         gbcTotalValor.insets    = new Insets( 5, 5, 10, 10);
-        double total = AppChat.getPrecioSuscripcion();
+        double total = AppChat.getInstancia().calcularPrecioSuscripcion();
         JLabel lblPrecioTotal = new JLabel(String.format("%.2f€", total));
         lblPrecioTotal.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         panelDerecho.add(lblPrecioTotal, gbcTotalValor);

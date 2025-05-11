@@ -64,7 +64,6 @@ public class Usuario {
 		 *
 		 */
 		public Usuario(BuilderUsuario b) {
-			this.fechaRegistro = LocalDate.now();
 			this.listaContactos =b.listaContactos;
 			this.mensajesRecibidos = b.listaDeMensajesRecibidos;
 			this.mensajesEnviados = b.listaDeMensajesEnviados;
@@ -78,6 +77,7 @@ public class Usuario {
 			this.password = b.password;
 			this.codigo = 0;
 			this.premium = b.premium;
+			this.fechaRegistro = b.fechaRegistro;
 		}
 
 	//Metodos getter y setter
@@ -397,11 +397,13 @@ public class Usuario {
 	    	private boolean premium;
 			private final List<Mensaje> listaDeMensajesRecibidos;
 			private final List<Mensaje> listaDeMensajesEnviados;
+			private LocalDate fechaRegistro;
 	        
 	        public BuilderUsuario() {
 	        	this.listaContactos = new LinkedList<Contacto>();
 	        	this.listaDeMensajesRecibidos = new LinkedList<Mensaje>();
 	        	this.listaDeMensajesEnviados = new LinkedList<Mensaje>();
+	        	this.fechaRegistro = LocalDate.now();
 	        }
 	        
 	        public BuilderUsuario nombre(String nombre) {this.nombre=nombre;return this;}
@@ -419,6 +421,7 @@ public class Usuario {
 	        public BuilderUsuario listaDeContactos(List<Contacto> lista) {this.listaContactos.addAll(lista);return this;}
 	        public BuilderUsuario listaDeMensajesRecibidos(List<Mensaje> listaR) {this.listaDeMensajesRecibidos.addAll(listaR);return this;}
 	        public BuilderUsuario listaDeMensajesEnviados(List<Mensaje> listaE) {this.listaDeMensajesEnviados.addAll(listaE);return this;}
+	        public BuilderUsuario fechaRegistro(LocalDate fecha) {this.fechaRegistro = fecha; return this;}
 	        public Usuario build() {return new Usuario(this);}
 	    }
 	    

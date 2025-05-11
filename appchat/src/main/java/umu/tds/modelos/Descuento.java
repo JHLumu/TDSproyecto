@@ -1,5 +1,9 @@
 package umu.tds.modelos;
 
+import java.time.LocalDate;
+
+import umu.tds.appchat.AppChat;
+
 public abstract class Descuento {
 	
 	//Atributos

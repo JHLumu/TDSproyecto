@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.DefaultComboBoxModel;
@@ -35,6 +37,7 @@ import javax.swing.DefaultListModel;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JList;
@@ -46,6 +49,12 @@ import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -57,6 +66,14 @@ import java.awt.Insets;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.pdf.PdfWriter;
+
 
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -281,8 +298,28 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
 		});
+		
+		
+		JButton btnExport = new JButton("Exportar PDF");
+		btnExport.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		btnExport.setForeground(Color.WHITE);
+		btnExport.setBackground(this.colorBotones);
+		btnExport.addActionListener(e -> {
+			
+			if (AppChat.getInstancia().isUsuarioPremium()) exportarConversacion();
+			else {
+				 JOptionPane.showMessageDialog(
+			                this,
+			                "Esta funcionalidad solo está disponible para usuarios premium.",
+			                "AppChat",
+			                JOptionPane.ERROR_MESSAGE
+			            );
+				
+			}
+		});
+		panelNorte.add(btnExport);
 		panelNorte.add(btnUsuario);
-
+		
 	}
 	
 	private void inicializacionPanelCentro() {
@@ -320,8 +357,12 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 				TDSEmojiPanel emojiPanel = new TDSEmojiPanel();
 				JDialog emojiDialog = new JDialog();
 			    emojiDialog.setTitle("Select Emoji");
+<<<<<<< HEAD
 			    emojiDialog.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 			    emojiDialog.add(emojiPanel);
+=======
+			    emojiDialog.getContentPane().add(emojiPanel);
+>>>>>>> f059fb5 (Implementación de Exportar Conversaciones a PDF.)
 			    emojiDialog.pack();
 			    emojiDialog.setLocationRelativeTo(null);
 			    emojiDialog.setModal(true);
@@ -610,6 +651,134 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
         buscador.setVisible(true);
 		buscador.setLocationRelativeTo(null);
     }
+	
+	private void exportarConversacion() {
+	
+	    Contacto contacto;
+	    if (seleccionPanel) {
+	        if (comboBoxContactos.getSelectedIndex() > 0) {
+	            contacto = (Contacto) comboBoxContactos.getSelectedItem();
+	        } else {
+	            JOptionPane.showMessageDialog(
+	                this,
+	                "Primero selecciona un contacto.",
+	                "AppChat",
+	                JOptionPane.ERROR_MESSAGE
+	            );
+	            return;
+	        }
+	    } else contacto = listaPanelChat.getSelectedValue();
+	    
+	    if (contacto == null) {
+	        JOptionPane.showMessageDialog(
+	            this,
+	            "Primero selecciona un contact.o",
+	            "AppChat",
+	            JOptionPane.ERROR_MESSAGE
+	        );
+	        return;
+	    }
+
+	  
+	    String alias = contacto.getNombre().replace(" ", "_");                
+	    LocalDateTime ahora = LocalDateTime.now();
+	    DateTimeFormatter formato = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
+	    String ts = ahora.format(formato);
+	    String nombreFichero = "conversacion_" + alias + "_" + ts + ".pdf";
+
+	  
+	    JFileChooser selector = new JFileChooser();
+	    selector.setDialogTitle("Guardar conversación como PDF");
+	    selector.setAcceptAllFileFilterUsed(false);
+	    selector.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+	    selector.setSelectedFile(new File(nombreFichero));
+
+	    int opcion = selector.showSaveDialog(this);
+	    if (opcion != JFileChooser.APPROVE_OPTION) {
+	        return;  // usuario ha cancelado
+	    }
+
+	    File destino = selector.getSelectedFile();
+	    if (!destino.getName().toLowerCase().endsWith(".pdf")) destino = new File(destino.getParentFile(),destino.getName() + ".pdf");
+	  
+	    List<Mensaje> mensajes = controlador.obtenerChatContacto(contacto);
+	    String miTelefono = controlador.getTelefonoUsuario();
+	    String miNombre   = controlador.getNombreUsuario();
+	    DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+	  
+	    try (FileOutputStream fos = new FileOutputStream(destino)) {
+	        Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
+	        PdfWriter.getInstance(doc, fos);
+	        doc.open();
+
+	        for (Mensaje m : mensajes) {
+	            boolean enviadoPorMi = m.esEmisor(miTelefono);
+
+	            String quien;
+	            if (enviadoPorMi) quien = miNombre;
+	            else quien = contacto.getNombre();
+	            
+	            String fechaHora = m.getFechaEnvio().format(formatoHora);
+	            String linea;
+	           
+	            if (m.getEmoticono() != -1 ) {
+	            	
+	            	Image emoji = controlador.obtenerEmojiRedimensionado(m.getEmoticono()).getImage();
+	            	BufferedImage bufferedEmoji = new BufferedImage(emoji.getWidth(null), emoji.getHeight(selector), BufferedImage.TYPE_INT_ARGB);
+	            	Graphics2D g = bufferedEmoji.createGraphics();
+	            	g.drawImage(emoji, 0, 0, null);
+	            	g.dispose();
+	            	ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+	            	ImageIO.write(bufferedEmoji, "png", bytes);
+	            	com.itextpdf.text.Image imagen = com.itextpdf.text.Image.getInstance(bytes.toByteArray());
+	            	imagen.scaleToFit(30, 30);
+	            	imagen.setSpacingBefore(5f);
+	            	imagen.setSpacingAfter(5f);
+	            	Paragraph lineaPrevia = new Paragraph(quien + " (" + fechaHora + "):");
+	                if (enviadoPorMi) {
+	                	imagen.setAlignment(Element.ALIGN_RIGHT);
+	                	lineaPrevia.setAlignment(Element.ALIGN_RIGHT);
+	                } else {
+	                	imagen.setAlignment(Element.ALIGN_LEFT);
+	                	lineaPrevia.setAlignment(Element.ALIGN_LEFT);
+	                }
+	                doc.add(lineaPrevia);
+	                doc.add(imagen);
+	            	
+	            	
+	            }
+	            
+	            else {linea = quien + " (" + fechaHora + "): " + m.getTexto();
+	            
+	            Paragraph parrafo = new Paragraph(linea);
+	            if (enviadoPorMi) parrafo.setAlignment(Element.ALIGN_RIGHT);
+	            else parrafo.setAlignment(Element.ALIGN_LEFT);
+	            
+	            parrafo.setSpacingAfter(5f);
+	            doc.add(parrafo);
+	            }
+	        }
+
+	        doc.close();
+	        JOptionPane.showMessageDialog(
+	            this,
+	            "PDF guardado en:\n" + destino.getAbsolutePath(),
+	            "AppChat",
+	            JOptionPane.INFORMATION_MESSAGE
+	        );
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(
+	            this,
+	            "Error al exportar PDF.",
+	            "AppChat",
+	            JOptionPane.ERROR_MESSAGE
+	        );
+	    }
+	}
+
 
 	/**
 	 * Create the frame.

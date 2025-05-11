@@ -61,7 +61,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		});
 	}
 
-	
+
 
 	private void inicializacionPanelCentral() {
 		JPanel panelCentral = new JPanel();
@@ -107,7 +107,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		gbc_list_1.gridx = 1;
 		gbc_list_1.gridy = 1;
 		panelCentral.add(list_1, gbc_list_1);
-		
+
 	}
 
 	private JList<Contacto> inicializacionListaContactos() {
@@ -127,14 +127,14 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 			            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
 			            controlador.nuevoMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	}
-		            
+
 		        }
 		    }
 		});
 		list.setModel(listaContactos);
 		return list;
 	}
-	
+
 	private JList<Contacto> inicializacionListaMiembros() {
 		JList<Contacto> list = new JList<>();
 		list.setBackground(Color.WHITE);
@@ -147,8 +147,11 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		    public void mouseClicked(MouseEvent e) {
 		        int index = list.locationToIndex(e.getPoint());
 		        if (index != -1) {
+		            Contacto seleccionado = list.getModel().getElementAt(index);
+		            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
+		            controlador.eliminarMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	if(e.getClickCount() == 2) {
-		        		Contacto seleccionado = list.getModel().getElementAt(index);
+		        		 seleccionado = list.getModel().getElementAt(index);
 			            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
 			            controlador.eliminarMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	}
@@ -165,7 +168,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		JPanel panelSuperior = new JPanel();
 		contentPane.add(panelSuperior, BorderLayout.NORTH);
 		panelSuperior.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel contenidoSuperior = new JPanel();
 		panelSuperior.add(contenidoSuperior, BorderLayout.NORTH);
 		GridBagLayout gbl_contenidoSuperior = new GridBagLayout();
@@ -174,7 +177,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		gbl_contenidoSuperior.columnWeights = new double[]{1.0, 0.0, 1.0, Double.MIN_VALUE};
 		gbl_contenidoSuperior.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contenidoSuperior.setLayout(gbl_contenidoSuperior);
-		
+
 		JLabel nombreGrupo = new JLabel(seleccionado.getNombre());
 		nombreGrupo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		GridBagConstraints gbc_nombreGrupo = new GridBagConstraints();
@@ -182,20 +185,26 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		gbc_nombreGrupo.gridx = 1;
 		gbc_nombreGrupo.gridy = 1;
 		contenidoSuperior.add(nombreGrupo, gbc_nombreGrupo);
-		
-		
-		
+
+
+
 		JLabel imagenPerfil = new JLabel("");
 		GridBagConstraints gbc_imagenPerfil = new GridBagConstraints();
 		gbc_imagenPerfil.insets = new Insets(0, 0, 5, 5);
 		gbc_imagenPerfil.gridx = 1;
 		gbc_imagenPerfil.gridy = 2;
-		
-		
+
+
 		Image localImage = ImagenUtils.getImagen(seleccionado);
 		if (localImage != null) imagenPerfil.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
-			
+
 		contenidoSuperior.add(imagenPerfil, gbc_imagenPerfil);
+		JButton btnNewButton = new JButton("Editar");
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
+		gbc_btnNewButton.gridx = 1;
+		gbc_btnNewButton.gridy = 3;
+		contenidoSuperior.add(btnNewButton, gbc_btnNewButton);
 	}
 
 	private void inicializacionPanelInferior() {
@@ -225,7 +234,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 				listaContactos.addElement(contacto);
 		}
 	}
-	
+
 	private void actualizarListaMiembros() {
 		listaMiembros.clear();
 		List<Contacto> miembros = this.controlador.obtenerListaMiembrosGrupo(this.grupo);
@@ -239,7 +248,7 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		this.controlador.deleteObserver(Estado.INFO_CONTACTO, this);
 		super.dispose();
 	}
-	
+
 	public GestionarGrupo(Contacto grupo) {
 		this.grupo=(Grupo) grupo;
 		this.controlador = AppChat.getInstancia();
@@ -258,6 +267,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		inicializacionPanelInferior();
 		this.controlador.addObserver(Estado.INFO_CONTACTO, this);
 	}
-	
+
 
 }

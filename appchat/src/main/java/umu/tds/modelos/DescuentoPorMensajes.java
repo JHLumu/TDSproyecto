@@ -6,7 +6,7 @@ public class DescuentoPorMensajes extends Descuento {
 	private final int minMensajesEnviados;
 	
 	
-	protected DescuentoPorMensajes(double porcentaje, int n) {
+	public DescuentoPorMensajes(double porcentaje, int n) {
 		super(porcentaje);
 		if (n < 0) throw new IllegalArgumentException("Número de mensajes enviado por mes es inferior a 0");
 		this.minMensajesEnviados = n;
@@ -15,8 +15,7 @@ public class DescuentoPorMensajes extends Descuento {
 
 	@Override
 	protected boolean esDescuentoAplicable(Usuario usuario) {
-		// TODO Auto-generated method stub
-		return false;
+		return (this.minMensajesEnviados <= usuario.getMensajesEnviados().size());
 	}
 
 	

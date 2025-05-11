@@ -87,7 +87,8 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 						new Propiedad("imagen", usuario.getURLImagen().toExternalForm()),
 						new Propiedad("fecha de nacimiento", usuario.getFechaNacimiento().format(formateador).toString()),
 						new Propiedad("saludo", usuario.getSaludo()),
-						new Propiedad("premium", String.valueOf(usuario.isPremium()))
+						new Propiedad("premium", String.valueOf(usuario.isPremium())),
+						new Propiedad("fecha de registro", usuario.getFechaRegistro().format(formateador).toString())
 						)));
 		
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -164,6 +165,10 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS modificarUsuario]: " + "Se ha modificado el estado premium del usuario a " + usuario.isPremium() + ".");
 			}
 			
+			else if (prop.getNombre().equals("fecha de registro")) {
+				prop.setValor(usuario.getFechaRegistro().format(formateador));
+			}
+			
 			servPersistencia.modificarPropiedad(prop);
 		}
 		
@@ -194,12 +199,15 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de nacimiento");
 		String premium = servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium");
 		String saludo = servPersistencia.recuperarPropiedadEntidad(eUsuario, "saludo");
+		String registroString = servPersistencia.recuperarPropiedadEntidad(eUsuario, "fecha de registro");
 		
 		//Convertimos aquellos campos necesarios a objetos
 		URL imagen = null;
 		LocalDate fecha = null;
+		LocalDate registro = null;
 		if (imagenPath != null) imagen = new URL(imagenPath);
 		if (fechaString !=null) fecha = LocalDate.parse(fechaString, formateador);
+		if (registroString != null) registro = LocalDate.parse(registroString, formateador);
 		
 		//Se crea el objeto con esas propiedas y se introduce en el pool
 				Usuario usuario = new BuilderUsuario()
@@ -212,6 +220,7 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 									.fechaNac(fecha)
 									.saludo(saludo)
 									.premium(Boolean.valueOf(premium))
+									.fechaRegistro(registro)
 									.build();
 		usuario.setCodigo(id);
 		poolUsuario.addObjeto(id, usuario);

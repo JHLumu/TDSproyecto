@@ -62,13 +62,9 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
 		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: Nombre de contacto: " + contacto);
-		String imagen = null;
-		URL URLContacto = contacto.getURLImagen();
-		if (URLContacto != null) imagen = URLContacto.toExternalForm(); 
-		propiedades.addAll(Arrays.asList(
-				new Propiedad("nombre", contacto.getNombre()),
-				new Propiedad("imagen", imagen)
-				));
+		
+		
+		propiedades.add(new Propiedad("nombre", contacto.getNombre()));
 		
 		//Propiedades si es ContactoIndividual
 		
@@ -85,8 +81,11 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		
 		//Propiedades si es Grupo
 		else if (contacto.getTipoContacto().equals(TipoContacto.GRUPO)) {
+			
 			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo Grupo.");
 			Grupo aux = (Grupo) contacto;
+			URL imagenURL = contacto.getURLImagen();
+			if (imagenURL != null) propiedades.add(new Propiedad("imagen", imagenURL.toExternalForm()));
 			propiedades.addAll( Arrays.asList(
 					new Propiedad("miembros", obtenerIdsMiembros(aux.getMiembros())),
 					new Propiedad("anfitrion", aux.getAnfitrion()),
@@ -162,10 +161,8 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
 		Entidad eContacto = servPersistencia.recuperarEntidad(id);
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
-		String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
 		String tipo = servPersistencia.recuperarPropiedadEntidad(eContacto, "tipo");
-		URL imagen = null;
-		if (imagenString != null) imagen = new URL(imagenString); 
+		
 		
 			
 		
@@ -192,6 +189,9 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		//Si no tiene asignado un Usuario, es un Grupo. Recuperamos los miembros del grupo
 		else {
 			
+			String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
+			URL imagen = null;
+			if (imagenString != null) imagen = new URL(imagenString); 
 			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la lista de miembros si es tipo Grupo.");
 			String idMiembros = servPersistencia.recuperarPropiedadEntidad(eContacto, "miembros");
 			String anfitrion = servPersistencia.recuperarPropiedadEntidad(eContacto, "anfitrion");

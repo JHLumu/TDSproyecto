@@ -19,7 +19,7 @@ public class DescuentoPorFecha extends Descuento{
 	@Override
 	protected boolean esDescuentoAplicable(Usuario usuario) {
 		LocalDate fechaRegistro = usuario.getFechaRegistro();
-		return ((fechaRegistro.isBefore(fechaInf) || fechaRegistro.isAfter(fechaSup)));
+		return (!(fechaRegistro.isBefore(fechaInf) || fechaRegistro.isAfter(fechaSup)));
 	}
 	
 	
