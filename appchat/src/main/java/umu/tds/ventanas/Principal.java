@@ -189,6 +189,10 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		btnEnv.setMinimumSize(new Dimension(80, 40));
 		btnEnv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				MensajeNoContacto mensaje = new MensajeNoContacto();
+
+		        mensaje.setVisible(true);
+				mensaje.setLocationRelativeTo(null);
 			}
 		});
 		btnEnv.setPreferredSize(new Dimension(90, 40));
@@ -357,12 +361,9 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 				TDSEmojiPanel emojiPanel = new TDSEmojiPanel();
 				JDialog emojiDialog = new JDialog();
 			    emojiDialog.setTitle("Select Emoji");
-<<<<<<< HEAD
 			    emojiDialog.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
 			    emojiDialog.add(emojiPanel);
-=======
 			    emojiDialog.getContentPane().add(emojiPanel);
->>>>>>> f059fb5 (Implementación de Exportar Conversaciones a PDF.)
 			    emojiDialog.pack();
 			    emojiDialog.setLocationRelativeTo(null);
 			    emojiDialog.setModal(true);

@@ -539,6 +539,24 @@ public class AppChat extends TDSObservable {
         return false;
     }
     
+    public void enviarMensaje(String text, String telf) {
+		Usuario usuario = this.catalogoUsuarios.getUsuario(telf);
+		
+		if(usuario != null && !text.isEmpty()) {
+	        Mensaje mensaje = new Mensaje(sesionUsuario, usuario, text, null);
+
+	        // Persistir y actualizar en ambos usuarios
+	        setChanged(Estado.INFO_CONTACTO);
+	        mensajeDAO.registrarMensaje(mensaje);
+	        sesionUsuario.enviarMensaje(mensaje);
+	        usuarioDAO.modificarUsuario(sesionUsuario);
+	        usuario.recibirMensaje(mensaje);
+	        usuarioDAO.modificarUsuario(usuario);
+	        notifyObservers(Estado.INFO_CONTACTO);
+		}
+		
+	}
+    
     /**
      * Método auxiliar para enviar mensaje a un contacto individual
      */
@@ -554,6 +572,7 @@ public class AppChat extends TDSObservable {
         }
 
         // Persistir y actualizar en ambos usuarios
+        
         mensajeDAO.registrarMensaje(mensaje);
         sesionUsuario.enviarMensaje(mensaje);
         usuarioDAO.modificarUsuario(sesionUsuario);
@@ -1039,6 +1058,8 @@ public class AppChat extends TDSObservable {
         // Si acabamos el bucle sin retorno, no lo encontramos
         return -1;
     }
+
+	
 
    
     
