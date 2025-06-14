@@ -199,12 +199,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		if (localImage != null) imagenPerfil.setIcon(new ImageIcon(localImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
 
 		contenidoSuperior.add(imagenPerfil, gbc_imagenPerfil);
-		JButton btnNewButton = new JButton("Editar");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
-		gbc_btnNewButton.gridx = 1;
-		gbc_btnNewButton.gridy = 3;
-		contenidoSuperior.add(btnNewButton, gbc_btnNewButton);
 	}
 
 	private void inicializacionPanelInferior() {

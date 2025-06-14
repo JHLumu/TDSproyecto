@@ -91,7 +91,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	private JPanel chat;
 	private DefaultComboBoxModel<Object> listaContactosComboBox;
 	private DefaultListModel<Contacto> listaContactosLista;
-	private boolean seleccionPanel; // true para comboBox, false para lista
+	private Contacto seleccionado;
 	private JScrollPane scrollPane;
 	private JPanel panelMensaje;
 	private JPanel panelCentro;
@@ -115,7 +115,10 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 			}
 		});
 	}
-
+	
+	private void vaciarTexto() {
+		this.textArea.setText("");
+	}
 	private void actualizarColor(Component comp) {
 	    
 		if (comp instanceof JButton) {
@@ -163,17 +166,18 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		actualizarListaContactosComboBox(); // Cargar contactos inicialmente
 		comboBoxContactos.setModel(listaContactosComboBox);
 		comboBoxContactos.addActionListener(e -> {
-		    Object seleccionado = null;
-		    this.seleccionPanel = true;
 		    if (comboBoxContactos.getSelectedIndex() != 0) {
-		    	seleccionado = comboBoxContactos.getSelectedItem();
-		        actualizarPanelChat((Contacto) seleccionado);
+		    	vaciarTexto();
+		    	seleccionado = (Contacto) comboBoxContactos.getSelectedItem();
+		    	actualizarPanelChat(seleccionado);
 		        SwingUtilities.invokeLater(() -> {
 		            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		        });
 		    } else {
 		        // Es el placeholder, por ejemplo: "Contacto o Teléfono"
 		        // Podés limpiar el panel o no hacer nada
+		    	vaciarTexto();
+		    	seleccionado = null;
 		    	chat.removeAll();
 		    	chat.revalidate();
 		    	chat.repaint();
@@ -371,23 +375,16 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 			    
 			    int selectedEmoji = emojiPanel.getSelectedEmojiId();
 		        if (selectedEmoji != -1) {
-		        	Contacto contacto = null;
-					if(seleccionPanel && (comboBoxContactos.getSelectedIndex() != 0)) {
-						contacto = (Contacto) comboBoxContactos.getSelectedItem();	
-					}				
-					else {
-						contacto = listaPanelChat.getSelectedValue();
-					}
-					if(controlador.enviarMensaje(contacto, selectedEmoji));
+					if(controlador.enviarMensaje(seleccionado, selectedEmoji));
 					actualizarListaContactosMensajes();
-					actualizarPanelChat(contacto);
+					actualizarPanelChat(seleccionado);
 					
 		        }
 		        SwingUtilities.invokeLater(() -> {
 				    JScrollBar vertical = scrollPane.getVerticalScrollBar();
 				    vertical.setValue(vertical.getMaximum());
 				});
-				textArea.setText("");
+				vaciarTexto();
 			    
 				
 			}
@@ -426,22 +423,18 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Contacto contacto = null;
-				if(seleccionPanel && (comboBoxContactos.getSelectedIndex() != 0)) {
-					contacto = (Contacto) comboBoxContactos.getSelectedItem();	
-				}				
-				else {
-					contacto = listaPanelChat.getSelectedValue();
-				}
-				if(controlador.enviarMensaje(contacto, textArea.getText()));
-				actualizarListaContactosMensajes();
-				actualizarPanelChat(contacto);
 
+				if(!textArea.getText().isEmpty() && controlador.enviarMensaje(seleccionado, textArea.getText())) {
+					actualizarListaContactosMensajes();
+					actualizarPanelChat(seleccionado);
+					
+				}
+				
 				SwingUtilities.invokeLater(() -> {
 				    JScrollBar vertical = scrollPane.getVerticalScrollBar();
 				    vertical.setValue(vertical.getMaximum());
 				});
-				textArea.setText("");
+				vaciarTexto();
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
@@ -484,11 +477,11 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		    public void mouseClicked(MouseEvent e) {
 		        int index = listaPanelChat.locationToIndex(e.getPoint());
 		        if (index != -1) {
-		            Contacto seleccionado = listaPanelChat.getSelectedValue();
+		            seleccionado = listaPanelChat.getSelectedValue();
 		            
 		            if(seleccionado instanceof Contacto && seleccionado != null){
 		                if (e.getClickCount() == 1) {
-		                	Principal.this.seleccionPanel = false;
+		                	vaciarTexto();
 		                    actualizarPanelChat(seleccionado);
 		                    SwingUtilities.invokeLater(() -> {
 		                        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
@@ -502,6 +495,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		                    
 		                }
 		            }
+
 		        }
 		    }
 		});
@@ -621,6 +615,8 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	@Override
 	public void onAccionRealizada(Contacto c, Mensaje mObjetivo) {
 		int targetIndex = controlador.ubicarMensaje(c, mObjetivo);
+		this.seleccionado = c;
+		vaciarTexto();
 		actualizarPanelChat(c);
 		if (targetIndex >= 0) {
 	        SwingUtilities.invokeLater(() -> {
@@ -655,7 +651,8 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	
 	private void exportarConversacion() {
 	
-	    Contacto contacto;
+	    Contacto contacto = seleccionado;
+	    /*
 	    if (seleccionPanel) {
 	        if (comboBoxContactos.getSelectedIndex() > 0) {
 	            contacto = (Contacto) comboBoxContactos.getSelectedItem();
@@ -669,6 +666,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	            return;
 	        }
 	    } else contacto = listaPanelChat.getSelectedValue();
+	    */
 	    
 	    if (contacto == null) {
 	        JOptionPane.showMessageDialog(

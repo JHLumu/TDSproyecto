@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;

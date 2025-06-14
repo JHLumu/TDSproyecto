@@ -1,11 +1,9 @@
 package umu.tds.appchat;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -23,12 +21,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfWriter;
 
 import tds.BubbleText;
 import umu.tds.modelos.CatalogoUsuarios;
