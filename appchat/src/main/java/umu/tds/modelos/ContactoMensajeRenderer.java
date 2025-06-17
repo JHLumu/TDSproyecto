@@ -2,6 +2,9 @@ package umu.tds.modelos;
 
 import javax.swing.*;
 import umu.tds.appchat.AppChat;
+import umu.tds.appchat.servicios.mensajes.MensajeCoincidencia;
+import umu.tds.appchat.servicios.vistas.InfoMensajeVista;
+
 import java.awt.*;
 
 /**
@@ -106,7 +109,7 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
             
             // Obtener la información procesada del controlador
             AppChat controlador = AppChat.getInstancia();
-            AppChat.InfoMensajeVista infoMensaje = controlador.prepararInfoParaVista(contacto);
+            InfoMensajeVista infoMensaje = controlador.prepararInfoParaVista(contacto);
             
             // Configurar el indicador E/R según si el mensaje es enviado o recibido
             if (infoMensaje.esMensajeEnviado()) {

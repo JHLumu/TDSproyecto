@@ -5,10 +5,10 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import umu.tds.appchat.AppChat;
+import umu.tds.appchat.servicios.mensajes.MensajeCoincidencia;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoMensajeRenderer;
 import umu.tds.modelos.Mensaje;
-import umu.tds.modelos.MensajeCoincidencia;
 import umu.tds.utils.BuscarFiltroListener;
 
 import java.awt.BorderLayout;

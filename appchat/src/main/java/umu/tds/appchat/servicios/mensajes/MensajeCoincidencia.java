@@ -1,6 +1,9 @@
-package umu.tds.modelos;
+package umu.tds.appchat.servicios.mensajes;
 
 import java.time.LocalDateTime;
+
+import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Mensaje;
 
 /**
  * Clase para almacenar un mensaje junto con su puntuación de coincidencia
