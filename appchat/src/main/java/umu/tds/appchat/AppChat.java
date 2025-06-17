@@ -192,16 +192,20 @@ public class AppChat extends TDSObservable {
     }
     
     /**
-     * Calcula el máximo descuento aplicable al usuario actual
+     * Calcula el máximo descuento aplicable al usuario actual con los descuentos por defecto.
      * 
-     * @param descuentosActivos Lista de descuentos activos en el sistema
      * @return Valor del descuento máximo aplicable
      */
-    
     public double getDescuentoAplicable() {
     	return getDescuentoAplicable(AppChat.DESCUENTO_POR_FECHA_POR_DEFECTO, AppChat.DESCUENTO_POR_MENSAJES_POR_DEFECTO);
     }
     
+    /**
+     * Calcula el máximo descuento aplicable al usuario actual.
+     * 
+     * @param descuentosActivos Lista de descuentos activos en el sistema.
+     * @return Valor del descuento máximo aplicable.
+     */
     public double getDescuentoAplicable(Descuento... descuentosActivos) {
         Optional<Double> res = Stream.of(descuentosActivos)
                 .map(d -> d.calcularDescuento(sesionUsuario, PRECIO_SUSCRIPCION))
@@ -210,17 +214,26 @@ public class AppChat extends TDSObservable {
         return res.orElse(0.0);
     }
     
+    /**
+     * Calcula el precio de la suscripción aplicado el máximo descuento de los por defecto.
+     * @return Precio total de la suscripción.
+     */
     public double calcularPrecioSuscripcion() {
     	return AppChat.getPrecioSuscripcion() - getDescuentoAplicable();
     }
     
+    /**
+     * Calcula el precio de la suscripción una vez aplicado el máximo descuento aplicable de una lista de descuentos.
+     * @param descuentosActivos Lista de descuentos activos en el sistema.
+     * @return Precio total de la suscripción.
+     */
     public double calcularPrecioSuscripcion(Descuento... descuentosActivos) {
     	System.out.println("[DEBUG AppChat calcularPrecioSuscripcion]: " + AppChat.getPrecioSuscripcion() + " " + getDescuentoAplicable(descuentosActivos));
     	return AppChat.getPrecioSuscripcion() - getDescuentoAplicable(descuentosActivos);
     }
     
     /**
-     * Actualiza el saludo del usuario actual
+     * Actualiza el saludo del usuario actual-
      * 
      * @param saludo Nuevo saludo
      */
@@ -250,56 +263,10 @@ public class AppChat extends TDSObservable {
         }
     }
     
-    // ---------- GETTERS DE INFORMACIÓN DEL USUARIO ----------
-    
-    /**
-     * Obtiene el nombre del usuario en sesión
-     */
-    public String getNombreUsuario() {
-        return this.sesionUsuario.getNombre();
+    public Usuario getUsuarioActual() {
+    	return this.sesionUsuario;
     }
-    
-    /**
-     * Obtiene el teléfono del usuario en sesión
-     */
-    public String getTelefonoUsuario() {
-        return this.sesionUsuario.getTelefono();
-    }
-    
-    /**
-     * Obtiene los apellidos del usuario en sesión
-     */
-    public String getApellidosUsuario() {
-        return this.sesionUsuario.getApellidos();
-    }
-    
-    /**
-     * Obtiene la fecha de nacimiento del usuario en sesión
-     */
-    public String getFechaNacimientoUsuario() {
-        return this.sesionUsuario.getFechaNacimiento().toString();
-    }
-    
-    /**
-     * Obtiene el correo del usuario en sesión
-     */
-    public String getCorreoUsuario() {
-        return this.sesionUsuario.getEmail();
-    }
-    
-    /**
-     * Obtiene el saludo del usuario en sesión
-     */
-    public String getSaludoUsuario() {
-        return this.sesionUsuario.getSaludo(); 
-    }
-    
-    /**
-     * Obtiene la imagen del usuario en sesión
-     */
-    public Image getImagenUsuarioActual() {
-        return ImagenUtils.getImagen(this.sesionUsuario);
-    }
+
     
     // ---------- MÉTODOS DE INTERFAZ GRÁFICA ----------
     
@@ -427,16 +394,6 @@ public class AppChat extends TDSObservable {
     
     // ---------- GESTIÓN DE MENSAJES ----------
       
-    /**
-     * Obtiene todos los mensajes intercambiados con un contacto
-     * 
-     * @param contacto Contacto o grupo
-     * @return Lista de mensajes ordenados cronológicamente
-     */
-    public List<Mensaje> obtenerChatContacto(Contacto contacto) {
-        return mensajeServ.getChatMensajes(sesionUsuario, contacto);
-    }
-    
 
     public boolean enviarMensaje(Contacto contacto, Object entrada) {
         return mensajeServ.enviarMensaje(sesionUsuario, contacto, entrada);
@@ -479,6 +436,7 @@ public class AppChat extends TDSObservable {
     }
     
 
+
 	/**
      * Formatea un mensaje de texto para la vista (trunca si es muy largo)
      */
@@ -516,8 +474,27 @@ public class AppChat extends TDSObservable {
      */
     public List<BubbleText> pintarMensajesBurbuja(Contacto contacto, JPanel chat) {
         return viewServ.generarBurbujasMensajes(contacto, chat, sesionUsuario);
-    }	
-
+    }
+    
+    /**
+     * Método auxiliar para determinar el autor a mostrar en la burbuja
+     */
+    private String determinarAutorMensaje(Contacto contacto, Mensaje mensaje, boolean esUsuario) {
+        String autor;
+        
+        if (esUsuario) {
+            autor = this.sesionUsuario.getNombre();
+            if (mensaje.getIDGrupo() != -1 && !mensaje.getReceptorTelf().equals(this.sesionUsuario.getTelefono())) {
+                autor += " <G> *" + mensaje.getNombreGrupo() + "*";
+            }
+        } else {
+        	autor = contacto.getNombre();
+    
+        }
+        
+        return autor += " <> " + formatearFechaMensaje(mensaje.getFechaEnvio());
+        
+    }
 
     public int ubicarMensaje(Contacto c, Mensaje mObjetivo) {
        return mensajeServ.ubicarMensaje(sesionUsuario, c, mObjetivo);

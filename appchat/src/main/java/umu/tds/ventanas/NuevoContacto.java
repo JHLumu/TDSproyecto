@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Usuario;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -33,6 +34,7 @@ public class NuevoContacto extends JDialog {
 	/**
 	 * 
 	 */
+	private Usuario sesionUsuario;
 	private static final long serialVersionUID = 1L;
 	private JTextField nombreField;
 	private JTextField telefonoField;
@@ -60,20 +62,20 @@ public class NuevoContacto extends JDialog {
 
 		if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
 
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: No se ha introducido ningún nombre.");
+			System.out.println("[DEBUG NuevoContacto nuevoContacto]: No se ha rellenado algun campo.");
 			 
 			JOptionPane.showMessageDialog(NuevoContacto.this, 
-					"Se debe escribir un nombre para el grupo..",
+					"Se deben rellenar ambos campos.",
 	                "AppChat",
 	                JOptionPane.ERROR_MESSAGE);
 			 return;
 		}
 		
-		else if (telefonoField.getText().equals(AppChat.getInstancia().getTelefonoUsuario())) {
+		else if (telefonoField.getText().equals(this.sesionUsuario.getTelefono())) {
 			
 			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El telefono introducido es el mismo que el del usuario actual.");
 			JOptionPane.showMessageDialog(this, 
-                    "ERROR: No te puedes añadir a tí mismo.",
+                    "No te puedes añadir a tí mismo.",
                     "AppChat",
                     JOptionPane.ERROR_MESSAGE);
 		 return;
@@ -138,6 +140,7 @@ public class NuevoContacto extends JDialog {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		this.sesionUsuario = AppChat.getInstancia().getUsuarioActual();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.colorPrimario = AppChat.getInstancia().getColorGUI(1);
 		setResizable(false);

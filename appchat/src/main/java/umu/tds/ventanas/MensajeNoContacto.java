@@ -100,7 +100,7 @@ public class MensajeNoContacto extends JDialog {
 		gbl_panelCentro.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panelCentro.setLayout(gbl_panelCentro);
 		
-		JLabel lblNewLabel = new JLabel("Introduzca el mensajey el teléfono.");
+		JLabel lblNewLabel = new JLabel("Introduzca el mensaje y el teléfono.");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.gridwidth = 4;

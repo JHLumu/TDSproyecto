@@ -81,17 +81,6 @@ public class ServicioMensajes{
     }
     
     /**
-     * Obtiene todos los mensajes intercambiados con un contacto
-     * 
-     * @param usuario Usuario actual
-     * @param contacto Contacto o grupo
-     * @return Lista de mensajes ordenados cronológicamente
-     */
-    public List<Mensaje> getChatMensajes(Usuario usuario, Contacto contacto) {
-        return usuario.getChatMensaje(contacto);
-    }
-   
-    /**
      * Obtiene el contenido del último mensaje con un contacto
      * 
      * @param usuario Usuario actual

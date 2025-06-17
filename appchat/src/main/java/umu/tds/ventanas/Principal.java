@@ -13,13 +13,16 @@ import javax.swing.border.EmptyBorder;
 
 import tds.BubbleText;
 import umu.tds.appchat.AppChat;
+import umu.tds.appchat.servicios.ServicioExportacion;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.ContactoMensajeRenderer;
 import umu.tds.modelos.Mensaje;
+import umu.tds.modelos.Usuario;
 import umu.tds.utils.BuscarFiltroListener;
 import umu.tds.utils.Estado;
+import umu.tds.utils.ImagenUtils;
 import umu.tds.utils.TDSObservable;
 import umu.tds.utils.TDSObserver;
 
@@ -81,6 +84,8 @@ import javax.swing.border.Border;
 
 public class Principal extends JFrame implements TDSObserver, BuscarFiltroListener{
 
+	private Usuario sesionUsuario;
+	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextArea textArea;
@@ -154,7 +159,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
 		comboBoxContactos = new JComboBox<Object>();
-		comboBoxContactos.setName("contacto o telefono");
+		comboBoxContactos.setName("Seleccionar Contacto");
 		comboBoxContactos.setToolTipText("");
 		comboBoxContactos.setSize(new Dimension(150, 40));
 		comboBoxContactos.setBackground(this.colorBotones);
@@ -174,8 +179,6 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		        });
 		    } else {
-		        // Es el placeholder, por ejemplo: "Contacto o Teléfono"
-		        // Podés limpiar el panel o no hacer nada
 		    	vaciarTexto();
 		    	seleccionado = null;
 		    	chat.removeAll();
@@ -289,12 +292,12 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		horizontalGlue.setMaximumSize(new Dimension(100, 0));
 		panelNorte.add(horizontalGlue);
 		
-		btnUsuario = new JButton(this.controlador.getNombreUsuario());
+		btnUsuario = new JButton(this.sesionUsuario.getNombre());
 		btnUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnUsuario.setForeground(new Color(255, 255, 255));
 		btnUsuario.setBackground(this.colorBotones);
 		
-		Image imagenUsuario = this.controlador.getImagenUsuarioActual();
+		Image imagenUsuario = ImagenUtils.getImagen(this.sesionUsuario);
 		if (imagenUsuario != null) btnUsuario.setIcon(new ImageIcon(imagenUsuario.getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 		
 		
@@ -366,7 +369,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 				JDialog emojiDialog = new JDialog();
 			    emojiDialog.setTitle("Select Emoji");
 			    emojiDialog.setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/Resources/chat.png")));
-			    emojiDialog.add(emojiPanel);
+			    emojiDialog.getContentPane().add(emojiPanel);
 			    emojiDialog.getContentPane().add(emojiPanel);
 			    emojiDialog.pack();
 			    emojiDialog.setLocationRelativeTo(null);
@@ -524,7 +527,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
                 this.actualizarListaContactosMensajes();
                 
             } else if (estadoActual.equals(Estado.NUEVA_FOTO_USUARIO)) {
-            	btnUsuario.setIcon(new ImageIcon(this.controlador.getImagenUsuarioActual().getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+            	btnUsuario.setIcon(new ImageIcon(ImagenUtils.getImagen(this.sesionUsuario).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
             }
          
         }
@@ -533,7 +536,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
     private void actualizarListaContactosComboBox() {
         DefaultComboBoxModel<Object> modeloCombo = listaContactosComboBox;
         modeloCombo.removeAllElements();
-        modeloCombo.addElement("Contacto o Teléfono"); // Placeholder
+        modeloCombo.addElement("Seleccionar Contacto"); 
         for (Contacto contacto : this.controlador.obtenerListaContactos()) {
             modeloCombo.addElement(contacto);
         }
@@ -649,133 +652,66 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		buscador.setLocationRelativeTo(null);
     }
 	
-	private void exportarConversacion() {
 	
-	    Contacto contacto = seleccionado;
-	    /*
-	    if (seleccionPanel) {
-	        if (comboBoxContactos.getSelectedIndex() > 0) {
-	            contacto = (Contacto) comboBoxContactos.getSelectedItem();
-	        } else {
-	            JOptionPane.showMessageDialog(
-	                this,
-	                "Primero selecciona un contacto.",
-	                "AppChat",
-	                JOptionPane.ERROR_MESSAGE
-	            );
-	            return;
-	        }
-	    } else contacto = listaPanelChat.getSelectedValue();
-	    */
-	    
-	    if (contacto == null) {
-	        JOptionPane.showMessageDialog(
-	            this,
-	            "Primero selecciona un contact.o",
-	            "AppChat",
-	            JOptionPane.ERROR_MESSAGE
-	        );
-	        return;
-	    }
+	private File seleccionarDestinoPDF(Contacto contacto) {
+		
+		 String alias = contacto.getNombre().replace(" ", "_");                
+		    LocalDateTime ahora = LocalDateTime.now();
+		    DateTimeFormatter formato = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
+		    String ts = ahora.format(formato);
+		    String nombreFichero = "conversacion_" + alias + "_" + ts + ".pdf";
 
-	  
-	    String alias = contacto.getNombre().replace(" ", "_");                
-	    LocalDateTime ahora = LocalDateTime.now();
-	    DateTimeFormatter formato = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
-	    String ts = ahora.format(formato);
-	    String nombreFichero = "conversacion_" + alias + "_" + ts + ".pdf";
+		  
+		    JFileChooser selector = new JFileChooser();
+		    selector.setDialogTitle("Guardar conversación como PDF");
+		    selector.setAcceptAllFileFilterUsed(false);
+		    selector.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+		    selector.setSelectedFile(new File(nombreFichero));
 
-	  
-	    JFileChooser selector = new JFileChooser();
-	    selector.setDialogTitle("Guardar conversación como PDF");
-	    selector.setAcceptAllFileFilterUsed(false);
-	    selector.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
-	    selector.setSelectedFile(new File(nombreFichero));
+		    int opcion = selector.showSaveDialog(this);
+		    if (opcion != JFileChooser.APPROVE_OPTION) {
+		        return null;  // usuario ha cancelado
+		    }
+		    
+		    File destino = selector.getSelectedFile();
+		    if (!destino.getName().toLowerCase().endsWith(".pdf")) destino = new File(destino.getParentFile(),destino.getName() + ".pdf");
+		    return destino;
+		
+	} 
+	
+	private void exportarConversacion() {
+		
+		 Contacto contacto = seleccionado;
 
-	    int opcion = selector.showSaveDialog(this);
-	    if (opcion != JFileChooser.APPROVE_OPTION) {
-	        return;  // usuario ha cancelado
-	    }
-
-	    File destino = selector.getSelectedFile();
-	    if (!destino.getName().toLowerCase().endsWith(".pdf")) destino = new File(destino.getParentFile(),destino.getName() + ".pdf");
-	  
-	    List<Mensaje> mensajes = controlador.obtenerChatContacto(contacto);
-	    String miTelefono = controlador.getTelefonoUsuario();
-	    String miNombre   = controlador.getNombreUsuario();
-	    DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-	  
-	    try (FileOutputStream fos = new FileOutputStream(destino)) {
-	        Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
-	        PdfWriter.getInstance(doc, fos);
-	        doc.open();
-
-	        for (Mensaje m : mensajes) {
-	            boolean enviadoPorMi = m.esEmisor(miTelefono);
-
-	            String quien;
-	            if (enviadoPorMi) quien = miNombre;
-	            else quien = contacto.getNombre();
-	            
-	            String fechaHora = m.getFechaEnvio().format(formatoHora);
-	            String linea;
-	           
-	            if (m.getEmoticono() != -1 ) {
-	            	
-	            	Image emoji = controlador.obtenerEmojiRedimensionado(m.getEmoticono()).getImage();
-	            	BufferedImage bufferedEmoji = new BufferedImage(emoji.getWidth(null), emoji.getHeight(selector), BufferedImage.TYPE_INT_ARGB);
-	            	Graphics2D g = bufferedEmoji.createGraphics();
-	            	g.drawImage(emoji, 0, 0, null);
-	            	g.dispose();
-	            	ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-	            	ImageIO.write(bufferedEmoji, "png", bytes);
-	            	com.itextpdf.text.Image imagen = com.itextpdf.text.Image.getInstance(bytes.toByteArray());
-	            	imagen.scaleToFit(30, 30);
-	            	imagen.setSpacingBefore(5f);
-	            	imagen.setSpacingAfter(5f);
-	            	Paragraph lineaPrevia = new Paragraph(quien + " (" + fechaHora + "):");
-	                if (enviadoPorMi) {
-	                	imagen.setAlignment(Element.ALIGN_RIGHT);
-	                	lineaPrevia.setAlignment(Element.ALIGN_RIGHT);
-	                } else {
-	                	imagen.setAlignment(Element.ALIGN_LEFT);
-	                	lineaPrevia.setAlignment(Element.ALIGN_LEFT);
-	                }
-	                doc.add(lineaPrevia);
-	                doc.add(imagen);
-	            	
-	            	
-	            }
-	            
-	            else {linea = quien + " (" + fechaHora + "): " + m.getTexto();
-	            
-	            Paragraph parrafo = new Paragraph(linea);
-	            if (enviadoPorMi) parrafo.setAlignment(Element.ALIGN_RIGHT);
-	            else parrafo.setAlignment(Element.ALIGN_LEFT);
-	            
-	            parrafo.setSpacingAfter(5f);
-	            doc.add(parrafo);
-	            }
-	        }
-
-	        doc.close();
-	        JOptionPane.showMessageDialog(
-	            this,
-	            "PDF guardado en:\n" + destino.getAbsolutePath(),
-	            "AppChat",
-	            JOptionPane.INFORMATION_MESSAGE
-	        );
-
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	        JOptionPane.showMessageDialog(
-	            this,
-	            "Error al exportar PDF.",
-	            "AppChat",
-	            JOptionPane.ERROR_MESSAGE
-	        );
-	    }
+		    if (contacto == null) {
+		        JOptionPane.showMessageDialog(
+		            this,
+		            "Primero selecciona un contacto.",
+		            "AppChat",
+		            JOptionPane.ERROR_MESSAGE
+		        );
+		        return;
+		    }
+		    
+		    File ficheroDestino = seleccionarDestinoPDF(seleccionado);
+		    if (ficheroDestino != null) {
+		    	
+		    	boolean resultado = ServicioExportacion.exportarConversacion(sesionUsuario, contacto, ficheroDestino);
+		    	if (resultado) JOptionPane.showMessageDialog(
+			            this,
+			            "PDF guardado en:\n" + ficheroDestino.getAbsolutePath(),
+			            "AppChat",
+			            JOptionPane.INFORMATION_MESSAGE
+			        );
+		    	else JOptionPane.showMessageDialog(
+			            this,
+			            "Error al exportar PDF.",
+			            "AppChat",
+			            JOptionPane.ERROR_MESSAGE
+			        );
+		    	
+		    }
+	
 	}
 
 
@@ -786,11 +722,12 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		
 		//Se obtiene la instancia del controlador
 		this.controlador = AppChat.getInstancia();
+		this.sesionUsuario = this.controlador.getUsuarioActual();
 		
 		this.colorBotones = this.controlador.getColorGUI(1);
 		this.controlador.addObserver(Estado.NUEVA_FOTO_USUARIO, this);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 746, 425);
+		setBounds(100, 100, 900, 425);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

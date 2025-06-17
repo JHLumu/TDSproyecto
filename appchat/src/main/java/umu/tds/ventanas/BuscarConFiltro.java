@@ -210,7 +210,7 @@ public class BuscarConFiltro extends JFrame {
 	    
 	    // Recopilar todos los mensajes de todos los contactos
 	    for (Contacto contacto : contactos) {
-	        List<Mensaje> mensajesContacto = AppChat.getInstancia().obtenerChatContacto(contacto);
+	        List<Mensaje> mensajesContacto = AppChat.getInstancia().getUsuarioActual().getChatMensaje(contacto);
 	        if (mensajesContacto != null && !mensajesContacto.isEmpty()) {
 	            for (Mensaje mensaje : mensajesContacto) {
 	                todosMensajes.add(new MensajeCoincidencia(mensaje, contacto));

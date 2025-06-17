@@ -23,15 +23,6 @@ import umu.tds.modelos.Usuario;
  * Servicio responsable de gestionar la preparación de datos para la vista,
  * transformando entidades del modelo en ViewModels listos para presentar.
  * 
- * Aplica los principios GRASP:
- * - Experto en Información: conoce cómo transformar datos del modelo para la vista
- * - Bajo Acoplamiento: no depende de la interfaz gráfica específica
- * - Alta Cohesión: se enfoca únicamente en tareas de presentación de datos
- * 
- * Aplica principios SOLID:
- * - SRP: responsabilidad única de preparar datos para la vista
- * - OCP: extensible para nuevos tipos de ViewModels sin modificar código existente
- * - DIP: depende de abstracciones (interfaces) no de implementaciones concretas
  */
 public class ServicioVistas {
     
@@ -190,7 +181,7 @@ public class ServicioVistas {
      * @return Lista de burbujas de texto listas para mostrar
      */
     public List<BubbleText> generarBurbujasMensajes(Contacto contacto, JPanel chat, Usuario usuario) {
-        List<Mensaje> mensajes = servicioMensajes.getChatMensajes(usuario, contacto);
+        List<Mensaje> mensajes = usuario.getChatMensaje(contacto);
         List<BubbleText> burbujas = new ArrayList<>();
 
         if (mensajes == null || mensajes.isEmpty()) {

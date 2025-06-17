@@ -14,6 +14,7 @@ import java.awt.Image;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import umu.tds.appchat.AppChat;
+import umu.tds.modelos.Usuario;
 import umu.tds.utils.ImagenUtils;
 
 import java.awt.GridBagConstraints;
@@ -37,6 +38,8 @@ import javax.swing.ImageIcon;
 
 public class EditarUsuario extends JDialog {
 
+	private AppChat controlador;
+	private Usuario usuario;
     private static final long serialVersionUID = 1L;
     private JPanel panelIzquierdo;
     private JPanel panelDerecho;
@@ -97,7 +100,7 @@ public class EditarUsuario extends JDialog {
         gbc_lblNombreValor.gridy = 0;
         gbc_lblNombreValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblNombreValor.anchor = GridBagConstraints.WEST;
-        JLabel lblNombreValor = new JLabel(AppChat.getInstancia().getNombreUsuario());
+        JLabel lblNombreValor = new JLabel(this.usuario.getNombre());
         lblNombreValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblNombreValor.setForeground(new Color(25, 25, 112));
         panelIzquierdo.add(lblNombreValor, gbc_lblNombreValor);
@@ -121,7 +124,7 @@ public class EditarUsuario extends JDialog {
         gbc_lblApellidoValor.gridy = 1;
         gbc_lblApellidoValor.insets = new Insets(5, 5, 5, 5);
         gbc_lblApellidoValor.anchor = GridBagConstraints.WEST;
-        JLabel lblApellidoValor = new JLabel(AppChat.getInstancia().getApellidosUsuario());
+        JLabel lblApellidoValor = new JLabel(this.usuario.getApellidos());
         lblApellidoValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblApellidoValor.setForeground(new Color(25, 25, 112));
         panelIzquierdo.add(lblApellidoValor, gbc_lblApellidoValor);
@@ -144,7 +147,7 @@ public class EditarUsuario extends JDialog {
          gbc_lblTelefonoValor.gridy = 2;
          gbc_lblTelefonoValor.insets = new Insets(5, 5, 5, 5);
          gbc_lblTelefonoValor.anchor = GridBagConstraints.WEST;
-         JLabel lblTelefonoValor = new JLabel(AppChat.getInstancia().getTelefonoUsuario());
+         JLabel lblTelefonoValor = new JLabel(this.usuario.getTelefono());
          lblTelefonoValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
          lblTelefonoValor.setForeground(new Color(25, 25, 112));
          panelIzquierdo.add(lblTelefonoValor, gbc_lblTelefonoValor);
@@ -167,7 +170,7 @@ public class EditarUsuario extends JDialog {
          gbc_lblEmailValor.gridy = 3;
          gbc_lblEmailValor.insets = new Insets(5, 5, 5, 5);
          gbc_lblEmailValor.anchor = GridBagConstraints.WEST;
-         JLabel lblEmailValor = new JLabel(AppChat.getInstancia().getCorreoUsuario());
+         JLabel lblEmailValor = new JLabel(this.usuario.getEmail());
          lblEmailValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
          lblEmailValor.setForeground(new Color(25, 25, 112));
          panelIzquierdo.add(lblEmailValor, gbc_lblEmailValor);
@@ -191,7 +194,7 @@ public class EditarUsuario extends JDialog {
          gbc_lblFechaNacimientoValor.gridy = 4;
          gbc_lblFechaNacimientoValor.insets = new Insets(5, 5, 5, 5);
          gbc_lblFechaNacimientoValor.anchor = GridBagConstraints.WEST;
-         JLabel lblFechaNacimientoValor = new JLabel(AppChat.getInstancia().getFechaNacimientoUsuario());
+         JLabel lblFechaNacimientoValor = new JLabel(this.usuario.getFechaNacimiento().toString());
          lblFechaNacimientoValor.setFont(new Font("Segoe UI", Font.PLAIN, 14));
          lblFechaNacimientoValor.setForeground(new Color(25, 25, 112));
          panelIzquierdo.add(lblFechaNacimientoValor, gbc_lblFechaNacimientoValor);
@@ -228,7 +231,7 @@ public class EditarUsuario extends JDialog {
  		saludoArea = new JTextArea();
  		scrollPane.setViewportView(saludoArea);
  		
- 		saludoUsuario = AppChat.getInstancia().getSaludoUsuario();
+ 		saludoUsuario = this.usuario.getSaludo();
  	    saludoArea.setText(saludoUsuario);
  	    saludoArea.setFont(new Font("Segoe UI", Font.PLAIN, 12));
  	    saludoArea.setForeground(new Color(25, 25, 112));
@@ -284,7 +287,8 @@ public class EditarUsuario extends JDialog {
          
          btnAceptarImagen.addActionListener(evento -> {
         	 if (! URLField.getText().isEmpty()) {
-             Image imagen = ImagenUtils.getImagen(URLField.getText());
+             	Image imagen = ImagenUtils.getImagen(URLField.getText());
+             
              if (imagen != null) {
                  try {
                      URL aux = new URL(URLField.getText());
@@ -314,7 +318,7 @@ public class EditarUsuario extends JDialog {
           gbc_lblImagen.gridy = 1;
           gbc_lblImagen.gridwidth = 2;
           lblImagen = new JLabel();
-          Image aux = AppChat.getInstancia().getImagenUsuarioActual();
+          Image aux = ImagenUtils.getImagen(this.usuario);
           if (aux!=null) this.foto = aux;
 		else
 			try {
@@ -360,7 +364,7 @@ public class EditarUsuario extends JDialog {
     public EditarUsuario() {
     	
     	this.fotoCorrecta = 0;
-    	
+    	this.usuario = this.controlador.getUsuarioActual();
     	//Se definen propiedades de la ventana
     	setResizable(true);
     	setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));

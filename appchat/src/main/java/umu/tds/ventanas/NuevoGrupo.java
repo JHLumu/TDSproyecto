@@ -62,7 +62,7 @@ public class NuevoGrupo extends JDialog {
 		if ((nombreField.getText().isEmpty())) {
 			
 			 JOptionPane.showMessageDialog(this, 
-	                    "ERROR: No se han rellenado los campos.",
+	                    "No se ha introducido un nombre para el grupo.",
 	                    "AppChat",
 	                    JOptionPane.ERROR_MESSAGE);
 			 return;
@@ -95,16 +95,16 @@ public class NuevoGrupo extends JDialog {
 				JOptionPane.showMessageDialog(this, 
 	                    "Ya exite un Grupo con nombre: " + nombreField.getText(),
 	                    "AppChat",
-	                    JOptionPane.PLAIN_MESSAGE);
+	                    JOptionPane.ERROR_MESSAGE);
 						this.dispose();
 			}
 		} catch (MalformedURLException e) {
 			
 			System.err.println("[ERROR NuevoGrupo crearGrupo]: La URL introducida no es válida.");
 			JOptionPane.showMessageDialog(this, 
-                    "URL mal formada",
+                    "No se ha podido leer la imagen",
                     "AppChat",
-                    JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
 					this.dispose();
 		}
 			 

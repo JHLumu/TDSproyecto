@@ -9,6 +9,7 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
@@ -40,7 +41,6 @@ public class ImagenUtils {
 			
 		}
 
-		
 		else if (objeto instanceof ContactoIndividual) {
 			
 			ContactoIndividual contactoIndividual = (ContactoIndividual) objeto;
@@ -69,7 +69,7 @@ public class ImagenUtils {
 	}
 	
 	public static URL getURL(Object objeto) {
-		
+		System.out.println("soy gilipollas");
 		if (objeto instanceof Usuario) {
 			
 			Usuario usuario = (Usuario) objeto;
@@ -168,15 +168,13 @@ public class ImagenUtils {
 		}
 		
 		//Paso 2: Comprobar si la URL es válida y en caso de que sea asi, descargar imagen
-		URL urlObjeto = ImagenUtils.getURL(objeto);
-		if (urlObjeto != null) {				
-			resultado = ImagenUtils.getImagenAPartirDeURL(urlObjeto);
+			resultado = ImagenUtils.getImagenAPartirDeURL(objeto);
 			if (resultado != null) {
 				
 				System.out.println("[DEBUG ImagenUtils getImagen]: Se ha leido correctamente la imagen tras descargarse por URL.");
 				
 				try {
-					ImageIO.write((BufferedImage) resultado, "png", ficheroLocal);
+					ImageIO.write((BufferedImage) resultado, "png", ImagenUtils.getFile(AppChat.getInstancia().getUsuarioActual()));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -184,9 +182,7 @@ public class ImagenUtils {
 				return resultado;
 				
 			}	
-			
-		}
-		
+
 		//Paso 3: Devolver imagen por defecto
 		return ImagenUtils.getImagenPorDefecto(objeto);
 		
@@ -219,5 +215,7 @@ public class ImagenUtils {
 	
 	
 }
+
+
 
 
