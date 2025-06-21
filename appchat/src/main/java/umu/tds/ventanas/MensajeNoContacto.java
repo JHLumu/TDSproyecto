@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
+import umu.tds.modelos.Usuario;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -35,8 +36,8 @@ public class MensajeNoContacto extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private JTextField telefonoField;
 	private Color colorPrimario;
-	private int i;
 	private Principal framePrincipal;
+	private Usuario usuarioActual;
 
 	/**
 	 * Launch the application.
@@ -65,8 +66,9 @@ public class MensajeNoContacto extends JDialog {
 		initialize();
 	}
 
-	public MensajeNoContacto(Principal frame) {
+	public MensajeNoContacto(Principal frame, Usuario usuario) {
 		super();
+		this.usuarioActual = usuario;
 		this.framePrincipal = frame;
 		initialize();
 	}
@@ -139,7 +141,7 @@ public class MensajeNoContacto extends JDialog {
 		btnAceptar.setBorderPainted(false);
 		btnAceptar.setBackground(this.colorPrimario);
 		btnAceptar.setForeground(Color.WHITE);
-		btnAceptar.setFont(new Font("Segoe UI", i = Font.PLAIN, 14));
+		btnAceptar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		btnAceptar.addActionListener(evento -> {
 			if (!this.telefonoField.getText().isEmpty()) nuevoContacto(this.telefonoField.getText());
 		});
@@ -168,6 +170,18 @@ public class MensajeNoContacto extends JDialog {
 
 
 	private void nuevoContacto(String telf) {
+		
+		if (telf.equals(this.usuarioActual.getTelefono())) {
+			
+			 JOptionPane.showMessageDialog(this, 
+		                "No te puedes enviar un mensaje a ti mismo", 
+		                "AppChat", 
+		                JOptionPane.ERROR_MESSAGE);
+			
+			
+		}
+		
+		
 		Contacto contacto = AppChat.getInstancia().nuevoContacto(telf);
 		if ((contacto == null)) {
 			
@@ -177,6 +191,11 @@ public class MensajeNoContacto extends JDialog {
 		                JOptionPane.ERROR_MESSAGE);
 			
 		}
+		
+		
+		
+		
+		
 		this.framePrincipal.setContactoSeleccionado(contacto);
 		this.dispose();
 	}

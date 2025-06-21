@@ -184,7 +184,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		btnEnv.setMinimumSize(new Dimension(80, 40));
 		btnEnv.addActionListener(evento -> {
 			
-			MensajeNoContacto mensaje = new MensajeNoContacto(this);
+			MensajeNoContacto mensaje = new MensajeNoContacto(this, this.sesionUsuario);
 	        mensaje.setVisible(true);
 			mensaje.setLocationRelativeTo(null);
 			
