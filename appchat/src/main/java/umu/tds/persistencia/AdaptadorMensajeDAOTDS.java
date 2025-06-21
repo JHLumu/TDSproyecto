@@ -81,7 +81,10 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		int emoticono = Integer.parseInt(emoticonoString);
 		
 		String grupoString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "grupo");
-		Grupo grupo = (Grupo) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.parseInt(grupoString));
+		Grupo grupo = null;  
+		if (!grupoString.equals("-1")) {  
+		    grupo = (Grupo) FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.parseInt(grupoString));  
+		}
 		
 		String fechaString = servPersistencia.recuperarPropiedadEntidad(eMensaje, "fecha");
 		LocalDateTime fecha = null ;

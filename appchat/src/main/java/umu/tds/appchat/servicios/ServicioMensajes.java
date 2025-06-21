@@ -14,8 +14,6 @@ import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.MensajeDAO;
 import umu.tds.persistencia.UsuarioDAO;
-import umu.tds.utils.Estado;
-import umu.tds.utils.TDSObservable;
 
 /**
  * Servicio que gestiona todas las operaciones relacionadas con mensajes
@@ -25,13 +23,11 @@ public class ServicioMensajes{
     private final MensajeDAO mensajeDAO;
     private final UsuarioDAO usuarioDAO;
     private final BuscadorMensaje buscadorMensaje;
-    private final TDSObservable observable;
     
-    public ServicioMensajes(MensajeDAO mensajeDAO, UsuarioDAO usuarioDAO, TDSObservable observable) {
+    public ServicioMensajes(MensajeDAO mensajeDAO, UsuarioDAO usuarioDAO) {
         this.mensajeDAO = mensajeDAO;
         this.usuarioDAO = usuarioDAO;
         this.buscadorMensaje = new BuscadorMensaje();
-        this.observable = observable;
     }
 
     private boolean esContenidoValido(Object contenido) {
@@ -218,14 +214,5 @@ public class ServicioMensajes{
             return new Mensaje(emisor, receptor, (Integer) contenido, grupo);
         }
     }
-    
-    /**
-     * Notifica cambios a los observadores
-     */
-    private void notificarCambios() {
-        observable.setChanged(Estado.INFO_CONTACTO);
-        observable.notifyObservers(Estado.INFO_CONTACTO);
-    }
-    
 
 }

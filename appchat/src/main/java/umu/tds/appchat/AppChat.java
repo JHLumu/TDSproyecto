@@ -81,7 +81,7 @@ public class AppChat extends TDSObservable {
         this.contactoDAO = this.factoria.getContactoDAO();
         this.mensajeDAO = this.factoria.getMensajeDAO();
         this.usuarioDAO = this.factoria.getUsuarioDAO();
-        this.mensajeServ = new ServicioMensajes(mensajeDAO, usuarioDAO, this);
+        this.mensajeServ = new ServicioMensajes(mensajeDAO, usuarioDAO);
         this.contactoServ = new ServicioContactos(contactoDAO, usuarioDAO, this);
         this.viewServ = new ServicioVistas(mensajeServ);
     }

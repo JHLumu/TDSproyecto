@@ -4,9 +4,6 @@ import java.net.MalformedURLException;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import umu.tds.persistencia.FactoriaDAO;
 import umu.tds.persistencia.FactoriaDAOTDS;
 import umu.tds.persistencia.UsuarioDAO;
