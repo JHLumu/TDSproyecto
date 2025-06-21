@@ -31,13 +31,7 @@ public class TDSObservable {
     // Agregar un observador
     public synchronized void addObserver(Estado e, TDSObserver o) {
     	obs.computeIfAbsent(e, k -> new ArrayList<>());
-
-        if (!obs.get(e).contains(o)) {
-            obs.get(e).add(o);
-            System.out.println("[DEBUG] Observador agregado: " + o + " para el estado: " + e.toString());
-        } else {
-            System.out.println("[DEBUG] Observador ya existe: " + o + " para el estado: " + e.toString());
-        }
+        if (!obs.get(e).contains(o)) obs.get(e).add(o);
     }
 
     // Eliminar un observador
@@ -45,7 +39,6 @@ public class TDSObservable {
     	 List<TDSObserver> observadores = obs.get(e);
          if (observadores != null) {
              observadores.remove(o);
-             System.out.println("[DEBUG] Observador eliminado: " + o + " para el usuario: " + e.toString());
              if (observadores.isEmpty()) {
                  obs.remove(e);
              }
@@ -76,11 +69,7 @@ public class TDSObservable {
         for (TDSObserver observer : observadoresCopy) {
             try {
                 observer.update(this, e);
-            } catch (Exception ex) {
-                // Manejar la excepción, por ejemplo, registrar el error
-                System.err.println("Error notificando al observador: " + ex.getMessage());
-                // Opcional: Puedes continuar notificando a otros observadores o decidir cómo manejarlo
-            }
+            } catch (Exception ex) {ex.printStackTrace();}
         }
     }
 

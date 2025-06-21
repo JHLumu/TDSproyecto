@@ -172,7 +172,7 @@ public class MensajeNoContacto extends JDialog {
 
 	private void nuevoContacto(String telf) {
 		Contacto contacto = AppChat.getInstancia().nuevoContacto(telf);
-		if (!(contacto == null)) {
+		if ((contacto == null)) {
 			
 			 JOptionPane.showMessageDialog(this, 
 		                "El teléfono introducido no está registrado", 

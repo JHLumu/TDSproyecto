@@ -69,7 +69,6 @@ public class ImagenUtils {
 	}
 	
 	public static URL getURL(Object objeto) {
-		System.out.println("soy gilipollas");
 		if (objeto instanceof Usuario) {
 			
 			Usuario usuario = (Usuario) objeto;
@@ -98,13 +97,10 @@ public class ImagenUtils {
 			
 		try {
 			if (ficheroLocal != null) resultado = ImageIO.read(ficheroLocal);
-			System.out.println("[DEBUG ImagenUtils getImagenPorDefecto]: Se ha leido correctamente la imagen por defecto.");
 			return resultado;
 		
-		} catch (IOException e) {}
+		} catch (IOException e) {e.printStackTrace();}
 		
-		
-		System.out.println("[DEBUG ImagenUtils getImagenPorDefecto]: Se devuelve null.");
 		return null;
 	}
 	
@@ -137,8 +133,6 @@ public class ImagenUtils {
 		
 		return resultado;
 	}
-	
-	//TODO: Revisar comportamiento del cambio de imagen del usuario
 	/**
 	 * 
 	 * Devuelve la imagen de un usuario, contacto o grupo. En caso de que
@@ -161,7 +155,6 @@ public class ImagenUtils {
 		if (ficheroLocal != null) {
 			try {
 				resultado = ImageIO.read(ficheroLocal);
-				System.out.println("[DEBUG ImagenUtils getImagen]: Se devuelve la imagen al estar guardado de manera local.");
 				return resultado;
 			} catch (IOException e) {}
 			
@@ -170,15 +163,9 @@ public class ImagenUtils {
 		//Paso 2: Comprobar si la URL es válida y en caso de que sea asi, descargar imagen
 			resultado = ImagenUtils.getImagenAPartirDeURL(objeto);
 			if (resultado != null) {
-				
-				System.out.println("[DEBUG ImagenUtils getImagen]: Se ha leido correctamente la imagen tras descargarse por URL.");
-				
 				try {
 					ImageIO.write((BufferedImage) resultado, "png", ImagenUtils.getFile(AppChat.getInstancia().getUsuarioActual()));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				} catch (IOException e) {e.printStackTrace();}
 				return resultado;
 				
 			}	
@@ -188,7 +175,6 @@ public class ImagenUtils {
 		
 	}
 	
-	
 	public static boolean guardarImagen(Object objeto) {
 		boolean resultado = false;
 		File ficheroLocal = ImagenUtils.getFile(objeto);
@@ -196,24 +182,14 @@ public class ImagenUtils {
 		BufferedImage imagen = null;
 		
 		if (ficheroLocal != null && URLimagen != null) {
-		
 			try {
 				imagen = ImageIO.read(URLimagen);
 				ImageIO.write(imagen, "png", ficheroLocal);
 				resultado = true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
+			} catch (IOException e) {e.printStackTrace();}
 		}
-		
-		return resultado;
-		
+		return resultado;	
 	}
-	
-	
-	
 }
 
 

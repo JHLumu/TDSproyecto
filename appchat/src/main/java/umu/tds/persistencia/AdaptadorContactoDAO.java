@@ -37,42 +37,30 @@ import umu.tds.modelos.Contacto.TipoContacto;
 	
 	@Override
 	public void registrarContacto(Contacto contacto) {
-		System.out.println("\n[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Inicio de registro de contacto.");
-		//Comprobamos que contacto no se encuentre registrado ya
-		
+
+		//Comprobamos que contacto no se encuentre registrado ya		
 		Entidad eContacto = null;
 		try {
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se comprueba si ya hay una entidad asociada.");
 			eContacto = servPersistencia.recuperarEntidad(contacto.getCodigo());
-		}catch(NullPointerException e) {};
+		}catch(NullPointerException e) {e.printStackTrace();};
 		if (eContacto != null) {
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Contacto ya ha sido registrado anteriormente.");
 			return;
 			}
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "No tiene una entidad asociada. Se crea la entidad.");
 		//Se deberian registrar sus objetos referenciados, pero se tiene en cuenta
 		//que para crear un contacto ya se valida si el usuario se encuentra registrado
 		
 		//Se crea la entidad
 		eContacto = new Entidad();
 		eContacto.setNombre("Contacto");
-		
-		
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se asocian sus propiedades comunes.");
+
 		//Propiedades comunes
 		ArrayList<Propiedad> propiedades =  new ArrayList<Propiedad>();
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: Nombre de contacto: " + contacto);
-		
-		
 		propiedades.add(new Propiedad("nombre", contacto.getNombre()));
 		
 		//Propiedades si es ContactoIndividual
 		
 		if (contacto.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) {
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo ContactoIndividual.");
-			
 			ContactoIndividual aux = (ContactoIndividual) contacto;
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: URL de la imagen del contacto: "+ contacto.getURLImagen());
 			propiedades.addAll(Arrays.asList(
 					new Propiedad("usuario", String.valueOf(aux.getUsuario().getCodigo())),
 					new Propiedad("tipo", "INDIVIDUAL")
@@ -81,8 +69,6 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		
 		//Propiedades si es Grupo
 		else if (contacto.getTipoContacto().equals(TipoContacto.GRUPO)) {
-			
-			System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: " + "Se añaden propiedades si es tipo Grupo.");
 			Grupo aux = (Grupo) contacto;
 			URL imagenURL = contacto.getURLImagen();
 			if (imagenURL != null) propiedades.add(new Propiedad("imagen", imagenURL.toExternalForm()));
@@ -91,64 +77,44 @@ import umu.tds.modelos.Contacto.TipoContacto;
 					new Propiedad("anfitrion", aux.getAnfitrion()),
 					new Propiedad("tipo", "GRUPO")
 					));
-			System.out.println(contacto.toString());
 		}
 		
 		//Se asocia a la entidad las propiedaddes y se registra la entidad
 		eContacto.setPropiedades(propiedades);
 		eContacto = servPersistencia.registrarEntidad(eContacto);
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene id " + eContacto.getId());
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene usuario referencia " + servPersistencia.recuperarPropiedadEntidad(eContacto, "usuario"));
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene nombre " + servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre"));
-		System.out.println("[DEBUG AdaptadorContactoDAO registrarContacto]: eContacto tiene anfitrion " + servPersistencia.recuperarPropiedadEntidad(eContacto, "anfitrion"));
-
 		contacto.setCodigo(eContacto.getId());
-		System.out.println("[DEBUG registrarContacto] Acabó y setCodigo() a → " + contacto.getCodigo());
 
-		
+
+
 	}
 
 	@Override
-	public void modificarContacto(Contacto contacto) {
-		System.out.println("\n[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Inicio de modificación de contacto " + contacto.getCodigo());
+	public void modificarContacto(Contacto contacto) {		
 		//Se recupera la entidad asociada al contacto
 		Entidad eContacto = servPersistencia.recuperarEntidad(contacto.getCodigo());
 		//Se recorren sus propiedades 
 		
 		for (Propiedad p : eContacto.getPropiedades()) {
+			
 			String pNombre = p.getNombre();
 			
-			if (pNombre.equals("nombre")) {
-				p.setValor(contacto.getNombre());
-				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica el nombre de contacto.");
-			}
+			if (pNombre.equals("nombre")) p.setValor(contacto.getNombre());
 			
-			else if (pNombre.equals("imagen")) {
-				p.setValor(String.valueOf(contacto.getURLImagen()));
-				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la imagen de contacto");
-			}
+			else if (pNombre.equals("imagen")) p.setValor(String.valueOf(contacto.getURLImagen()));
 			
-			//REVISAR: Eliminar si no se implementa la funcionalidad de cambiar el telefono
-			else if (pNombre.equals("usuario")) {
-				p.setValor(String.valueOf(((ContactoIndividual) contacto).getUsuario().getCodigo()));
-				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica el Usuario asociado a contacto");
-			}
+			else if (pNombre.equals("usuario")) p.setValor(String.valueOf(((ContactoIndividual) contacto).getUsuario().getCodigo()));
 			
-			else if (pNombre.equals("miembros")) {
-				p.setValor(obtenerIdsMiembros(((Grupo) contacto).getMiembros()));
-				System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se modifica la lista de miembros del grupo.");
-			} 
+			else if (pNombre.equals("miembros")) p.setValor(obtenerIdsMiembros(((Grupo) contacto).getMiembros())); 
 			
 			servPersistencia.modificarPropiedad(p);
-			System.out.println("[DEBUG AdaptadorContactoDAO modificarContacto]: " + "Se guardan los cambios de contacto.");
-		}
-		
+	
+		}	
 		
 	}
 
 	@Override
 	public Contacto recuperarContacto(int id) throws NumberFormatException, MalformedURLException {
-		System.out.println("\n[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Inicio de recuperar contacto. " + id);
+		
 		//Si el objeto se encuentra en el pool, se retorna
 		
 		PoolDAO poolContacto = PoolDAO.getUnicaInstancia();

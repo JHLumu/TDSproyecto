@@ -42,7 +42,7 @@ public class Lanzador {
 					"Hola soy Jose Luis, estoy usando App Chat!", 
 					new URL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToeoB0trn1U5LVbKvZYixTbbgs3mDn3WDRQA&s")
 					);
-			System.out.println("[DEBUG Lanzador registro]: Se han registrado a los integrantes del grupo.");
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}

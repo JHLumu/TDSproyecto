@@ -161,12 +161,10 @@ public class Usuario {
 		        if (contacto.getTipoContacto() == TipoContacto.INDIVIDUAL) {
 		            ContactoIndividual individual = (ContactoIndividual) contacto;
 		            if (individual.getTelefono().equals(telefono)) {
-		                System.out.println("[DEBUG recuperarContactoIndividual]: Contacto Individual encontrado: " + individual.getNombre());
 		                return individual;
 		            }
 		        }
 		    }
-		    System.out.println("[DEBUG recuperarContactoIndividual]: No se encontró contacto individual con teléfono: " + telefono);
 		    return null;
 		}
 
@@ -174,13 +172,9 @@ public class Usuario {
 		    for (Contacto contacto : this.listaContactos) {
 		        if (contacto.getTipoContacto() == TipoContacto.GRUPO) {
 		            Grupo grupo = (Grupo) contacto;
-		            if (grupo.getNombre().equals(nombre)) {
-		                System.out.println("[DEBUG recuperarGrupo]: Grupo encontrado: " + grupo.getNombre());
-		                return grupo;
-		            }
+		            if (grupo.getNombre().equals(nombre)) return grupo;
 		        }
 		    }
-		    System.out.println("[DEBUG recuperarGrupo]: No se encontró grupo con nombre: " + nombre);
 		    return null;
 		}
 

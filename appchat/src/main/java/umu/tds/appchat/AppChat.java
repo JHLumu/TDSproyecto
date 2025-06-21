@@ -228,7 +228,6 @@ public class AppChat extends TDSObservable {
      * @return Precio total de la suscripción.
      */
     public double calcularPrecioSuscripcion(Descuento... descuentosActivos) {
-    	System.out.println("[DEBUG AppChat calcularPrecioSuscripcion]: " + AppChat.getPrecioSuscripcion() + " " + getDescuentoAplicable(descuentosActivos));
     	return AppChat.getPrecioSuscripcion() - getDescuentoAplicable(descuentosActivos);
     }
     

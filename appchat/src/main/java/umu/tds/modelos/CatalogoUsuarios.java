@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import umu.tds.persistencia.FactoriaDAO;
@@ -57,25 +58,10 @@ public class CatalogoUsuarios {
 	
 	private void cargarCatalogo() {
 		
-		List<Usuario> aux;
 		try {
-			aux = usuarioDAO.recuperarTodosUsuarios();
-			System.out.println("\n");
-			for (Usuario usuario : aux) {
-				usuarios.put(usuario.getTelefono(), usuario);
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "ID Usuario:" + usuario.getCodigo());
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Nombre Usuario:" + usuario.getNombre());
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Contraseña Usuario:" + usuario.getPassword());
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Telefono Usuario:" + usuario.getTelefono());
-				List<String> lista = usuario.getListaContacto().stream()
-						.map(c -> c.getNombre())
-						.collect(Collectors.toList());
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Lista de Contacto Usuario:" + lista);
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Imagen Usuario:" + usuario.getURLImagen().toExternalForm());
-				System.out.println("[DEBUG CatalogoUsuarios cargarCatalogo]: " + "Estado Premium Usuario:" + usuario.isPremium());
-			}
+			usuarioDAO.recuperarTodosUsuarios().stream().collect(Collectors.toMap(Usuario::getTelefono, Function.identity()));
+			
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

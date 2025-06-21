@@ -52,7 +52,7 @@ public class BuscarConFiltro extends JFrame {
 		this.buscarFiltroListener = listener;
 		setSize(350, 500);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource(AppChat.getInstancia().getURLIcon())));
-		setTitle("Buscar");
+		setTitle("AppChat");
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelNorte = new JPanel();

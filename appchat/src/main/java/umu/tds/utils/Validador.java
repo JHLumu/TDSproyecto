@@ -12,12 +12,9 @@ public class Validador {
 	private static boolean validacionTelefono(String telefono) {
 		//Devuelve falso si telefono esta vacio o no cumple con el formato de 9 numeros sin espacios
 		if (telefono.isEmpty()) return false;
-		System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono no es vacio.");
 		Pattern expresionRegularTelefonos = Pattern.compile("^[0-9]{9}$");
 		Matcher matcher = expresionRegularTelefonos.matcher(telefono);
 		boolean resultado = matcher.matches();
-		System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono cumple formato: " + resultado);
-		if (resultado) System.out.println("[DEBUG Registro validacionTelefono]: " + "Telefono: " + telefono);
 		return resultado;
 	}
 	
@@ -26,8 +23,6 @@ public class Validador {
 		//Validar el formato de las contraseñas (si añadimos)
 		if (password == null || password1 == null) return false;
 		boolean resultado = (password.equals(password1));
-		System.out.println("[DEBUG Registro validacionPasswords]: " + "Password son iguales: " + resultado);
-		if (resultado) System.out.println("[DEBUG Registro validacionPasswords]: " + "Password: " + password);
 		return resultado;
 	}
 	
@@ -37,8 +32,6 @@ public class Validador {
 		Pattern expresionRegularEmails = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 		Matcher matcher = expresionRegularEmails.matcher(email);
 		boolean resultado = matcher.matches();
-		System.out.println("[DEBUG Registro validacionEmail]: " + "Email cumple formato: " + resultado);
-		if (resultado) System.out.println("[DEBUG Registro validacionEmail]: " + "Email: " + email);
 		return resultado;
 	}
 	
@@ -47,8 +40,6 @@ public class Validador {
 		if (instante == null) return false;
 		LocalDate fecha = instante.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		boolean resultado = ((LocalDate.now().getYear() - fecha.getYear()) >= 16);
-		System.out.println("[DEBUG Registro validacionFecha]: " + "Fecha cumple formato: " + resultado);
-		if (resultado) System.out.println("[DEBUG Registro validacionFecha]: " + "Fecha: " + fecha.toString());
 		return resultado;
 		
 	}
@@ -56,7 +47,6 @@ public class Validador {
 	private static boolean validacionImagen(String url) {
 		Image imagen = ImagenUtils.getImagenAPartirDeURL(url);
 		boolean resultado = (imagen != null);
-		System.out.println("[DEBUG Registro validacionImagen]: " + "Imagen cumple formato: " + resultado);
 		return resultado;
 		
 	}
@@ -68,10 +58,6 @@ public class Validador {
 		Matcher matcherApellidos = expresionRegular.matcher(apellidos);
 		boolean resultado1 = matcherNombre.matches();
 		boolean resultado2 = matcherApellidos.matches();
-		System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Nombre cumple formato: " + resultado1);
-		System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Apellidos cumple formato: " + resultado2);
-		if (resultado1 && resultado2) System.out.println("[DEBUG Registro validacionNombreCompleto]: " + "Nombre completo: " + nombre + 
-				 " " + apellidos);
 		return (resultado1 && resultado2);
 	}
 	

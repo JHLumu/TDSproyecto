@@ -509,7 +509,6 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
     public void update(TDSObservable o, Object arg) {
     	if (arg instanceof Estado) {
             Estado estadoActual = (Estado) arg;
-            System.out.println("[DEBUG Principal update] Estado recibido en ListaContactos: " + estadoActual);
             if (estadoActual.equals(Estado.INFO_CONTACTO)) {
                 this.actualizarListaContactosComboBox();
                 this.actualizarListaContactosMensajes();

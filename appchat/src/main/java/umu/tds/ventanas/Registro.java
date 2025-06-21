@@ -91,7 +91,6 @@ public class Registro extends JFrame {
 					saludoArea.getText(), 
 					new URL(URLField.getText()));
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
