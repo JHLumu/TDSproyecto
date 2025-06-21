@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"umu.tds.appchat"},{"l":"umu.tds.appchat.servicios"},{"l":"umu.tds.appchat.servicios.mensajes"},{"l":"umu.tds.appchat.servicios.vistas"},{"l":"umu.tds.lanzador"},{"l":"umu.tds.modelos"},{"l":"umu.tds.persistencia"},{"l":"umu.tds.utils"},{"l":"umu.tds.ventanas"}];updateSearchResults();
