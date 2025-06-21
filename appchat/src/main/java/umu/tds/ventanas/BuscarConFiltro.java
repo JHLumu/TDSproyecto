@@ -38,7 +38,7 @@ import javax.swing.JOptionPane;
 
 public class BuscarConFiltro extends JFrame {
 	/**
-	 * 
+	 * Atributos
 	 */
 	private static final long serialVersionUID = 1L;
 	private JTextField txtTexto;
@@ -188,15 +188,7 @@ public class BuscarConFiltro extends JFrame {
 			return;
 		}
 		buscarMensajes(textoFiltro, buscarPorNombre ? nombreContactoFiltro : null, buscarPorTelefono ? telefonoFiltro : null);
-		/*
-		if (buscarPorTexto) {
-			// Búsqueda de mensajes que contienen el texto
-			buscarMensajes(textoFiltro, buscarPorNombre ? nombreContactoFiltro : null, buscarPorTelefono ? telefonoFiltro : null);
-		} else {
-			// Búsqueda de contactos por nombre y/o teléfono
-			buscarContactos(nombreContactoFiltro, telefonoFiltro);
-		}
-		*/
+
 	}
 	/**
 	 * Muestra todos los mensajes ordenados primero por contacto y luego por fecha

@@ -40,7 +40,7 @@ public class ImagenUtils {
 	/**
 	 * Calcula la ruta de archivo para la imagen de un objeto dado, que puede ser un Usuario,
 	 * ContactoIndividual o Grupo. Si el directorio padre no existe, lo crea.
-	 * * @param objeto Instancia de Usuario, ContactoIndividual o Grupo.
+	 * @param objeto Instancia de Usuario, ContactoIndividual o Grupo.
 	 * @return Un objeto File que representa la ruta de la imagen del icono de la aplicación,
 	 * o null si el objeto no es de un tipo soportado.
 	 */
@@ -84,7 +84,7 @@ public class ImagenUtils {
 	
 	/**
 	 * Obtiene la URL de la imagen asociada a un objeto dado, que puede ser un Usuario o Contacto.
-	 * * @param objeto Instancia de Usuario o Contacto.
+	 * @param objeto Instancia de Usuario o Contacto.
 	 * @return La URL de la imagen del objeto, o null si el objeto no es de un tipo soportado.
 	 */
 	public static URL getURL(Object objeto) {
@@ -108,7 +108,7 @@ public class ImagenUtils {
 	
 	/**
 	 * Obtiene la imagen por defecto para un objeto dado (Usuario, ContactoIndividual o Grupo).
-	 * * @param objeto Instancia de Usuario, ContactoIndividual o Grupo.
+	 * @param objeto Instancia de Usuario, ContactoIndividual o Grupo.
 	 * @return La imagen por defecto correspondiente, o null si ocurre un error o el objeto no es de un tipo soportado.
 	 */
 	public static Image getImagenPorDefecto(Object objeto) {
@@ -130,7 +130,7 @@ public class ImagenUtils {
 	
 	/**
 	 * Carga una imagen a partir de una URL o una cadena que representa una URL.
-	 * * @param objeto Un objeto URL o una cadena String que representa una URL.
+	 * @param objeto Un objeto URL o una cadena String que representa una URL.
 	 * @return La imagen cargada, o null si la URL es inválida o ocurre un error de E/S.
 	 */
 	public static Image getImagenAPartirDeURL(Object objeto) {
@@ -164,7 +164,7 @@ public class ImagenUtils {
 	 * Devuelve la imagen de un usuario, contacto o grupo. Primero intenta cargar la imagen
 	 * de manera local, si no está disponible, intenta descargarla desde la URL asociada.
 	 * Si ambos intentos fallan, devuelve la imagen por defecto.
-	 * * @param objeto Instancia de Usuario, Contacto o Grupo.
+	 * @param objeto Instancia de Usuario, Contacto o Grupo.
 	 * @return La imagen del objeto (local, descargada o por defecto), o null si no se puede obtener ninguna imagen.
 	 */
 	public static Image getImagen(Object objeto) {
@@ -205,7 +205,7 @@ public class ImagenUtils {
 	
 	/**
 	 * Guarda la imagen de un objeto (Usuario, Contacto, Grupo) desde su URL asociada a un archivo local.
-	 * * @param objeto Instancia de Usuario, Contacto o Grupo de la cual se desea guardar la imagen.
+	 * @param objeto Instancia de Usuario, Contacto o Grupo de la cual se desea guardar la imagen.
 	 * @return true si la imagen se guardó exitosamente, false en caso contrario.
 	 */
 	public static boolean guardarImagen(Object objeto) {

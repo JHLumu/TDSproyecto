@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
-import umu.tds.modelos.Contacto.TipoContacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
+import umu.tds.modelos.TipoContacto;
 import umu.tds.modelos.Usuario;
 import umu.tds.persistencia.ContactoDAO;
 import umu.tds.persistencia.UsuarioDAO;
@@ -132,7 +132,6 @@ public class ServicioContactos{
      * @param usuario Usuario propietario del grupo
      * @param grupo Grupo al que añadir el miembro
      * @param contacto Contacto individual que se añadirá como miembro
-     * @return Resultado de la operación
      */
     public void agregarMiembroGrupo(Usuario usuario, Grupo grupo, Contacto contacto) {
         
@@ -152,7 +151,6 @@ public class ServicioContactos{
      * @param usuario Usuario propietario del grupo
      * @param grupo Grupo del que eliminar el miembro
      * @param contacto Contacto individual que se eliminará como miembro
-     * @return Resultado de la operación
      */
     public void eliminarMiembroGrupo(Usuario usuario, Grupo grupo, Contacto contacto) {
         Grupo grupoRecuperado = usuario.eliminarMiembroGrupo(grupo, contacto);

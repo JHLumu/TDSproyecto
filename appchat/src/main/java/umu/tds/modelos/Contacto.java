@@ -154,11 +154,4 @@ public abstract class Contacto implements Comparable<Contacto> {
         return this.nombre.compareTo(otro.nombre);
     }
     
-    /**
-     * Enumeración que define los tipos de contacto posibles.
-     */
-    public static enum TipoContacto {
-    	INDIVIDUAL, GRUPO;
-    }
-    
 }

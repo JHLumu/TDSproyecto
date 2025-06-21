@@ -17,8 +17,8 @@ import tds.driver.ServicioPersistencia;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
+import umu.tds.modelos.TipoContacto;
 import umu.tds.modelos.Usuario;
-import umu.tds.modelos.Contacto.TipoContacto;
 	
 /**
  * <p>Adaptador que implementa la interfaz {@link ContactoDAO} utilizando el servicio de persistencia TDS.</p>

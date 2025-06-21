@@ -28,7 +28,7 @@ public class ServicioExportacion {
 
 	/**
 	 * Exporta una conversación entre un usuario y un contacto a un archivo PDF.
-	 * * @param usuario El usuario actual cuya conversación se va a exportar.
+	 * @param usuario El usuario actual cuya conversación se va a exportar.
 	 * @param contacto El contacto (individual o grupo) con el que se tuvo la conversación.
 	 * @param destino El archivo de destino donde se guardará el PDF.
 	 * @return true si la exportación fue exitosa, false en caso contrario.

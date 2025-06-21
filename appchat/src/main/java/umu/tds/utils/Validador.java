@@ -15,7 +15,7 @@ public class Validador {
 
 	/**
 	 * Valida si un número de teléfono tiene el formato correcto (9 dígitos numéricos sin espacios).
-	 * * @param telefono El número de teléfono a validar.
+	 * @param telefono El número de teléfono a validar.
 	 * @return true si el teléfono es válido, false en caso contrario (vacío o formato incorrecto).
 	 */
 	private static boolean validacionTelefono(String telefono) {
@@ -30,7 +30,7 @@ public class Validador {
 	
 	/**
 	 * Valida si dos contraseñas son iguales. No valida el formato de las contraseñas.
-	 * * @param password La primera contraseña.
+	 * @param password La primera contraseña.
 	 * @param password1 La segunda contraseña para comparar.
 	 * @return true si ambas contraseñas son iguales y no nulas, false en caso contrario.
 	 */
@@ -103,7 +103,7 @@ public class Validador {
 	 * Los datos deben pasarse en el siguiente orden dentro del array de Strings:
 	 * datos[0]: nombre, datos[1]: apellidos, datos[2]: teléfono, datos[3]: contraseña,
 	 * datos[4]: confirmación de contraseña, datos[5]: email, datos[6]: URL de imagen.
-	 * * @param fecha La fecha de nacimiento del usuario.
+	 * @param fecha La fecha de nacimiento del usuario.
 	 * @param datos Un array de Strings que contiene los demás campos de registro.
 	 * @return true si todos los campos de registro son válidos, false en caso contrario.
 	 */

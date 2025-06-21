@@ -46,7 +46,7 @@ public class ServicioMensajes{
     
     /**
      * Envía un mensaje a un contacto o grupo
-     * * @param emisor Usuario que envía el mensaje
+     * @param emisor Usuario que envía el mensaje
      * @param contacto Destinatario (individual o grupo)
      * @param contenido Contenido del mensaje (String para texto, Integer para emoji)
      * @return true si se envió correctamente, false en caso contrario
@@ -83,7 +83,7 @@ public class ServicioMensajes{
     
     /**
      * Envía un mensaje directo a un usuario por teléfono
-     * * @param emisor Usuario que envía el mensaje
+     * @param emisor Usuario que envía el mensaje
      * @param receptor Usuario que recibe el mensaje
      * @param text Texto del mensaje
      * @return true si el mensaje se envió correctamente, false en caso contrario.
@@ -105,7 +105,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene el contenido del último mensaje con un contacto
-     * * @param usuario Usuario actual
+     * @param usuario Usuario actual
      * @param contacto Contacto
      * @return Contenido del último mensaje o null si no existe
      */
@@ -116,7 +116,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene la fecha del último mensaje con un contacto
-     * * @param usuario Usuario actual
+     * @param usuario Usuario actual
      * @param contacto Contacto
      * @return Fecha del último mensaje o null si no existe
      */
@@ -127,7 +127,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene todos los mensajes de un usuario
-     * * @param usuario Usuario
+     * @param usuario Usuario
      * @return Lista de todos los mensajes del usuario
      */
     public List<Mensaje> getTodosMensajes(Usuario usuario) {
@@ -137,7 +137,7 @@ public class ServicioMensajes{
     /**
      * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
      * Delega la funcionalidad al BuscadorMensaje
-     * * @param usuario Usuario actual
+     * @param usuario Usuario actual
      * @param buscarCriterio Criterios de búsqueda
      * @return Lista de mensajes coincidentes ordenados
      */
@@ -148,7 +148,7 @@ public class ServicioMensajes{
     /**
      * Localiza la posición de un mensaje específico en el chat con un contacto
      * Delega la funcionalidad al BuscadorMensaje
-     * * @param usuario Usuario actual
+     * @param usuario Usuario actual
      * @param contacto Contacto
      * @param targetMensaje Mensaje a localizar
      * @return Índice del mensaje o -1 si no se encuentra
@@ -159,7 +159,7 @@ public class ServicioMensajes{
     
     /**
      * Verifica si el último mensaje con un contacto fue enviado por el usuario
-     * * @param usuario Usuario actual
+     * @param usuario Usuario actual
      * @param contacto Contacto
      * @return true si el último mensaje fue enviado por el usuario
      */

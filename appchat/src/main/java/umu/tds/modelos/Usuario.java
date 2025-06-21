@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import umu.tds.modelos.Contacto.TipoContacto;
-
 public class Usuario {
 	
 	//El siguiente atributo se utiliza como identificador unico de usuario para la persistencia

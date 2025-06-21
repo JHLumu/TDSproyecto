@@ -6,11 +6,12 @@ import java.time.LocalDate;
 
 import umu.tds.appchat.AppChat;
 
+/*
+ * Clase para inicializar la base de datos de prueba
+ */
 public class Lanzador {
 	
-	/*
-	 * Clase para inicializar la base de datos de prueba
-	 */
+	
 	public static void registro() {
 		try {
 			AppChat.getInstancia().registrarUsuario(

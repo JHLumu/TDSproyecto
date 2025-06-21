@@ -450,16 +450,16 @@ public class AppChat extends TDSObservable {
     * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
     * Si no se proporciona texto de búsqueda, devuelve todos los mensajes que cumplan con los filtros de emisor/receptor
     * 
-    * Soporta búsqueda de emojis con el formato "Emoji:<número de 0 a 23>"
+    * Soporta búsqueda de emojis con el formato "Emoji:[número de 0 a 23]"
     * 
     * Los resultados se ordenan por:
-    * - Si hay textoFiltro: ordenados por precisión de coincidencia
-    * - Si no hay textoFiltro: ordenados por coincidencia de contacto y luego por fecha de envío
+    * Si hay textoFiltro: ordenados por precisión de coincidencia
+    * Si no hay textoFiltro: ordenados por coincidencia de contacto y luego por fecha de envío
     *
-    * **@param** textoFiltro Texto a buscar en los mensajes (puede ser null o vacío)
-    * **@param** nombreFiltro Filtro de nombre de contacto (puede ser null)
-    * **@param** telefonoFiltro Filtro de teléfono de contacto (puede ser null)
-    * **@return** Lista de mensajes coincidentes ordenados según los criterios establecidos
+    * @param textoFiltro Texto a buscar en los mensajes (puede ser null o vacío)
+    * @param nombreFiltro Filtro de nombre de contacto (puede ser null)
+    * @param telefonoFiltro Filtro de teléfono de contacto (puede ser null)
+    * @return Lista de mensajes coincidentes ordenados según los criterios establecidos
     */
     public List<MensajeCoincidencia> buscarMensajes(String textoFiltro, String nombreFiltro, String telefonoFiltro) {
         return mensajeServ.buscarMensajes(sesionUsuario, new CriterioBuscarMensaje(textoFiltro, nombreFiltro, telefonoFiltro));
