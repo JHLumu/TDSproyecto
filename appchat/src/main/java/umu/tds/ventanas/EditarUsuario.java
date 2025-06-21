@@ -359,7 +359,7 @@ public class EditarUsuario extends JDialog {
     }
     
     public EditarUsuario() {
-    	
+    	this.controlador = AppChat.getInstancia();
     	this.fotoCorrecta = 0;
     	this.usuario = this.controlador.getUsuarioActual();
     	//Se definen propiedades de la ventana

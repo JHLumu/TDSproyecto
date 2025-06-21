@@ -43,6 +43,8 @@ public class Lanzador {
 					new URL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToeoB0trn1U5LVbKvZYixTbbgs3mDn3WDRQA&s")
 					);
 
+			System.out.println("Instancias registradas");
+			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}

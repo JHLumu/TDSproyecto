@@ -25,17 +25,14 @@ import javax.swing.JDialog;
 
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
-import java.util.Optional;
 import java.awt.Dimension;
 
 
 public class MensajeNoContacto extends JDialog {
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JTextField mensajeField;
 	private JTextField telefonoField;
 	private Color colorPrimario;
 	private int i;

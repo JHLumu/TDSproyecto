@@ -3,7 +3,6 @@ package umu.tds.appchat.servicios;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import umu.tds.appchat.AppChat;
 import umu.tds.appchat.servicios.mensajes.BuscadorMensaje;
 import umu.tds.appchat.servicios.mensajes.CriterioBuscarMensaje;
 import umu.tds.appchat.servicios.mensajes.MensajeCoincidencia;

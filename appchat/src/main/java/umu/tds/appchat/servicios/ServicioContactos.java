@@ -3,7 +3,6 @@ package umu.tds.appchat.servicios;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import umu.tds.modelos.CatalogoUsuarios;

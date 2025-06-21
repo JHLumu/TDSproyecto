@@ -57,9 +57,10 @@ public class CatalogoUsuarios {
 	}
 	
 	private void cargarCatalogo() {
-		
+		List<Usuario> aux;
 		try {
-			usuarioDAO.recuperarTodosUsuarios().stream().collect(Collectors.toMap(Usuario::getTelefono, Function.identity()));
+			aux = usuarioDAO.recuperarTodosUsuarios();
+			for(Usuario usuario : aux) {usuarios.put(usuario.getTelefono(), usuario);}
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
