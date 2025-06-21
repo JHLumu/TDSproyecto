@@ -172,6 +172,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene la lista completa de contactos del usuario
+     * @param usuario El usuario del que se quieren obtener los contactos.
+     * @return Una lista de objetos Contacto.
      */
     public List<Contacto> obtenerTodosLosContactos(Usuario usuario) {
         return usuario.getListaContacto();
@@ -179,6 +181,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene sólo los contactos individuales, ordenados por nombre
+     * @param usuario El usuario del que se quieren obtener los contactos individuales.
+     * @return Una lista de objetos Contacto que son contactos individuales.
      */
     public List<Contacto> obtenerContactosIndividuales(Usuario usuario) {
         if (usuario == null) {
@@ -193,6 +197,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene sólo los grupos, ordenados por nombre
+     * @param usuario El usuario del que se quieren obtener los grupos.
+     * @return Una lista de objetos Contacto que son grupos.
      */
     public List<Contacto> obtenerGrupos(Usuario usuario) {
         if (usuario == null) {
@@ -207,6 +213,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene la lista de contactos con los que se ha intercambiado mensajes
+     * @param usuario El usuario del que se quieren obtener los contactos con mensajes.
+     * @return Una lista de objetos Contacto.
      */
     public List<Contacto> obtenerContactosConMensajes(Usuario usuario) {
         return usuario.getListaContactosConMensajes();
@@ -214,6 +222,9 @@ public class ServicioContactos{
     
     /**
      * Verifica si un contacto pertenece a la lista de contactos del usuario
+     * @param usuario El usuario.
+     * @param contacto El contacto a verificar.
+     * @return true si el contacto pertenece a la lista de contactos del usuario, false en caso contrario.
      */
     public boolean esContacto(Usuario usuario, Contacto contacto) {
         return usuario.getListaContacto().contains(contacto);
@@ -221,6 +232,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene el teléfono de un contacto o del anfitrión si es un grupo
+     * @param contacto El contacto del que se quiere obtener el teléfono.
+     * @return El número de teléfono del contacto si es individual, o el del anfitrión si es un grupo.
      */
     public String obtenerTelefonoContacto(Contacto contacto) {
         return contacto instanceof ContactoIndividual ? 
@@ -230,6 +243,8 @@ public class ServicioContactos{
     
     /**
      * Obtiene la lista de miembros de un grupo
+     * @param grupo El grupo del que se quieren obtener los miembros.
+     * @return Una lista de objetos Contacto que son miembros del grupo.
      */
     public List<Contacto> obtenerMiembrosGrupo(Grupo grupo) {
         return grupo.getMiembros();
@@ -239,6 +254,8 @@ public class ServicioContactos{
     
     /**
      * Persiste los cambios de un contacto y notifica a los observadores
+     * @param contacto El contacto cuyos cambios se van a persistir.
+     * @param usuario El usuario al que pertenece el contacto.
      */
     private void persistirCambiosContacto(Contacto contacto, Usuario usuario) {
         contactoDAO.registrarContacto(contacto);

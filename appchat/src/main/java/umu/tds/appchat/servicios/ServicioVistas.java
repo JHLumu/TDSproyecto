@@ -22,8 +22,7 @@ import umu.tds.modelos.Usuario;
 /**
  * Servicio responsable de gestionar la preparación de datos para la vista,
  * transformando entidades del modelo en ViewModels listos para presentar.
- * 
- */
+ * */
 public class ServicioVistas {
     
     // Constantes de configuración de la vista
@@ -37,8 +36,7 @@ public class ServicioVistas {
     
     /**
      * Constructor que recibe las dependencias necesarias
-     * 
-     * @param servicioMensajes Servicio para obtener información de mensajes
+     * * @param servicioMensajes Servicio para obtener información de mensajes
      */
     public ServicioVistas(ServicioMensajes servicioMensajes) {
         this.servicioMensajes = servicioMensajes;
@@ -49,8 +47,7 @@ public class ServicioVistas {
     /**
      * Prepara la información de un mensaje para mostrar en la vista.
      * Actúa como un adaptador entre el modelo de dominio y la vista.
-     * 
-     * @param item Objeto que contiene información del mensaje (Contacto o MensajeCoincidencia)
+     * * @param item Objeto que contiene información del mensaje (Contacto o MensajeCoincidencia)
      * @param usuario Usuario actual de la sesión
      * @return InfoMensajeVista con los datos formateados para la vista
      */
@@ -89,8 +86,7 @@ public class ServicioVistas {
     
     /**
      * Procesa el contenido de un mensaje y lo asigna al InfoMensajeVista
-     * 
-     * @param info InfoMensajeVista a completar
+     * * @param info InfoMensajeVista a completar
      * @param contenido Contenido del mensaje (String o Integer)
      */
     private void procesarContenidoMensaje(InfoMensajeVista info, Object contenido) {
@@ -103,8 +99,7 @@ public class ServicioVistas {
     
     /**
      * Formatea un mensaje de texto para la vista (trunca si es muy largo)
-     * 
-     * @param mensajeTexto Texto original del mensaje
+     * * @param mensajeTexto Texto original del mensaje
      * @return Texto formateado y truncado si es necesario
      */
     public String formatearTextoMensaje(String mensajeTexto) {
@@ -120,8 +115,7 @@ public class ServicioVistas {
     
     /**
      * Formatea la fecha de un mensaje para mostrar en la vista
-     * 
-     * @param fecha Fecha y hora del mensaje
+     * * @param fecha Fecha y hora del mensaje
      * @return Fecha formateada como string
      */
     public String formatearFechaMensaje(LocalDateTime fecha) {
@@ -133,8 +127,7 @@ public class ServicioVistas {
     
     /**
      * Obtiene un emoji redimensionado para la vista
-     * 
-     * @param emojiCode Código del emoji
+     * * @param emojiCode Código del emoji
      * @return ImageIcon del emoji redimensionado o null si no se encuentra
      */
     public ImageIcon obtenerEmojiRedimensionado(Integer emojiCode) {
@@ -153,8 +146,7 @@ public class ServicioVistas {
     
     /**
      * Formatea el saludo de un contacto para la vista
-     * 
-     * @param contacto Contacto cuyo saludo se va a formatear
+     * * @param contacto Contacto cuyo saludo se va a formatear
      * @return Saludo formateado y truncado si es necesario
      */
     public String formatearSaludoVista(Contacto contacto) {
@@ -174,8 +166,7 @@ public class ServicioVistas {
     /**
      * Genera las burbujas de chat para mostrar en la interfaz.
      * Transforma los mensajes del modelo en elementos visuales.
-     * 
-     * @param contacto Contacto del chat
+     * * @param contacto Contacto del chat
      * @param chat Panel donde se mostrarán las burbujas
      * @param usuario Usuario actual
      * @return Lista de burbujas de texto listas para mostrar
@@ -200,8 +191,7 @@ public class ServicioVistas {
     
     /**
      * Crea una burbuja individual para un mensaje
-     * 
-     * @param mensaje Mensaje a convertir en burbuja
+     * * @param mensaje Mensaje a convertir en burbuja
      * @param contacto Contacto del chat
      * @param chat Panel contenedor
      * @param usuario Usuario actual
@@ -224,8 +214,7 @@ public class ServicioVistas {
     
     /**
      * Determina el texto del autor a mostrar en la burbuja del mensaje
-     * 
-     * @param contacto Contacto del chat
+     * * @param contacto Contacto del chat
      * @param mensaje Mensaje específico
      * @param esUsuario Si el mensaje fue enviado por el usuario actual
      * @param usuario Usuario actual

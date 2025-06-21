@@ -88,7 +88,16 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
         contenidoPanel.add(fechaLabel, gbc);
     }
 
-    // Modificar el método getListCellRendererComponent
+    /**
+     * Devuelve un componente que ha sido configurado para mostrar el valor especificado.
+     * Este método es llamado por un JList para obtener un componente que renderice cada elemento.
+     * @param list El JList que está pidiendo el renderizador para pintar.
+     * @param contacto El valor del elemento a pintar. Puede ser un {@link Contacto} o un {@link MensajeCoincidencia}.
+     * @param index El índice de la celda.
+     * @param isSelected Verdadero si la celda especificada ha sido seleccionada.
+     * @param cellHasFocus Verdadero si la celda especificada tiene el foco.
+     * @return Un componente que ha sido configurado para mostrar el valor especificado.
+     */
     @Override
     public Component getListCellRendererComponent(JList<? extends Object> list, 
                                                   Object contacto, 
@@ -143,7 +152,9 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
         return this;
     }
     
-    
+    /**
+     * Aplica estilos específicos para los elementos seleccionados en la lista.
+     */
     @Override
     protected void aplicarEstilosSeleccionado() {
         nombreLabel.setForeground(new Color(0, 0, 120));
@@ -152,6 +163,10 @@ public class ContactoMensajeRenderer extends BaseContactoRenderer implements Lis
         separador.setForeground(SELECTED_SEPARATOR_COLOR);
     }
     
+    /**
+     * Aplica estilos específicos para los elementos no seleccionados en la lista.
+     * @param list El JList al que se aplica el renderizador.
+     */
     @Override
     protected void aplicarEstilosNoSeleccionado(JList<?> list) {
         nombreLabel.setForeground(list.getForeground());

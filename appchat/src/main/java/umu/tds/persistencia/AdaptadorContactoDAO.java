@@ -19,15 +19,31 @@ import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
 import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Contacto.TipoContacto;
-
-	public class AdaptadorContactoDAO implements ContactoDAO {
+	
+/**
+ * <p>Adaptador que implementa la interfaz {@link ContactoDAO} utilizando el servicio de persistencia TDS.</p>
+ * <p>Esta clase se encarga de mapear objetos {@link Contacto} (ya sean {@link ContactoIndividual} o {@link Grupo})
+ * a entidades persistibles y viceversa, gestionando su almacenamiento y recuperación.</p>
+ * <p>Sigue el patrón Singleton para asegurar una única instancia del adaptador.</p>
+ */
+public class AdaptadorContactoDAO implements ContactoDAO {
 	private ServicioPersistencia servPersistencia;
 	private static AdaptadorContactoDAO instancia = new AdaptadorContactoDAO();
 	
+	
+	/**
+	 * Obtiene la única instancia del AdaptadorContactoDAO.
+	 *
+	 * @return La instancia de {@link AdaptadorContactoDAO}.
+	 */
 	public static AdaptadorContactoDAO getContactoDAO() {
 		return instancia;
 	}
 	
+	/**
+	 * Constructor privado para aplicar el patrón Singleton.
+	 * Inicializa el servicio de persistencia.
+	 */
 	private AdaptadorContactoDAO(){
 		
 		servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
@@ -35,6 +51,13 @@ import umu.tds.modelos.Contacto.TipoContacto;
 	};
 	
 	
+	/**
+	 * {@inheritDoc}
+	 * <p>Registra un nuevo contacto (individual o grupo) en el sistema de persistencia.</p>
+	 * <p>Antes de registrar, comprueba si el contacto ya está registrado.
+	 * Diferencia entre {@link ContactoIndividual} y {@link Grupo} para almacenar sus propiedades específicas.</p>
+	 * @param contacto El objeto {@link Contacto} a registrar.
+	 */
 	@Override
 	public void registrarContacto(Contacto contacto) {
 
@@ -87,7 +110,14 @@ import umu.tds.modelos.Contacto.TipoContacto;
 
 
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>Modifica un contacto existente en el sistema de persistencia.</p>
+	 * <p>Actualiza las propiedades del contacto en la entidad persistida,
+	 * diferenciando entre propiedades comunes y las específicas de {@link ContactoIndividual} o {@link Grupo}.</p>
+	 * @param contacto El objeto {@link Contacto} con los datos actualizados.
+	 */
 	@Override
 	public void modificarContacto(Contacto contacto) {		
 		//Se recupera la entidad asociada al contacto
@@ -111,7 +141,19 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		}	
 		
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>Recupera un contacto de la base de datos por su identificador único.</p>
+	 * <p>Si el contacto ya está en el pool de objetos, lo retorna directamente.
+	 * De lo contrario, lo recupera del servicio de persistencia, lo construye
+	 * (determinando si es un {@link ContactoIndividual} o un {@link Grupo})
+	 * y lo añade al pool.</p>
+	 * @param id El ID del contacto a recuperar.
+	 * @return El objeto {@link Contacto} recuperado.
+	 * @throws NumberFormatException Si ocurre un error al convertir un ID a número.
+	 * @throws MalformedURLException Si la URL de la imagen del grupo no es válida.
+	 */
 	@Override
 	public Contacto recuperarContacto(int id) throws NumberFormatException, MalformedURLException {
 		//Si el objeto se encuentra en el pool, se retorna
@@ -156,6 +198,12 @@ import umu.tds.modelos.Contacto.TipoContacto;
 	
 	//Funciones auxiliares
 	
+	/**
+	 * Función auxiliar para obtener una cadena de IDs de una lista de miembros de un grupo.
+	 * Los IDs se unen con un espacio como separador.
+	 * @param lista La lista de objetos {@link Contacto} que son miembros de un grupo.
+	 * @return Una cadena de texto con los IDs de los miembros.
+	 */
 	private String obtenerIdsMiembros(List<Contacto> lista) {
 		
 		String aux = lista.stream()
@@ -165,6 +213,14 @@ import umu.tds.modelos.Contacto.TipoContacto;
 
 	}
 	
+	/**
+	 * Función auxiliar para obtener una lista de objetos Contacto a partir de una cadena de IDs de miembros.
+	 *
+	 * @param idsMiembros Una cadena de texto con los IDs de los miembros separados por espacios.
+	 * @return Una lista de objetos {@link Contacto} correspondientes a los IDs.
+	 * @throws NumberFormatException Si alguno de los IDs no es un número válido.
+	 * @throws MalformedURLException Si la URL de la imagen de perfil de algún miembro no es válida.
+	 */
 	private List<Contacto> obtenerMiembrosporIds(String idsMiembros) throws NumberFormatException, MalformedURLException{
 		List<Contacto> resultado = new LinkedList<Contacto>();
 		if (idsMiembros != null && !idsMiembros.isEmpty()) {

@@ -289,6 +289,7 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene la URL del icono según el estado premium
+     * @return La ruta del recurso del icono.
      */
     public String getURLIcon() {
         return this.isUsuarioPremium() ? "/Resources/chat_premium.png" : "/Resources/chat.png";
@@ -307,7 +308,11 @@ public class AppChat extends TDSObservable {
         return contactoServ.crearContactoIndividual(sesionUsuario, nombre, telefono);
     }
     
-    
+    /**
+     * Crea un nuevo contacto individual para el usuario actual dado su número de teléfono.
+     * @param telefono El número de teléfono del contacto.
+     * @return El objeto Contacto creado, o null si no se pudo crear.
+     */
     public Contacto nuevoContacto(String telefono) {
     	return contactoServ.crearContactoIndividual(telefono);
     }
@@ -315,6 +320,7 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene la lista completa de contactos del usuario
+     * @return Una lista de objetos Contacto.
      */
     public List<Contacto> obtenerListaContactos() {
         return contactoServ.obtenerTodosLosContactos(sesionUsuario);
@@ -322,6 +328,7 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene sólo los contactos individuales, ordenados por nombre
+     * @return Una lista de objetos Contacto que son contactos individuales.
      */
     public List<Contacto> obtenerListaContactosIndividuales() {
         return contactoServ.obtenerContactosIndividuales(sesionUsuario);
@@ -329,6 +336,7 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene sólo los grupos, ordenados por nombre
+     * @return Una lista de objetos Contacto que son grupos.
      */
     public List<Contacto> obtenerListaContactosGrupo() {
         return contactoServ.obtenerGrupos(sesionUsuario);
@@ -336,6 +344,7 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene la lista de contactos con los que se ha intercambiado mensajes
+     * @return Una lista de objetos Contacto con los que hay mensajes.
      */
     public List<Contacto> obtenerListaChatMensajes() {
         return contactoServ.obtenerContactosConMensajes(sesionUsuario);
@@ -343,6 +352,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Verifica si un contacto pertenece a la lista de contactos del usuario
+     * @param contacto El contacto a verificar.
+     * @return true si el contacto está en la lista del usuario, false en caso contrario.
      */
     public boolean esContacto(Contacto contacto) {
         return contactoServ.esContacto(sesionUsuario, contacto);
@@ -350,6 +361,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene el teléfono de un contacto o del anfitrión si es un grupo
+     * @param contacto El contacto del que se quiere obtener el teléfono.
+     * @return El número de teléfono del contacto o del anfitrión del grupo.
      */
     public String getTelefonoContacto(Contacto contacto) {
         return contactoServ.obtenerTelefonoContacto(contacto);
@@ -392,6 +405,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Obtiene la lista de miembros de un grupo
+     * @param grupo El grupo del que se quieren obtener los miembros.
+     * @return Una lista de objetos Contacto que son miembros del grupo.
      */
     public List<Contacto> obtenerListaMiembrosGrupo(Grupo grupo) {
         return contactoServ.obtenerMiembrosGrupo(grupo);
@@ -399,15 +414,31 @@ public class AppChat extends TDSObservable {
     
     // ---------- GESTIÓN DE MENSAJES ----------
       
-
+    /**
+     * Envía un mensaje al contacto o grupo especificado.
+     * @param contacto El contacto o grupo al que se enviará el mensaje.
+     * @param entrada El contenido del mensaje (String para texto, Integer para emoji).
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
+     */
     public boolean enviarMensaje(Contacto contacto, Object entrada) {
         return mensajeServ.enviarMensaje(sesionUsuario, contacto, entrada);
     }
     
+    /**
+     * Envía un mensaje a un usuario especificado por su número de teléfono.
+     * @param telefono El número de teléfono del destinatario.
+     * @param entrada El contenido del mensaje (String para texto, Integer para emoji).
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
+     */
     public boolean enviarMensaje(String telefono, Object entrada) {
     	return mensajeServ.enviarMensaje(sesionUsuario, telefono, entrada);
     }
     
+    /**
+     * Envía un mensaje de texto a un usuario especificado por su número de teléfono.
+     * @param text El texto del mensaje.
+     * @param telf El número de teléfono del destinatario.
+     */
     public void enviarMensaje(String text, String telf) {
 		Usuario usuario = this.catalogoUsuarios.getUsuario(telf);
 		
@@ -439,6 +470,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Prepara la información de un mensaje para mostrar en la vista
+     * @param item El objeto que contiene la información del mensaje (puede ser Contacto o MensajeCoincidencia).
+     * @return Un objeto InfoMensajeVista con la información formateada para la vista.
      */
     public InfoMensajeVista prepararInfoParaVista(Object item) {
         return viewServ.prepararInfoMensajeParaVista(item, sesionUsuario);
@@ -446,8 +479,10 @@ public class AppChat extends TDSObservable {
     
 
 
-	/**
+    /**
      * Formatea un mensaje de texto para la vista (trunca si es muy largo)
+     * @param mensajeTexto El texto del mensaje a formatear.
+     * @return El texto del mensaje formateado.
      */
     public String formatearMensajeParaVista(String mensajeTexto) {
         return viewServ.formatearTextoMensaje(mensajeTexto);
@@ -455,6 +490,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Formatea la fecha de un mensaje para mostrar solo la hora
+     * @param fecha La fecha y hora del mensaje.
+     * @return La fecha formateada como una cadena de texto.
      */
     public String formatearFechaMensaje(LocalDateTime fecha) {
         return viewServ.formatearFechaMensaje(fecha);
@@ -462,6 +499,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Redimensiona un emoji para la vista
+     * @param emojiCode El código del emoji.
+     * @return Un ImageIcon que representa el emoji redimensionado.
      */
     public ImageIcon obtenerEmojiRedimensionado(Integer emojiCode) {
         return viewServ.obtenerEmojiRedimensionado(emojiCode);
@@ -469,6 +508,8 @@ public class AppChat extends TDSObservable {
     
     /**
      * Formatea el saludo de un contacto para la vista
+     * @param contacto El contacto cuyo saludo se quiere formatear.
+     * @return El saludo formateado como una cadena de texto.
      */
     public String formatearSaludoVista(Contacto contacto) {
         return viewServ.formatearSaludoVista(contacto);
@@ -485,6 +526,12 @@ public class AppChat extends TDSObservable {
         return viewServ.generarBurbujasMensajes(contacto, chat, sesionUsuario);
     }
     
+    /**
+     * Localiza la posición de un mensaje específico en el chat con un contacto.
+     * @param c El contacto con el que se tiene el chat.
+     * @param mObjetivo El mensaje objetivo a localizar.
+     * @return El índice del mensaje en el chat, o -1 si no se encuentra.
+     */
     public int ubicarMensaje(Contacto c, Mensaje mObjetivo) {
        return mensajeServ.ubicarMensaje(sesionUsuario, c, mObjetivo);
     }

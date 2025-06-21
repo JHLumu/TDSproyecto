@@ -8,7 +8,9 @@ import umu.tds.appchat.AppChat;
 
 public class Lanzador {
 	
-	
+	/*
+	 * Clase para inicializar la base de datos de prueba
+	 */
 	public static void registro() {
 		try {
 			AppChat.getInstancia().registrarUsuario(

@@ -22,17 +22,33 @@ import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 import umu.tds.modelos.Usuario.BuilderUsuario;
 
+
+/**
+ * <p>Adaptador que implementa la interfaz {@link UsuarioDAO} utilizando el servicio de persistencia TDS.</p>
+ * <p>Esta clase se encarga de mapear objetos {@link Usuario} a entidades persistibles
+ * y viceversa, gestionando su almacenamiento y recuperación.</p>
+ * <p>Sigue el patrón Singleton para asegurar una única instancia del adaptador.</p>
+ */
 public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
-	//REVISAR: La persistencia de fecha
+
 	private ServicioPersistencia servPersistencia;
 	private static AdaptadorUsuarioDAOTDS instancia = new AdaptadorUsuarioDAOTDS();
 	private DateTimeFormatter formateador;
 	private FactoriaDAO factoria;
 	
+	/**
+	 * Obtiene la única instancia del AdaptadorUsuarioDAOTDS.
+	 *
+	 * @return La instancia de {@link AdaptadorUsuarioDAOTDS}.
+	 */
 	public static AdaptadorUsuarioDAOTDS getUsuarioDAO() {
 		return instancia;
 	}
 	
+	/**
+	 * Constructor privado para aplicar el patrón Singleton.
+	 * Inicializa el servicio de persistencia y el formateador de fechas.
+	 */
 	private AdaptadorUsuarioDAOTDS(){
 		this.factoria = FactoriaDAOTDS.getFactoriaDAO();
 		this.servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
@@ -41,7 +57,12 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 	};
 	
 	
-	
+	/**
+	 * {@inheritDoc}
+	 * <p>Registra un nuevo usuario en el sistema de persistencia.</p>
+	 * <p>Antes de registrar el usuario, se registran sus contactos individuales y mensajes asociados.</p>
+	 * @param usuario El objeto {@link Usuario} a registrar.
+	 */
 	@Override
 	public void registrarUsuario(Usuario usuario) {
 		//Comprobacion de que usuario ya no tenga asociado una entidad
@@ -84,7 +105,12 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
 		usuario.setCodigo(eUsuario.getId());		
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>Modifica un usuario existente en el sistema de persistencia.</p>
+	 * @param usuario El objeto {@link Usuario} con los datos actualizados.
+	 */
 	@Override
 	public void modificarUsuario(Usuario usuario) {
 		Entidad eUsuario = servPersistencia.recuperarEntidad(usuario.getCodigo());
@@ -122,6 +148,15 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * <p>Recupera un usuario de la base de datos por su código de entidad.</p>
+	 * <p>Si el usuario ya está en el pool de objetos, lo retorna directamente. De lo contrario,
+	 * lo recupera del servicio de persistencia, lo construye y lo añade al pool.</p>
+	 * @param id El ID del usuario a recuperar.
+	 * @return El objeto {@link Usuario} recuperado.
+	 * @throws MalformedURLException Si la URL de la imagen de perfil no es válida.
+	 */
 	@Override
 	public Usuario recuperarUsuario(int id) throws MalformedURLException {
 		
@@ -180,7 +215,13 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		return usuario;
 
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>Recupera todos los usuarios registrados en el sistema de persistencia.</p>
+	 * @return Una lista de todos los objetos {@link Usuario}.
+	 * @throws MalformedURLException Si la URL de la imagen de perfil de algún usuario no es válida.
+	 */
 	@Override
 	public List<Usuario> recuperarTodosUsuarios() throws MalformedURLException{
 		List<Entidad> eUsuarios = servPersistencia.recuperarEntidades("Usuario");
@@ -190,7 +231,13 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		return usuarios;
 		
 	}
-
+	
+	/**
+	 * Función auxiliar para obtener una cadena de IDs de una lista de contactos.
+	 * Los IDs se unen con un espacio como separador.
+	 * @param lista La lista de objetos {@link Contacto}.
+	 * @return Una cadena de texto con los IDs de los contactos.
+	 */
 	private String obtenerIdsContactos(List<Contacto> lista) {
 		String aux = lista.stream()
 				.map(c -> String.valueOf(c.getCodigo()))
@@ -199,6 +246,14 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				
 	}
 	
+	/**
+	 * Función auxiliar para obtener una lista de objetos Contacto a partir de una cadena de IDs.
+	 *
+	 * @param idContactos Una cadena de texto con los IDs de los contactos separados por espacios.
+	 * @return Una lista de objetos {@link Contacto} correspondientes a los IDs.
+	 * @throws NumberFormatException Si alguno de los IDs no es un número válido.
+	 * @throws MalformedURLException Si la URL de la imagen de perfil de algún contacto no es válida.
+	 */
 	private List<Contacto> obtenerContactosAPartirDeIds(String idContactos) throws NumberFormatException, MalformedURLException{
 		List<Contacto> resultado = new LinkedList<Contacto>();
 		if (idContactos != null && !idContactos.isEmpty()) {
@@ -212,6 +267,12 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 		return resultado;
 	}
 	
+	/**
+	 * Función auxiliar para obtener una cadena de IDs de una lista de mensajes.
+	 * Los IDs se unen con un espacio como separador.
+	 * @param lista La lista de objetos {@link Mensaje}.
+	 * @return Una cadena de texto con los IDs de los mensajes.
+	 */
 	private String obtenerIdsMensajes(List<Mensaje> lista) {
 		String aux = lista.stream()
 				.map(c -> String.valueOf(c.getCodigo()))
@@ -220,6 +281,14 @@ public class AdaptadorUsuarioDAOTDS implements UsuarioDAO {
 				
 	}
 	
+	/**
+	 * Función auxiliar para obtener una lista de objetos Mensaje a partir de una cadena de IDs.
+	 *
+	 * @param idMensajes Una cadena de texto con los IDs de los mensajes separados por espacios.
+	 * @return Una lista de objetos {@link Mensaje} correspondientes a los IDs.
+	 * @throws NumberFormatException Si alguno de los IDs no es un número válido.
+	 * @throws MalformedURLException Si la URL de algún adjunto de mensaje no es válida.
+	 */
 	private List<Mensaje> obtenerMensajesAPartirDeIds(String idMensajes) throws NumberFormatException, MalformedURLException{
 		List<Mensaje> resultado = new LinkedList<Mensaje>();
 		if (idMensajes != null && !idMensajes.isEmpty()) {

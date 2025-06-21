@@ -24,20 +24,29 @@ public class ServicioMensajes{
     private final UsuarioDAO usuarioDAO;
     private final BuscadorMensaje buscadorMensaje;
     
+    /**
+     * Constructor del servicio de mensajes.
+     * @param mensajeDAO El DAO para la persistencia de mensajes.
+     * @param usuarioDAO El DAO para la persistencia de usuarios.
+     */
     public ServicioMensajes(MensajeDAO mensajeDAO, UsuarioDAO usuarioDAO) {
         this.mensajeDAO = mensajeDAO;
         this.usuarioDAO = usuarioDAO;
         this.buscadorMensaje = new BuscadorMensaje();
     }
 
+    /**
+     * Verifica si el contenido de un mensaje es válido (String o Integer).
+     * @param contenido El contenido a validar.
+     * @return true si el contenido es válido, false en caso contrario.
+     */
     private boolean esContenidoValido(Object contenido) {
     	return ((contenido instanceof String || contenido instanceof Integer));
     }
     
     /**
      * Envía un mensaje a un contacto o grupo
-     * 
-     * @param emisor Usuario que envía el mensaje
+     * * @param emisor Usuario que envía el mensaje
      * @param contacto Destinatario (individual o grupo)
      * @param contenido Contenido del mensaje (String para texto, Integer para emoji)
      * @return true si se envió correctamente, false en caso contrario
@@ -58,6 +67,13 @@ public class ServicioMensajes{
         return false;
     }
     
+    /**
+     * Envía un mensaje a un usuario especificado por su número de teléfono.
+     * @param emisor El usuario que envía el mensaje.
+     * @param telefono El número de teléfono del destinatario.
+     * @param contenido El contenido del mensaje (String para texto, Integer para emoji).
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
+     */
     public boolean enviarMensaje(Usuario emisor, String telefono, Object contenido) {
     	 // Validar tipo de entrada
     	 if (!esContenidoValido(contenido)) return false;
@@ -67,10 +83,10 @@ public class ServicioMensajes{
     
     /**
      * Envía un mensaje directo a un usuario por teléfono
-     * 
-     * @param emisor Usuario que envía el mensaje
+     * * @param emisor Usuario que envía el mensaje
      * @param receptor Usuario que recibe el mensaje
      * @param text Texto del mensaje
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
      */
     public boolean enviarMensajeTelefono(Usuario emisor, Usuario receptor, String text) {
         if (receptor != null && !text.isEmpty()) {
@@ -89,8 +105,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene el contenido del último mensaje con un contacto
-     * 
-     * @param usuario Usuario actual
+     * * @param usuario Usuario actual
      * @param contacto Contacto
      * @return Contenido del último mensaje o null si no existe
      */
@@ -101,8 +116,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene la fecha del último mensaje con un contacto
-     * 
-     * @param usuario Usuario actual
+     * * @param usuario Usuario actual
      * @param contacto Contacto
      * @return Fecha del último mensaje o null si no existe
      */
@@ -113,8 +127,7 @@ public class ServicioMensajes{
     
     /**
      * Obtiene todos los mensajes de un usuario
-     * 
-     * @param usuario Usuario
+     * * @param usuario Usuario
      * @return Lista de todos los mensajes del usuario
      */
     public List<Mensaje> getTodosMensajes(Usuario usuario) {
@@ -124,8 +137,7 @@ public class ServicioMensajes{
     /**
      * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
      * Delega la funcionalidad al BuscadorMensaje
-     * 
-     * @param usuario Usuario actual
+     * * @param usuario Usuario actual
      * @param buscarCriterio Criterios de búsqueda
      * @return Lista de mensajes coincidentes ordenados
      */
@@ -136,8 +148,7 @@ public class ServicioMensajes{
     /**
      * Localiza la posición de un mensaje específico en el chat con un contacto
      * Delega la funcionalidad al BuscadorMensaje
-     * 
-     * @param usuario Usuario actual
+     * * @param usuario Usuario actual
      * @param contacto Contacto
      * @param targetMensaje Mensaje a localizar
      * @return Índice del mensaje o -1 si no se encuentra
@@ -148,8 +159,7 @@ public class ServicioMensajes{
     
     /**
      * Verifica si el último mensaje con un contacto fue enviado por el usuario
-     * 
-     * @param usuario Usuario actual
+     * * @param usuario Usuario actual
      * @param contacto Contacto
      * @return true si el último mensaje fue enviado por el usuario
      */
@@ -162,6 +172,10 @@ public class ServicioMensajes{
     
     /**
      * Envía un mensaje a un contacto individual
+     * @param emisor El usuario que envía el mensaje.
+     * @param contacto El contacto individual al que se envía el mensaje.
+     * @param contenido El contenido del mensaje.
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
      */
     private boolean enviarMensajeIndividual(Usuario emisor, ContactoIndividual contacto, Object contenido) {
         Usuario receptor = contacto.getUsuario();
@@ -179,6 +193,10 @@ public class ServicioMensajes{
     
     /**
      * Envía un mensaje a un grupo
+     * @param emisor El usuario que envía el mensaje.
+     * @param grupo El grupo al que se envía el mensaje.
+     * @param contenido El contenido del mensaje.
+     * @return true si el mensaje se envió correctamente, false en caso contrario.
      */
     private boolean enviarMensajeGrupo(Usuario emisor, Grupo grupo, Object contenido) {
         List<Contacto> miembros = grupo.getMiembros();
@@ -206,6 +224,11 @@ public class ServicioMensajes{
     
     /**
      * Crea un mensaje según el tipo de contenido
+     * @param emisor El usuario emisor del mensaje.
+     * @param receptor El usuario receptor del mensaje.
+     * @param contenido El contenido del mensaje (String o Integer).
+     * @param grupo El grupo al que pertenece el mensaje, o null si es un mensaje individual.
+     * @return Un objeto Mensaje.
      */
     private Mensaje crearMensaje(Usuario emisor, Usuario receptor, Object contenido, Grupo grupo) {
         if (contenido instanceof String) {

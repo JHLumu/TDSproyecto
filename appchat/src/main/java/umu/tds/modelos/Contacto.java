@@ -4,11 +4,11 @@ import java.net.URL;
 import java.util.Objects;
 
 
-//Clase abstracta para implementar el Patron Composite
-//Tanto Grupos como Contactos Individuales son 
-//tratados de igual manera, aqui se define la 
-//estructura comun de ambos
-
+/**
+ * Clase abstracta para implementar el Patrón Composite.
+ * Tanto los Grupos como los Contactos Individuales son tratados de igual manera,
+ * aquí se define la estructura común de ambos.
+ */
 public abstract class Contacto implements Comparable<Contacto> {
 
     // Atributos comunes a todos los contactos
@@ -16,47 +16,87 @@ public abstract class Contacto implements Comparable<Contacto> {
     private URL imagen;
     private int codigo;
 
-    // Constructor para contactos sin imagen
+    /**
+     * Constructor para contactos sin imagen.
+     * @param nombre El nombre del contacto.
+     */
     public Contacto(String nombre) {
         this(nombre, null);
     }
 
-    // Constructor para contactos con imagen
+    /**
+     * Constructor para contactos con imagen.
+     * @param nombre El nombre del contacto.
+     * @param imagen La URL de la imagen del contacto.
+     */
     public Contacto(String nombre, URL imagen) {
         this.nombre = nombre;
         this.imagen = imagen;
         this.codigo = 0;
     }
 
-    // Getters y setters
+    /**
+     * Obtiene el nombre del contacto.
+     * @return El nombre del contacto.
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Establece el nombre del contacto.
+     * @param nombre El nuevo nombre del contacto.
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Establece la imagen del contacto.
+     * @param imagen La URL de la nueva imagen del contacto.
+     */
     public void setImagen(URL imagen) {
         this.imagen = imagen;
     }
     
+    /**
+     * Obtiene la URL de la imagen del contacto.
+     * @return La URL de la imagen del contacto.
+     */
     public URL getURLImagen() {
     	return this.imagen;
     }
 
+    /**
+     * Obtiene el código identificador del contacto.
+     * @return El código del contacto.
+     */
 	public int getCodigo() {
 		return this.codigo;
 	}
 	
+	/**
+	 * Establece el código identificador del contacto.
+	 * @param codigo El nuevo código del contacto.
+	 */
 	public void setCodigo(int codigo) {
 		this.codigo = codigo;
 	}
     
-    // Métodos abstractos (obligatorios en subclases)
+    /**
+     * Método abstracto para obtener el tipo de contacto.
+     * Debe ser implementado por las subclases.
+     * @return El tipo de contacto (Individual o Grupo).
+     */
     public abstract TipoContacto getTipoContacto();
 
     
+    /**
+     * Compara este objeto Contacto con el objeto especificado para determinar si son iguales.
+     * La igualdad se basa en el número de teléfono para {@link ContactoIndividual} y en el nombre y anfitrión para {@link Grupo}.
+     * @param o El objeto a comparar.
+     * @return true si los objetos son iguales, false en caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,6 +115,11 @@ public abstract class Contacto implements Comparable<Contacto> {
         return false;
     }
 
+    /**
+     * Devuelve un valor de código hash para el objeto.
+     * El código hash se basa en el número de teléfono para {@link ContactoIndividual} y en el nombre para {@link Grupo}.
+     * @return Un valor de código hash para este objeto.
+     */
     @Override
     public int hashCode() {
         if (this instanceof ContactoIndividual) {
@@ -85,6 +130,13 @@ public abstract class Contacto implements Comparable<Contacto> {
         return super.hashCode();
     }
 
+    /**
+     * Compara este objeto con el objeto especificado para el orden.
+     * Los grupos tienen prioridad sobre los contactos individuales. Si son del mismo tipo, se comparan por nombre.
+     * @param otro El objeto Contacto a comparar.
+     * @return Un entero negativo, cero o un entero positivo si este objeto es menor, igual o mayor que el objeto especificado.
+     * @throws NullPointerException Si el contacto comparado es null.
+     */
     @Override
     public int compareTo(Contacto otro) {
         if (otro == null) {
@@ -102,9 +154,11 @@ public abstract class Contacto implements Comparable<Contacto> {
         return this.nombre.compareTo(otro.nombre);
     }
     
+    /**
+     * Enumeración que define los tipos de contacto posibles.
+     */
     public static enum TipoContacto {
     	INDIVIDUAL, GRUPO;
     }
     
 }
-

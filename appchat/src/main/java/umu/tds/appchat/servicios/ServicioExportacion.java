@@ -21,8 +21,18 @@ import umu.tds.modelos.Contacto;
 import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 
+/**
+ * Servicio para la exportación de conversaciones a formato PDF.
+ */
 public class ServicioExportacion {
 
+	/**
+	 * Exporta una conversación entre un usuario y un contacto a un archivo PDF.
+	 * * @param usuario El usuario actual cuya conversación se va a exportar.
+	 * @param contacto El contacto (individual o grupo) con el que se tuvo la conversación.
+	 * @param destino El archivo de destino donde se guardará el PDF.
+	 * @return true si la exportación fue exitosa, false en caso contrario.
+	 */
 	public static boolean exportarConversacion(Usuario usuario, Contacto contacto, File destino) {
 
 	    List<Mensaje> mensajes = usuario.getChatMensaje(contacto);

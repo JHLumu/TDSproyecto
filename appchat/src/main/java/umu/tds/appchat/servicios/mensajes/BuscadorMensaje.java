@@ -14,16 +14,17 @@ import umu.tds.modelos.Mensaje;
 import umu.tds.modelos.Usuario;
 
 /**
- * Clase especializada en la búsqueda de mensajes con diferentes criterios
+ * Clase especializada en la búsqueda de mensajes con diferentes criterios.
  */
 public class BuscadorMensaje {
     
     /**
-     * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor
-     * 
-     * @param usuario Usuario actual
-     * @param buscarCriterio Criterios de búsqueda
-     * @return Lista de mensajes coincidentes ordenados
+     * Busca mensajes que contienen un texto específico, opcionalmente filtrando por emisor y/o receptor.
+     * Los resultados se ordenan según la relevancia del texto y el contacto.
+     * @param usuario El usuario actual para el que se realiza la búsqueda.
+     * @param buscarCriterio Los criterios de búsqueda a aplicar (texto, contacto, etc.).
+     * @return Una lista de objetos {@link MensajeCoincidencia} que representan los mensajes coincidentes,
+     * ordenados por relevancia descendente.
      */
     public List<MensajeCoincidencia> buscarMensajes(Usuario usuario, CriterioBuscarMensaje buscarCriterio) {
         List<Contacto> contactos = usuario.getListaContactosConMensajes();
@@ -76,12 +77,11 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Localiza la posición de un mensaje específico en el chat con un contacto
-     * 
-     * @param usuario Usuario actual
-     * @param contacto Contacto
-     * @param targetMensaje Mensaje a localizar
-     * @return Índice del mensaje o -1 si no se encuentra
+     * Localiza la posición (índice) de un mensaje específico dentro de la lista de mensajes de un chat con un contacto dado.
+     * @param usuario El usuario actual.
+     * @param contacto El contacto con el que se comparte el chat.
+     * @param targetMensaje El mensaje a localizar.
+     * @return El índice del mensaje dentro del chat, o -1 si el mensaje no se encuentra.
      */
     public int ubicarMensaje(Usuario usuario, Contacto contacto, Mensaje targetMensaje) {
         List<Mensaje> mensajes = usuario.getChatMensaje(contacto);
@@ -98,7 +98,10 @@ public class BuscadorMensaje {
     // ---------- MÉTODOS PRIVADOS ----------
     
     /**
-     * Filtra contactos según los criterios de búsqueda
+     * Filtra una lista de contactos basándose en los criterios de nombre y/o teléfono especificados en {@code criteria}.
+     * @param contactos La lista de contactos a filtrar.
+     * @param criteria Los criterios de búsqueda de contacto.
+     * @return Una nueva lista de contactos que cumplen con los criterios de filtrado.
      */
     private List<Contacto> filtrarContacto(List<Contacto> contactos, CriterioBuscarMensaje criteria) {
         return contactos.stream()
@@ -115,7 +118,10 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Obtiene el teléfono de un contacto
+     * Obtiene el número de teléfono de un contacto, distinguiendo entre {@link ContactoIndividual} y {@link Grupo}.
+     * Para un {@link ContactoIndividual}, devuelve su número de teléfono. Para un {@link Grupo}, devuelve el teléfono del anfitrión.
+     * @param contacto El contacto del que se desea obtener el teléfono.
+     * @return El número de teléfono del contacto o del anfitrión del grupo.
      */
     private String getContactTelf(Contacto contacto) {
         return contacto instanceof ContactoIndividual ? 
@@ -124,7 +130,15 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Procesa la búsqueda de emojis
+     * Procesa la búsqueda de mensajes cuando el criterio es un emoji específico.
+     * Agrega el mensaje a la lista de coincidencias si el contenido del mensaje es un emoji y coincide con el número de emoji buscado.
+     * @param mensaje El mensaje a procesar.
+     * @param contacto El contacto asociado al mensaje.
+     * @param emojiNumero El número del emoji que se está buscando, o -1 si se buscan todos los emojis.
+     * @param mensajesCoincidentes La lista de {@link MensajeCoincidencia} donde se añadirán los resultados.
+     * @param puntuacionesTexto Un mapa para almacenar las puntuaciones de coincidencia de texto de cada mensaje.
+     * @param puntuacionesContacto Un mapa para almacenar las puntuaciones de coincidencia de contacto de cada mensaje.
+     * @param puntuacionContacto La puntuación de coincidencia del contacto asociado.
      */
     private void processEmojiSearch(Mensaje mensaje, Contacto contacto, int emojiNumero,
                                   List<MensajeCoincidencia> mensajesCoincidentes,
@@ -147,7 +161,16 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Procesa la búsqueda de texto
+     * Procesa la búsqueda de mensajes cuando el criterio es un texto.
+     * Calcula la puntuación de coincidencia del texto y, si es relevante, agrega el mensaje a la lista de coincidencias.
+     * @param mensaje El mensaje a procesar.
+     * @param contacto El contacto asociado al mensaje.
+     * @param criteria Los criterios de búsqueda de mensajes.
+     * @param busquedaPorTexto Indica si la búsqueda actual es por texto.
+     * @param mensajesCoincidentes La lista de {@link MensajeCoincidencia} donde se añadirán los resultados.
+     * @param puntuacionesTexto Un mapa para almacenar las puntuaciones de coincidencia de texto de cada mensaje.
+     * @param puntuacionesContacto Un mapa para almacenar las puntuaciones de coincidencia de contacto de cada mensaje.
+     * @param puntuacionContacto La puntuación de coincidencia del contacto asociado.
      */
     private void processTextSearch(Mensaje mensaje, Contacto contacto, CriterioBuscarMensaje criteria,
                                  boolean busquedaPorTexto, List<MensajeCoincidencia> mensajesCoincidentes,
@@ -174,7 +197,11 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Calcula la puntuación de coincidencia de texto
+     * Calcula una puntuación de coincidencia para un texto de mensaje dado un filtro.
+     * La puntuación se basa en si el filtro está contenido en el mensaje, su longitud relativa y su posición.
+     * @param messageText El texto del mensaje a evaluar.
+     * @param filter El texto de filtro a buscar.
+     * @return Una puntuación double que indica la relevancia de la coincidencia (0.0 a 1.0).
      */
     private double calculateTextMatchScore(String messageText, String filter) {
         if (filter == null || filter.isEmpty()) {
@@ -198,7 +225,11 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Calcula la puntuación de coincidencia de contacto
+     * Calcula una puntuación de coincidencia para un contacto basándose en los criterios de nombre y/o teléfono.
+     * La puntuación refleja qué tan bien el nombre y/o el teléfono del contacto coinciden con los filtros.
+     * @param contacto El contacto a evaluar.
+     * @param criteria Los criterios de búsqueda de contacto.
+     * @return Una puntuación double que indica la relevancia de la coincidencia (0.0 a 1.0).
      */
     private double calculateContactMatchScore(Contacto contacto, CriterioBuscarMensaje criteria) {
         double puntuacion = 1.0;
@@ -234,7 +265,13 @@ public class BuscadorMensaje {
     }
     
     /**
-     * Ordena los resultados de búsqueda
+     * Ordena la lista de {@link MensajeCoincidencia} según las puntuaciones de texto y/o contacto.
+     * Si {@code busquedaPorTexto} es true, se prioriza la puntuación de texto, y luego la fecha de envío descendente.
+     * Si es false, se prioriza la puntuación de contacto, y luego la fecha de envío descendente.
+     * @param mensajesCoincidentes La lista de mensajes coincidentes a ordenar.
+     * @param puntuacionesTexto Un mapa con las puntuaciones de coincidencia de texto para cada mensaje.
+     * @param puntuacionesContacto Un mapa con las puntuaciones de coincidencia de contacto para cada mensaje.
+     * @param busquedaPorTexto Un booleano que indica si la búsqueda principal fue por texto.
      */
     private void sortSearchResults(List<MensajeCoincidencia> mensajesCoincidentes,
                                  Map<MensajeCoincidencia, Double> puntuacionesTexto,

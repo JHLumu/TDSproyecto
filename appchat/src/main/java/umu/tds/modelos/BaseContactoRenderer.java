@@ -41,7 +41,8 @@ public abstract class BaseContactoRenderer extends JPanel {
     protected JSeparator separador;
     
     /**
-     * Constructor que configura la estructura básica del renderizador
+     * Constructor que configura la estructura básica del renderizador.
+     * Inicializa los componentes comunes y los añade al layout principal.
      */
     public BaseContactoRenderer() {
         // Configuración del panel principal
@@ -58,7 +59,8 @@ public abstract class BaseContactoRenderer extends JPanel {
     }
     
     /**
-     * Inicializa los componentes básicos compartidos
+     * Inicializa los componentes básicos compartidos por todos los renderizadores de contacto.
+     * Llama a {@link #inicializarImagenPanel()} y {@link #inicializarContenidoPanel()}.
      */
     protected void inicializarComponentes() {
         // Inicializar panel de imagen
@@ -69,7 +71,8 @@ public abstract class BaseContactoRenderer extends JPanel {
     }
     
     /**
-     * Inicializa el panel de imagen con su configuración
+     * Inicializa el panel de imagen con su configuración por defecto.
+     * Este panel contendrá la imagen del contacto.
      */
     protected void inicializarImagenPanel() {
         imagenPanel = new JPanel(new BorderLayout());
@@ -85,25 +88,29 @@ public abstract class BaseContactoRenderer extends JPanel {
     }
     
     /**
-     * Inicializa el panel de contenido base
-     * Las clases hijas implementarán esto según sus necesidades específicas
+     * Método abstracto para inicializar el panel de contenido específico.
+     * Las clases hijas deben implementar este método para definir la disposición
+     * y los componentes dentro del panel de contenido según sus necesidades específicas.
      */
     protected abstract void inicializarContenidoPanel();
     
     /**
-     * Configura la imagen del contacto
+     * Configura la imagen del contacto en el {@code imagenLabel}.
+     * Carga la imagen del contacto y la escala al tamaño predefinido.
+     * Si no hay imagen personalizada, carga una imagen predeterminada.
+     * @param contacto El objeto {@link Contacto} cuya imagen se va a configurar.
      */
     protected void configurarImagen(Contacto contacto) {
         
     	Image localImage = ImagenUtils.getImagen(contacto);    	
     	if (localImage != null) imagenLabel.setIcon(new ImageIcon(localImage.getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH)));
-  
+    	else cargarImagenPredeterminada(contacto); // Llama a cargar la imagen por defecto si no hay imagen local
     }
     
-    
-    
     /**
-     * Carga la imagen predeterminada cuando no existe una personalizada
+     * Carga la imagen predeterminada cuando no existe una personalizada para el contacto.
+     * La imagen predeterminada varía si el contacto es individual o un grupo.
+     * @param contacto El objeto {@link Contacto} para el cual se cargará la imagen predeterminada.
      */
     protected void cargarImagenPredeterminada(Contacto contacto) {
         ImageIcon defaultIcon;
@@ -121,40 +128,47 @@ public abstract class BaseContactoRenderer extends JPanel {
     }
     
     /**
-     * Aplica los estilos visuales según selección y posición
+     * Aplica los estilos visuales al renderizador de celda según su estado de selección y posición.
+     * Establece colores de fondo alternados para las filas no seleccionadas y un estilo distintivo para las seleccionadas.
+     * @param list El {@link JList} al que pertenece esta celda.
+     * @param index El índice de la celda en la lista.
+     * @param isSelected Verdadero si la celda está seleccionada.
      */
     protected void aplicarEstilos(JList<?> list, int index, boolean isSelected) {
         // Colores alternados para filas
-        Color background = (index % 2 == 0) ? ROW_COLOR_EVEN : ROW_COLOR_ODD;
+        Color background = (index % 2 == 0) ? ROW_COLOR_EVEN : ROW_COLOR_ODD; //
         
         if (isSelected) {
             // Estilo para elementos seleccionados
-            background = SELECTED_BG_COLOR;
-            setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(SELECTED_BORDER_COLOR, 2),
-                BorderFactory.createEmptyBorder(PADDING-2, PADDING-2, PADDING-2, PADDING-2)
+            background = SELECTED_BG_COLOR; //
+            setBorder(BorderFactory.createCompoundBorder( //
+                BorderFactory.createLineBorder(SELECTED_BORDER_COLOR, 2), //
+                BorderFactory.createEmptyBorder(PADDING-2, PADDING-2, PADDING-2, PADDING-2) //
             ));
-            aplicarEstilosSeleccionado();
+            aplicarEstilosSeleccionado(); //
         } else {
             // Estilo para elementos no seleccionados
-            setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(230, 230, 240), 1),
-                BorderFactory.createEmptyBorder(PADDING-1, PADDING-1, PADDING-1, PADDING-1)
+            setBorder(BorderFactory.createCompoundBorder( //
+                BorderFactory.createLineBorder(new Color(230, 230, 240), 1), //
+                BorderFactory.createEmptyBorder(PADDING-1, PADDING-1, PADDING-1, PADDING-1) //
             ));
-            aplicarEstilosNoSeleccionado(list);
+            aplicarEstilosNoSeleccionado(list); //
         }
         
-        setBackground(background);
-        setOpaque(true);
+        setBackground(background); //
+        setOpaque(true); //
     }
     
     /**
-     * Aplica estilos específicos para elementos seleccionados
+     * Método abstracto para aplicar estilos específicos cuando un elemento está seleccionado.
+     * Debe ser implementado por las subclases.
      */
     protected abstract void aplicarEstilosSeleccionado();
     
     /**
-     * Aplica estilos específicos para elementos no seleccionados
+     * Método abstracto para aplicar estilos específicos cuando un elemento no está seleccionado.
+     * Debe ser implementado por las subclases.
+     * @param list El JList al que se aplica el renderizador.
      */
     protected abstract void aplicarEstilosNoSeleccionado(JList<?> list);
 }
