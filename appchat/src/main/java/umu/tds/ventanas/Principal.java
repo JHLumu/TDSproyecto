@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,7 +39,6 @@ import javax.swing.DefaultListModel;
 import java.awt.Component;
 import java.awt.Dimension;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JList;
@@ -52,10 +50,7 @@ import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -70,13 +65,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.pdf.PdfWriter;
-
 
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -194,14 +182,14 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		btnEnv.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		btnEnv.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnEnv.setMinimumSize(new Dimension(80, 40));
-		btnEnv.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				MensajeNoContacto mensaje = new MensajeNoContacto();
-
-		        mensaje.setVisible(true);
-				mensaje.setLocationRelativeTo(null);
-			}
+		btnEnv.addActionListener(evento -> {
+			
+			MensajeNoContacto mensaje = new MensajeNoContacto(this);
+	        mensaje.setVisible(true);
+			mensaje.setLocationRelativeTo(null);
+			
 		});
+
 		btnEnv.setPreferredSize(new Dimension(90, 40));
 		btnEnv.setForeground(new Color(255, 255, 255));
 		btnEnv.setBackground(this.colorBotones);
@@ -714,6 +702,11 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 	
 	}
 
+	public void setContactoSeleccionado(Contacto contacto) {
+		this.seleccionado = contacto;
+		this.actualizarPanelChat(seleccionado);
+	}
+	
 
 	/**
 	 * Create the frame.
@@ -743,7 +736,7 @@ public class Principal extends JFrame implements TDSObserver, BuscarFiltroListen
 		
 	}
 
+	
    
 
 }
-

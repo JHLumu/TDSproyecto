@@ -3,6 +3,7 @@ package umu.tds.appchat.servicios;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import umu.tds.modelos.CatalogoUsuarios;
@@ -74,6 +75,25 @@ public class ServicioContactos{
         persistirCambiosContacto(contacto, usuario);
         
         return 1;
+    }
+    
+    /**
+     * Crea una instancia ContactoIndividual dado un teléfono
+     * 
+     * @param telefono Teléfono del contacto
+     * @return Instancia ContactoIndividual si el teléfono está registrado, null en caso contrario. 
+     */
+    public Contacto crearContactoIndividual(String telefono) {
+        // Verificar si el teléfono está registrado en el sistema
+        if (!catalogoUsuarios.estaUsuarioRegistrado(telefono)) return null;        
+
+        // Obtener el usuario asociado al teléfono
+        Usuario usuarioAsociado = catalogoUsuarios.getUsuario(telefono);
+
+        // Obtener el contacto creado y persistir los cambios
+        ContactoIndividual contacto = new ContactoIndividual(telefono, usuarioAsociado);
+        
+        return contacto;
     }
     
     // ---------- GESTIÓN DE GRUPOS ----------

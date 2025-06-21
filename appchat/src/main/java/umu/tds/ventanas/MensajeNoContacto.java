@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import umu.tds.appchat.AppChat;
 import umu.tds.modelos.Contacto;
@@ -24,6 +25,7 @@ import javax.swing.JDialog;
 
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.util.Optional;
 import java.awt.Dimension;
 
 
@@ -36,6 +38,8 @@ public class MensajeNoContacto extends JDialog {
 	private JTextField mensajeField;
 	private JTextField telefonoField;
 	private Color colorPrimario;
+	private int i;
+	private Principal framePrincipal;
 
 	/**
 	 * Launch the application.
@@ -64,8 +68,9 @@ public class MensajeNoContacto extends JDialog {
 		initialize();
 	}
 
-	public MensajeNoContacto(Contacto seleccionado) {
+	public MensajeNoContacto(Principal frame) {
 		super();
+		this.framePrincipal = frame;
 		initialize();
 	}
 
@@ -100,7 +105,7 @@ public class MensajeNoContacto extends JDialog {
 		gbl_panelCentro.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panelCentro.setLayout(gbl_panelCentro);
 		
-		JLabel lblNewLabel = new JLabel("Introduzca el mensaje y el teléfono.");
+		JLabel lblNewLabel = new JLabel("Introduzca el teléfono del usuario.");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.gridwidth = 4;
@@ -108,25 +113,6 @@ public class MensajeNoContacto extends JDialog {
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 2;
 		panelCentro.add(lblNewLabel, gbc_lblNewLabel);
-		
-		JLabel lblMensaje = new JLabel("Mensaje");
-		lblMensaje.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		GridBagConstraints gbc_lblMensaje = new GridBagConstraints();
-		gbc_lblMensaje.anchor = GridBagConstraints.WEST;
-		gbc_lblMensaje.insets = new Insets(0, 0, 5, 5);
-		gbc_lblMensaje.gridx = 1;
-		gbc_lblMensaje.gridy = 3;
-		panelCentro.add(lblMensaje, gbc_lblMensaje);
-		
-		this.mensajeField = new JTextField();
-		this.mensajeField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		GridBagConstraints gbc_mensajeField = new GridBagConstraints();
-		gbc_mensajeField.insets = new Insets(0, 0, 5, 5);
-		gbc_mensajeField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_mensajeField.gridx = 2;
-		gbc_mensajeField.gridy = 3;
-		panelCentro.add(this.mensajeField, gbc_mensajeField);
-		this.mensajeField.setColumns(10);
 		
 		JLabel lblTelefono = new JLabel("Teléfono");
 		lblTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 15));
@@ -152,15 +138,17 @@ public class MensajeNoContacto extends JDialog {
 		getContentPane().add(panelSur, BorderLayout.SOUTH);
 		panelSur.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JButton btnEnviar = new JButton("Enviar");
-		btnEnviar.setBorderPainted(false);
-		btnEnviar.setBackground(this.colorPrimario);
-		btnEnviar.setForeground(Color.WHITE);
-		btnEnviar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-		btnEnviar.addActionListener(evento -> nuevoMensaje(mensajeField.getText(), telefonoField.getText()));
+		JButton btnAceptar = new JButton("Aceptar");
+		btnAceptar.setBorderPainted(false);
+		btnAceptar.setBackground(this.colorPrimario);
+		btnAceptar.setForeground(Color.WHITE);
+		btnAceptar.setFont(new Font("Segoe UI", i = Font.PLAIN, 14));
+		btnAceptar.addActionListener(evento -> {
+			if (!this.telefonoField.getText().isEmpty()) nuevoContacto(this.telefonoField.getText());
+		});
+		
 						
-		panelSur.add(btnEnviar);
+		panelSur.add(btnAceptar);
 		
 		JPanel panelNorte = new JPanel();
 		panelNorte.setBackground(new Color(255, 255, 253));
@@ -182,8 +170,17 @@ public class MensajeNoContacto extends JDialog {
 	}
 
 
-	private void nuevoMensaje(String text, String telf) {
-		AppChat.getInstancia().enviarMensaje(text, telf);
+	private void nuevoContacto(String telf) {
+		Contacto contacto = AppChat.getInstancia().nuevoContacto(telf);
+		if (!(contacto == null)) {
+			
+			 JOptionPane.showMessageDialog(this, 
+		                "El teléfono introducido no está registrado", 
+		                "AppChat", 
+		                JOptionPane.ERROR_MESSAGE);
+			
+		}
+		this.framePrincipal.setContactoSeleccionado(contacto);
 		this.dispose();
 	}
 

@@ -308,6 +308,12 @@ public class AppChat extends TDSObservable {
         return contactoServ.crearContactoIndividual(sesionUsuario, nombre, telefono);
     }
     
+    
+    public Contacto nuevoContacto(String telefono) {
+    	return contactoServ.crearContactoIndividual(telefono);
+    }
+    
+    
     /**
      * Obtiene la lista completa de contactos del usuario
      */
@@ -399,6 +405,10 @@ public class AppChat extends TDSObservable {
         return mensajeServ.enviarMensaje(sesionUsuario, contacto, entrada);
     }
     
+    public boolean enviarMensaje(String telefono, Object entrada) {
+    	return mensajeServ.enviarMensaje(sesionUsuario, telefono, entrada);
+    }
+    
     public void enviarMensaje(String text, String telf) {
 		Usuario usuario = this.catalogoUsuarios.getUsuario(telf);
 		
@@ -476,26 +486,6 @@ public class AppChat extends TDSObservable {
         return viewServ.generarBurbujasMensajes(contacto, chat, sesionUsuario);
     }
     
-    /**
-     * Método auxiliar para determinar el autor a mostrar en la burbuja
-     */
-    private String determinarAutorMensaje(Contacto contacto, Mensaje mensaje, boolean esUsuario) {
-        String autor;
-        
-        if (esUsuario) {
-            autor = this.sesionUsuario.getNombre();
-            if (mensaje.getIDGrupo() != -1 && !mensaje.getReceptorTelf().equals(this.sesionUsuario.getTelefono())) {
-                autor += " <G> *" + mensaje.getNombreGrupo() + "*";
-            }
-        } else {
-        	autor = contacto.getNombre();
-    
-        }
-        
-        return autor += " <> " + formatearFechaMensaje(mensaje.getFechaEnvio());
-        
-    }
-
     public int ubicarMensaje(Contacto c, Mensaje mObjetivo) {
        return mensajeServ.ubicarMensaje(sesionUsuario, c, mObjetivo);
     }

@@ -154,20 +154,8 @@ public class Usuario {
 			ContactoIndividual contacto = new ContactoIndividual(nombre, usuario);
 			if (this.listaContactos.contains(contacto)) return false;
 			return this.listaContactos.add(contacto);
-			
 		}
-		/*
-		public ContactoIndividual recuperarContacto(String telefono) {
-			ContactoIndividual contacto = null;
-			for (Contacto c : this.listaContactos) {
-				System.out.println(c.getTipoContacto());
-				if (c.getTipoContacto().equals(TipoContacto.INDIVIDUAL)) System.out.println("me quiero matar");
-				if (c.getTipoContacto().equals(TipoContacto.INDIVIDUAL) && ((ContactoIndividual) c).getTelefono().equals(telefono)) {contacto = (ContactoIndividual) c; break;} 
-			}
-			System.out.println("es que no puedo MAS JAJSAJSAJSJASJA" + contacto.getNombre());
-			return contacto;
-		}
-		*/
+	
 		public ContactoIndividual recuperarContactoIndividual(String telefono) {
 		    for (Contacto contacto : this.listaContactos) {
 		        if (contacto.getTipoContacto() == TipoContacto.INDIVIDUAL) {

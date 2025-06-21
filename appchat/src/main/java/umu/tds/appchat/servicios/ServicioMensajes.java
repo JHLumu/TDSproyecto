@@ -3,9 +3,11 @@ package umu.tds.appchat.servicios;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import umu.tds.appchat.AppChat;
 import umu.tds.appchat.servicios.mensajes.BuscadorMensaje;
 import umu.tds.appchat.servicios.mensajes.CriterioBuscarMensaje;
 import umu.tds.appchat.servicios.mensajes.MensajeCoincidencia;
+import umu.tds.modelos.CatalogoUsuarios;
 import umu.tds.modelos.Contacto;
 import umu.tds.modelos.ContactoIndividual;
 import umu.tds.modelos.Grupo;
@@ -32,6 +34,10 @@ public class ServicioMensajes{
         this.buscadorMensaje = new BuscadorMensaje();
         this.observable = observable;
     }
+
+    private boolean esContenidoValido(Object contenido) {
+    	return ((contenido instanceof String || contenido instanceof Integer));
+    }
     
     /**
      * Envía un mensaje a un contacto o grupo
@@ -43,10 +49,8 @@ public class ServicioMensajes{
      */
     public boolean enviarMensaje(Usuario emisor, Contacto contacto, Object contenido) {
         // Validar tipo de entrada
-        if (!(contenido instanceof String || contenido instanceof Integer)) {
-            return false;
-        }
-
+        if (!esContenidoValido(contenido)) return false;
+        
         // Caso: mensaje a contacto individual
         if (contacto instanceof ContactoIndividual) {
             return enviarMensajeIndividual(emisor, (ContactoIndividual) contacto, contenido);
@@ -59,6 +63,13 @@ public class ServicioMensajes{
         return false;
     }
     
+    public boolean enviarMensaje(Usuario emisor, String telefono, Object contenido) {
+    	 // Validar tipo de entrada
+    	 if (!esContenidoValido(contenido)) return false;
+    	 return enviarMensajeTelefono(emisor, CatalogoUsuarios.getInstancia().getUsuario(telefono), (String) contenido);
+    	
+    }
+    
     /**
      * Envía un mensaje directo a un usuario por teléfono
      * 
@@ -66,7 +77,7 @@ public class ServicioMensajes{
      * @param receptor Usuario que recibe el mensaje
      * @param text Texto del mensaje
      */
-    public void enviarMensajeTelefono(Usuario emisor, Usuario receptor, String text) {
+    public boolean enviarMensajeTelefono(Usuario emisor, Usuario receptor, String text) {
         if (receptor != null && !text.isEmpty()) {
             Mensaje mensaje = new Mensaje(emisor, receptor, text, null);
 
@@ -76,8 +87,9 @@ public class ServicioMensajes{
             usuarioDAO.modificarUsuario(emisor);
             receptor.recibirMensaje(mensaje);
             usuarioDAO.modificarUsuario(receptor);
-            notificarCambios();
+            return true;
         }
+        else return false;
     }
     
     /**
