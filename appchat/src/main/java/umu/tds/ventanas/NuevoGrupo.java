@@ -100,7 +100,6 @@ public class NuevoGrupo extends JDialog {
 			}
 		} catch (MalformedURLException e) {
 			
-			System.err.println("[ERROR NuevoGrupo crearGrupo]: La URL introducida no es válida.");
 			JOptionPane.showMessageDialog(this, 
                     "No se ha podido leer la imagen",
                     "AppChat",

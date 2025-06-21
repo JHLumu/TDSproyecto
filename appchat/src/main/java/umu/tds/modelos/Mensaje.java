@@ -127,7 +127,6 @@ public class Mensaje implements Comparable<Mensaje>{
 
 
 	public String getReceptorTelf() {
-		// TODO Auto-generated method stub
 		return this.receptor.getTelefono();
 	}
 	

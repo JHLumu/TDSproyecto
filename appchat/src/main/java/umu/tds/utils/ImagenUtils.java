@@ -116,20 +116,18 @@ public class ImagenUtils {
 	        try {
 	            url = new URL((String) objeto);
 	        } catch (MalformedURLException e) {
-	            System.err.println("[ERROR ImagenUtils getImagenAPartirDeURL] URL mal formada: " + objeto);
+	        	e.printStackTrace();
 	            return null;
 	        }
-	    } else {
-	        System.err.println("[ERROR ImagenUtils getImagenAPartirDeURL] Parámetro debe ser URL o String, fue: " + objeto);
-	        return null;
 	    }
+	    
+	    else return null;
+
 	
 		try {
 			resultado = ImageIO.read(url);
-			 if (resultado == null) System.err.println("[ERROR ImagenUtils getImagenAPartirDeURL] No se pudo leer la imagen desde: " + url);
 			
-			
-		} catch (IOException e) { System.err.println("[ERROR ImagenUtils getImagenAPartirDeURL] No se pudo descargar la imagen desde: " + url);}
+		} catch (IOException e) {e.printStackTrace();}
 		
 		return resultado;
 	}

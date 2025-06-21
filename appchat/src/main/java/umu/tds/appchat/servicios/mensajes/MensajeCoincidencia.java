@@ -38,7 +38,6 @@ public class MensajeCoincidencia{
 	}
 
 	public boolean esEmisor(String telf) {
-		// TODO Auto-generated method stub
 		return mensaje.esEmisor(telf);
 	}
 	

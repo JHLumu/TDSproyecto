@@ -105,7 +105,7 @@ public class Login extends JFrame{
 		botonLogin.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
 		botonLogin.addActionListener(evento -> {
-			//Falta comprobar que los datos sean correctos e invocar el metodo del Controlador
+			
 			//Si el login es correcto
 			if (AppChat.getInstancia().iniciarSesionUsuario(textField.getText(), new String(passwordField.getPassword()))){
 				this.dispose();

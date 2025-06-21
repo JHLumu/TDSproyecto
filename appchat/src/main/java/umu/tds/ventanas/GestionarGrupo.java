@@ -123,7 +123,6 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		        if (index != -1) {
 		        	if(e.getClickCount() == 2) {
 		        		Contacto seleccionado = list.getModel().getElementAt(index);
-			            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
 			            controlador.nuevoMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	}
 
@@ -147,11 +146,9 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 		        int index = list.locationToIndex(e.getPoint());
 		        if (index != -1) {
 		            Contacto seleccionado = list.getModel().getElementAt(index);
-		            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
 		            controlador.eliminarMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	if(e.getClickCount() == 2) {
 		        		 seleccionado = list.getModel().getElementAt(index);
-			            System.out.println("\n[DEBUG GestionGrupos eliminarMiembro]: Miembro -> " + seleccionado);
 			            controlador.eliminarMiembroGrupo(GestionarGrupo.this.grupo, seleccionado);
 		        	}
 		            
@@ -208,10 +205,8 @@ public class GestionarGrupo extends JDialog implements TDSObserver {
 	@Override
 	public void update(TDSObservable o, Object arg) {
 		if (arg instanceof Estado) {
-			Estado estadoActual = (Estado) arg;
-			System.out.println("[DEBUG ListaContactos update]: Estado recibido en ListaContactos: " + estadoActual);
+			Estado estadoActual = (Estado) arg;			
 			if (estadoActual.equals(Estado.INFO_CONTACTO)) {
-				System.out.println("[DEBUG ListaContactos update]: Actualizando contacto");
 				this.actualizarListaContactos();
 				this.actualizarListaMiembros();
 			}

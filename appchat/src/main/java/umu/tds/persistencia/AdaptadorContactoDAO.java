@@ -114,51 +114,34 @@ import umu.tds.modelos.Contacto.TipoContacto;
 
 	@Override
 	public Contacto recuperarContacto(int id) throws NumberFormatException, MalformedURLException {
-		
 		//Si el objeto se encuentra en el pool, se retorna
 		
 		PoolDAO poolContacto = PoolDAO.getUnicaInstancia();
-		if (poolContacto.contiene(id)) {
-			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Contacto se encuentra en el Pool. Se devuelve contacto " + id);
-			return (Contacto) poolContacto.getObjeto(id);
-			
-		}
+		if (poolContacto.contiene(id)) return (Contacto) poolContacto.getObjeto(id);
 		
 		//Si no esta en el pool, se recupera la entidad y aquellas propiedades de campos primitivos
 		Entidad eContacto = servPersistencia.recuperarEntidad(id);
 		String nombre = servPersistencia.recuperarPropiedadEntidad(eContacto, "nombre");	
 		String tipo = servPersistencia.recuperarPropiedadEntidad(eContacto, "tipo");
 		
-		
-			
-		
-		System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la entidad con sus propiedades primitivas.");
-		
 		//Se guarda en el pool antes de recuperar los objetos referenciados
 		
 		//Para poder crear el objeto Contacto necesitamos saber de que tipo es
 		String idUsuario = servPersistencia.recuperarPropiedadEntidad(eContacto, "usuario");
-		System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "idUsuario igual a " + idUsuario);
 		
 		Contacto contacto = null;
 		
 		//Si tiene asignado un Usuario, es Contacto Individual; si no, es Grupo
 		if ("INDIVIDUAL".equals(tipo)) {
-			
-			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera el usuario asociado a Contacto si es tipo ContactoIndividual.");
 			Usuario usuario = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idUsuario));
 			contacto = new ContactoIndividual(nombre, usuario);
-			
-			
 		}
 		
 		//Si no tiene asignado un Usuario, es un Grupo. Recuperamos los miembros del grupo
 		else {
-			
 			String imagenString = servPersistencia.recuperarPropiedadEntidad(eContacto, "imagen");
 			URL imagen = null;
 			if (imagenString != null) imagen = new URL(imagenString); 
-			System.out.println("[DEBUG AdaptadorContactoDAO recuperarContacto]: " + "Se recupera la lista de miembros si es tipo Grupo.");
 			String idMiembros = servPersistencia.recuperarPropiedadEntidad(eContacto, "miembros");
 			String anfitrion = servPersistencia.recuperarPropiedadEntidad(eContacto, "anfitrion");
 			contacto = new Grupo(nombre, imagen, anfitrion, obtenerMiembrosporIds(idMiembros));
@@ -187,10 +170,8 @@ import umu.tds.modelos.Contacto.TipoContacto;
 		if (idsMiembros != null && !idsMiembros.isEmpty()) {
 			
 			for (String idContacto: idsMiembros.split(" ")) {
-				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMiembrosAPartirDeIds]: " + "idContacto: " + idContacto);
 				Contacto contacto = (FactoriaDAO.getFactoriaDAO().getContactoDAO().recuperarContacto(Integer.valueOf(idContacto)));
 				resultado.add(contacto);
-				System.out.println("[DEBUG AdaptadorUsuarioDAOTDS obtenerMiembrosAPartirDeIds]: " + "Se recupera el contacto " + contacto.getNombre());
 			}
 		
 		}

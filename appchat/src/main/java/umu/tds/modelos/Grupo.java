@@ -62,7 +62,6 @@ public class Grupo extends Contacto {
     }
 
 	public void eliminarMiembro(ContactoIndividual c) {
-		// TODO Auto-generated method stub
 		this.miembros.remove(c);
 	}
 }

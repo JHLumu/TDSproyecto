@@ -56,7 +56,6 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		eMensaje.setPropiedades(propiedades);
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
 		mensaje.setCodigo(eMensaje.getId());
-		System.out.println("dao mensaje registrado");
 		
 	}
 
@@ -70,7 +69,6 @@ public class AdaptadorMensajeDAOTDS implements MensajeDAO {
 		
 		Entidad eMensaje = servPersistencia.recuperarEntidad(id);
 		String texto = servPersistencia.recuperarPropiedadEntidad(eMensaje, "texto");
-		System.out.println("RECUPERADO TEXTO: " + texto);
 		
 		String idEmisor = servPersistencia.recuperarPropiedadEntidad(eMensaje, "emisor");
 		Usuario emisor = FactoriaDAO.getFactoriaDAO().getUsuarioDAO().recuperarUsuario(Integer.parseInt(idEmisor));

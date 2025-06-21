@@ -61,9 +61,7 @@ public class NuevoContacto extends JDialog {
 	public void nuevoContacto() {
 
 		if ((nombreField.getText().isEmpty()) || (telefonoField.getText().isEmpty())) {
-
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: No se ha rellenado algun campo.");
-			 
+			
 			JOptionPane.showMessageDialog(NuevoContacto.this, 
 					"Se deben rellenar ambos campos.",
 	                "AppChat",
@@ -73,7 +71,6 @@ public class NuevoContacto extends JDialog {
 		
 		else if (telefonoField.getText().equals(this.sesionUsuario.getTelefono())) {
 			
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El telefono introducido es el mismo que el del usuario actual.");
 			JOptionPane.showMessageDialog(this, 
                     "No te puedes añadir a tí mismo.",
                     "AppChat",
@@ -86,7 +83,7 @@ public class NuevoContacto extends JDialog {
 			
 		//Si el resultado es -1 el teléfono no está registrado
 		if (resultado == -1) { 
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El teléfono no se encuentra registrado.");
+
 			JOptionPane.showMessageDialog(NuevoContacto.this, 
 					"El teléfono no se encuentra registrado.",
 					"AppChat",
@@ -96,18 +93,15 @@ public class NuevoContacto extends JDialog {
 		
 		else if (resultado == 0) {
 
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: El teléfono ya se encuentra registrado en la lista de contactos.");
 			JOptionPane.showMessageDialog(NuevoContacto.this,
 					"El teléfono ya se encuentra registrado en la lista de contactos.",
 					"AppChat",
-					JOptionPane.ERROR_MESSAGE);	
-			
+					JOptionPane.ERROR_MESSAGE);				
 		}
 		
 		
 		else {
 
-			System.out.println("[DEBUG NuevoContacto nuevoContacto]: Se ha registrado correctamente.");
 			JOptionPane.showMessageDialog(NuevoContacto.this, 
 					"Se ha registrado el teléfono como " + nombreField.getText(),
 					"AppChat",

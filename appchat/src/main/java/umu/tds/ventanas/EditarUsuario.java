@@ -323,10 +323,7 @@ public class EditarUsuario extends JDialog {
 		else
 			try {
 				this.foto = ImageIO.read(Registro.class.getResource("/resources/usuario_64.png"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (IOException e) {e.printStackTrace();}
 
           lblImagen.setIcon(new ImageIcon(this.foto.getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
           lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
