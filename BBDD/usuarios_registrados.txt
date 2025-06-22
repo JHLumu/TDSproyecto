@@ -1,0 +1,27 @@
+Nombre: Jiahui
+Apellidos: Lin
+Teléfono: 123456789
+Fecha de nacimiento: 2004-07-22
+Email: jiahui@appchat.com
+Contraseña: 1234
+Estado: Hola soy Jiahui, estoy usando App Chat!
+Foto de perfil: https://i.pinimg.com/736x/fe/4c/7c/fe4c7cbb4be3bc37fa46f2255581d5ee.jpg
+
+Nombre: Jesús
+Apellidos: Sánchez
+Teléfono: 987654321
+Fecha de nacimiento: 2004-08-05
+Email: jesus@appchat.com
+Contraseña: 4321
+Estado: Hola soy Jesús, estoy usando App Chat!
+Foto de perfil: https://static.wikia.nocookie.net/las-aventuras-de-super-mario-bros-3/images/6/6d/Luigi.png/revision/latest?cb=20151118165038&path-prefix=es
+
+Nombre: Jose Luis
+Apellidos: Martinez
+Teléfono: 123454321
+Fecha de nacimiento: 2004-07-22
+Email: josel@appchat.com
+Contraseña: 1234
+Estado: Hola soy Jose Luis, estoy usando App Chat!
+Foto de perfil: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToeoB0trn1U5LVbKvZYixTbbgs3mDn3WDRQA&s
+
